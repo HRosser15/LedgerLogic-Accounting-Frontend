@@ -1,9 +1,5 @@
-/* UserDashboard.module.css */
-
-.dashboardContainer {
-    /* Styles specific to the user dashboard container */
+.userDashboardContainer {
     margin: auto;
     width: 80%;
-    /* ... */
   }
   

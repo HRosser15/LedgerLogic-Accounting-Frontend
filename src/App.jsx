@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard/UserDashboard";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
+import UserList from "./pages/UserList/UserList";
 import NotFound from "./pages/NotFound/NotFound";
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="/user-dashboard" element={<UserDashboard />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/manager-dashboard" element={<ManagerDashboard />} />
+            <Route path="/user-list" element={<UserList />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

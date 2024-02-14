@@ -1,9 +1,5 @@
-/* AdminDashboard.module.css */
-
-.dashboardContainer {
-    /* Styles specific to the admin dashboard container */
+.adminDashboardContainer {
     margin: auto;
     width: 80%;
-    /* ... */
   }
   

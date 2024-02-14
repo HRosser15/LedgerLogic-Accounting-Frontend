@@ -11,7 +11,7 @@ const NavBar = () => {
   return (
     <div className={`${styles.container} pd-hz`}>
       <Link to="/">
-        <img alt="Ledger Logic LOGO" src={logo} className={styles.logo} />
+        
       </Link>
 
       <div>
@@ -19,15 +19,17 @@ const NavBar = () => {
           <Link to="/login">Log in</Link>
         ) : (
           <div className={styles.toggle}>
+            <img alt="Ledger Logic LOGO" src={logo} className={styles.logo} />
+            <Link to="/">ADD USERNAME HERE</Link>
             <Link to="/UserDashboard">
-              <img
+              <img className={styles.userIcon}
                 alt="user profile icon"
                 src={userIcon}
                 width={30}
                 height={30}
               />
             </Link>
-            <Link to="/">Log out</Link>
+            
           </div>
         )}
       </div>
@@ -36,3 +38,10 @@ const NavBar = () => {
 };
 
 export default NavBar;
+
+//   TODO: 
+//  add current_user's username at right side of NavBar
+//  make the navbar response depended on user type
+//           * User should go to UserDashboard
+//           * Manager should go to ManagerDashboard
+//           * Admin should go to AdminDashboard
