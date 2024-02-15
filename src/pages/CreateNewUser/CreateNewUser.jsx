@@ -1,150 +1,141 @@
 import React, { useState } from 'react';
-import SignUpService from '../../services/SignUpService';
+import { registerUser } from '../../services/AuthService';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './CreateNewUser.module.css';
 
 const CreateNewUser = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    birthDay: null,
-    password: '',
-    passwordConfirm: '',
-    securityAnswer1: '',
-    securityAnswer2: ''
-  });
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        role: '',
+        streetAddress: '',
+        status: 'false'
+    });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }));
+    };
 
-  const handleDateChange = (date) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      dob: date,
-    }));
-  };
+    const registerUserHandler = async () => {
+        try {
+            const response = await registerUser(formData);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+            if (response.status === 201) {
+                console.log('Registration successful');
+            } else {
+                console.error('Registration failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
-    try {
-      // Call SignUpService 
-      const response = await SignUpService.createPendingUser(formData);
+    return (
+        <div className={`container ${styles.formContainer}`}>
+            <h2>Registration Test</h2>
 
-      console.log('Success:', response);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+            <form onSubmit={(e) => {e.preventDefault(); registerUserHandler(); }} className="row g-3">
+                <div className="col-md-6">
+                    <label htmlFor="firstName" className="form-label">First Name</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="firstName"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        placeholder="First name"
+                    />
+                </div>
+                <div className="col-md-6">
+                    <label htmlFor="lastName" className="form-label">Last Name</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="lastName"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        placeholder="Last name"
+                    />
+                </div>
 
-  return (
-    <div className="styles.formContainer">
-      <form onSubmit={handleSubmit} className="row g-3">
-        <div className="row">
-          <div className="col">
-            <label htmlFor="firstName" className="form-label">First Name</label>
-            <input
-              type="text"
-              className="form-control"
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              placeholder="First name"
-              aria-label="First name"
-            />
-          </div>
-          <div className="col">
-            <label htmlFor="lastName" className="form-label">Last Name</label>
-            <input
-              type="text"
-              className="form-control"
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              placeholder="Last name"
-              aria-label="Last name"
-            />
-          </div>
-        </div>
-        
-        <div className="row">
-          <div className="col">
-            <label htmlFor="email" className="form-label">Email</label>
-            <input
-              type="text"
-              className="form-control"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email"
-              aria-label="Email"
-            />
-          </div>
+                <div className="col-md-6">
+                    <label htmlFor="email" className="form-label">Email</label>
+                    <input
+                        type="email"
+                        className="form-control"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                    />
+                </div>
 
-          <div className="col">
-            <label htmlFor="dob" className="form-label"></label>
-            <DatePicker
-              className="form-control"
-              selected={formData.dob}
-              onChange={handleDateChange}
-              placeholderText="Select Date of Birth"
-              dateFormat="MM/dd/yyyy"
-              isClearable
-            />
-          </div>
-        </div>
-            </form>
-        
-        <div className={styles.formContainer}>
-          <form onSubmit={handleSubmit} className="row g-3">
-            
-            <div className="col-12">
-              <label htmlFor="streetAddress" className="form-label">Street Address</label>
-              <input
-                type="text"
-                className="form-control"
-                id="streetAddress"
-                name="streetAddress"
-                value={formData.streetAddress}
-                onChange={handleChange}
-                placeholder="1234 Main St"
-              />
-            </div>
-    
-            <div className="col-md-6">
-              <label htmlFor="city" className="form-label">City</label>
-              <input
-                type="text"
-                className="form-control"
-                id="city"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                placeholder="Atlanta"
-              />
-            </div>
-            <div className="col-md-4">
+                <div className="col-md-6">
+                    <label htmlFor="password" className="form-label">Password</label>
+                    <input
+                        type="password"
+                        className="form-control"
+                        id="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                    />
+                </div>
+
+                <div className="col-md-6">
+                    <label htmlFor="role" className="form-label">Role</label>
+                    <select
+                        id="role"
+                        className="form-select"
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                    >
+                        <option value="user">User</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                
+                <div className="col-md-6">
+                  <label htmlFor="streetAddress" className="form-label">Street Address</label>
+                  <input
+                      type="text"
+                      className="form-control"
+                      id="streetAddress"
+                      name="streetAddress"
+                      value={formData.streetAddress}
+                      onChange={handleChange}
+                      placeholder="1234 Main Street"
+                  />
+                </div>
+
+                <div className="col-md-4">
+                    <label htmlFor="city" className="form-label">City</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="city"
+                        name="city"
+                        placeholder="Atlanta"
+                    />
+                </div>
+
+                <div className="col-md-4">
               <label htmlFor="state" className="form-label">State</label>
               <select
                 id="state"
                 className="form-select"
                 name="state"
-                value={formData.state}
-                onChange={handleChange}
               >
                 <option value="" disabled>Choose...</option>
                 <option value="AL">Alabama</option>
@@ -199,73 +190,42 @@ const CreateNewUser = () => {
                 <option value="WY">Wyoming</option>
               </select>
             </div>
-            <div className="col-md-2">
-              <label htmlFor="zipCode" className="form-label">ZIP Code</label>
-              <input
-                type="text"
-                className="form-control"
-                id="zipCode"
-                name="zipCode"
-                value={formData.zipCode}
-                onChange={handleChange}
-                placeholder="ZIP"
-              />
-            </div>
-          </form>
-        <div className="mb-3">
-          <label htmlFor="securityAnswer1" className="form-label">What was the name of your first pet?</label>
-          <input
-            type="text"
-            className="form-control"
-            id="securityAnswer1"
-            name="securityAnswer1"
-            value={formData.securityAnswer1}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="securityAnswer2" className="form-label">What is your mother's maiden name?</label>
-          <input
-            type="text"
-            className="form-control"
-            id="securityAnswer2"
-            name="securityAnswer2"
-            value={formData.securityAnswer2}
-            onChange={handleChange}
-          />
-        </div>
 
-        <div className="col-md-6">
-          <label htmlFor="password" className="form-label">Password</label>
-          <input
-            type="password"
-            className="form-control"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-        </div>
+                <div className="col">
+                    <label htmlFor="zipCode" className="form-label">ZIP Code</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="zipCode"
+                        name="zipCode"
+                    />
+                </div>
 
-        <div className="col-md-6">
-          <label htmlFor="passwordConfirm" className="form-label">Confirm Password</label>
-          <input
-            type="password"
-            className="form-control"
-            id="passwordConfirm"
-            name="passwordConfirm"
-            value={formData.passwordConfirm}
-            onChange={handleChange}
-          />
-        </div>
-            </div>
+                <div className="mb-3">
+                  <label htmlFor="securityAnswer1" className="form-label">What was the name of your first pet?</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="securityAnswer1"
+                    name="securityAnswer1"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="securityAnswer2" className="form-label">What is your mother's maiden name?</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="securityAnswer2"
+                    name="securityAnswer2"
+                  />
+                </div>
 
-            <div className="col-12">
-              <button type="submit" className="btn btn-primary">Create User</button>
-            </div>
-    </div>
-    
-    
-  );
+                <div className="col-12">
+                    <button type="submit" className="btn btn-primary">Register</button>
+                </div>
+            </form>
+        </div>
+    );
 };
+
 export default CreateNewUser;
