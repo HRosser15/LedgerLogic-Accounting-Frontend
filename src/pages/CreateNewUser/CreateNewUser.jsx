@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { forgotPassword } from '../../services/AuthService';
+import { registerUser } from '../../services/AuthService';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './CreateNewUser.module.css';
