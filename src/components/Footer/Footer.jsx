@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom'
 const Footer = () => {
   return (
     <div className={styles.container}>
-        <img src={logo} alt="logo" className={styles.logo}/>
+        {/* <img src={logo} alt="logo" className={styles.logo}/> */}
         <p>
         Elevate Your Accounting Game with Ledger Logic - Balancing the Books, Unleashing Potential
         </p>
 
-        <h3>Quick Nav (temporary for dev use)</h3>
+        <p>Quick Nav (temporary for dev use)</p>
         <div className={styles.flex}>
           <Link to="/">Login</Link>
           <Link to="/admin-dashboard">AdminDashboard</Link>

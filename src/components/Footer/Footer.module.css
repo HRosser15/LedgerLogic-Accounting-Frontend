@@ -1,5 +1,9 @@
 .container {
+  margin: 0;
+  padding: 0;
   position: fixed;
+  left: 0;
+  overflow-x: hidden;
   bottom: 0;
   width: 100%;
   display: flex;
@@ -7,12 +11,12 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  background-color: #ffffff;
-  border-top: solid 1px #2c7417;
+  background-color: #c4c4c4;
+  border-top: inset 2px #6bd14c;
 }
 
 .container h3 {
-  margin-top: 1em;
+  margin-top: 0em;
 }
 
 .logo {

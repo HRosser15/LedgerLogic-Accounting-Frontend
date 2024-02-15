@@ -15,6 +15,10 @@ const LoginPage = () => {
       {/* Your login page content */}
       <h1>Welcome to the login page!</h1>
       <img src={logo} alt="Logo"></img>
+
+
+      <div style={{ height: '200px' }}></div>
+
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { registerUser } from '../../services/AuthService';
+import { Modal, Button } from 'react-bootstrap';
+import { forgotPassword } from '../../services/AuthService';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './CreateNewUser.module.css';
@@ -15,6 +16,11 @@ const CreateNewUser = () => {
         status: 'false'
     });
 
+    
+    const [requestSent, setRequestSent] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevFormData) => ({
@@ -23,23 +29,34 @@ const CreateNewUser = () => {
         }));
     };
 
+
     const registerUserHandler = async () => {
         try {
             const response = await registerUser(formData);
 
             if (response.status === 201) {
                 console.log('Registration successful');
+                setRequestSent(true);
             } else {
                 console.error('Registration failed');
+                setErrorMessage('Request failed. Please check that you don\'t already have an account and verify that your password meets the requirements');
             }
         } catch (error) {
             console.error('Error:', error);
+            setErrorMessage('Request failed. Please check that you don\'t already have an account and verify that your password meets the minimum requirements');
         }
     };
 
+
+    const handleClose = () => {
+      setRequestSent(false);
+      setErrorMessage('');
+    };
+
+
     return (
         <div className={`container ${styles.formContainer}`}>
-            <h2>Registration Test</h2>
+            <h2>Create an Account</h2>
 
             <form onSubmit={(e) => {e.preventDefault(); registerUserHandler(); }} className="row g-3">
                 <div className="col-md-6">
@@ -88,7 +105,9 @@ const CreateNewUser = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
+                        placeholder='Password'
                     />
+                    <p className="password-requirements">Password must be 8 or characters and at least one of each: uppercase, number, special character </p>
                 </div>
 
                 <div className="col-md-6">
@@ -100,7 +119,7 @@ const CreateNewUser = () => {
                         value={formData.role}
                         onChange={handleChange}
                     >
-                        <option value="user">User</option>
+                        <option value="user">Accountant</option>
                         <option value="manager">Manager</option>
                         <option value="admin">Admin</option>
                     </select>
@@ -221,9 +240,27 @@ const CreateNewUser = () => {
                 </div>
 
                 <div className="col-12">
-                    <button type="submit" className="btn btn-primary">Register</button>
+                    <button type="submit" className="btn btn-primary">Submit Request</button>
                 </div>
-            </form>
+              </form>
+                <Modal show={requestSent || !!errorMessage} onHide={handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>{requestSent ? 'Request Sent for Approval' : 'Registration Failed'}</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                  {requestSent ? (
+                    'Your registration request has been submitted and is pending approval.'
+                  ) : (
+                    errorMessage
+                  )}
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                      Close
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
+                <div style={{ height: '200px' }}></div>
         </div>
     );
 };

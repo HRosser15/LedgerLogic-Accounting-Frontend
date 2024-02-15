@@ -20,8 +20,8 @@ const NavBar = () => {
         ) : (
           <div className={styles.toggle}>
             <img alt="Ledger Logic LOGO" src={logo} className={styles.logo} />
-            <Link to="/">ADD USERNAME HERE</Link>
-            <Link to="/UserDashboard">
+            <Link to="/admin-dashboard"></Link>
+            <Link to="/admin-dashboard">ab0224
               <img className={styles.userIcon}
                 alt="user profile icon"
                 src={userIcon}

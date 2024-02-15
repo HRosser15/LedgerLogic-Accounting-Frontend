@@ -10,6 +10,9 @@ const UserDashboard = () => {
     <div className={styles.dashboardContainer}>
       <h1>User Dashboard</h1>
       {/* Your user dashboard content */}
+
+      
+      <div style={{ height: '200px' }}></div>
     </div>
   );
 };
