@@ -1,12 +1,14 @@
 // LoginChoice.jsx
 
 import React, { useState } from 'react';
-import styles from './Login/Login.module.css';
+import styles from '../Login/Login.module.css';
 import logo from "../../assets/logoNoWords.png";
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 const LoginChoice = () => {
+
+return(
     <div className ={styles.main}>
       {/* Your login page content */}
       
@@ -19,12 +21,10 @@ const LoginChoice = () => {
                 <Link className = {styles.fixLinks} to="/create-new-user">
                     <button className = {styles.forgotPassword}>Register Now</button>
                 </Link>
-              
+
             </div>
 
-        </div>
-
-        <div className = {styles.column}>
+            <div className = {styles.column}>
 
             <Link className = {styles.fixLinks} to="/user-login">
               <button className = {styles.forgotPassword}>User Login</button>
@@ -38,7 +38,13 @@ const LoginChoice = () => {
               <button className = {styles.forgotPassword}>Admin Login</button>
                 </Link>
         </div>
+
+        </div>
+
+        
     </div>
+
+)
 
 
 }

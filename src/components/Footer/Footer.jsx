@@ -11,8 +11,8 @@ const Footer = () => {
 
         <h6>Quick Nav (temporary for dev use)</h6>
         <div className={styles.flex}>
-          <Link to="/">Login</Link>
-          <Link to="/login-choice">LoginChoice</Link>
+          <Link to="/">LoginChoice</Link>
+          <Link to="/login">Login</Link>
           <Link to="/user-login">UserLogin</Link>
           <Link to="/manager-login">ManagerLogin</Link>
           <Link to="/admin-login">AdminLogin</Link>

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { loginUser } from '../../services/UserService';
 
-import styles from '../ManagerLogin.module.css';
+import styles from './ManagerLogin.module.css';
 import logo from "../../assets/logoNoWords.png";
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';

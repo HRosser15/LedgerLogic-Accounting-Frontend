@@ -10,6 +10,10 @@ import NavBar from "./components/NavBar/NavBar";
 import ContextProvider from "../context/ContextProvider";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login/Login";
+import LoginChoice from "./pages/LoginChoice/LoginChoice";
+import UserLogin from "./pages/UserLogin/UserLogin";
+import ManagerLogin from "./pages/ManagerLogin/ManagerLogin";
+import AdminLogin from "./pages/AdminLogin/AdminLogin";
 import CreateNewUser from "./pages/CreateNewUser/CreateNewUser";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard/UserDashboard";
@@ -27,7 +31,11 @@ function App() {
         <NavBar />
         <div className="pd-hz ht-100 pd-vt bg-light-gray">
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<LoginChoice />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/user-login" element={<UserLogin />} />
+            <Route path="/manager-login" element={<ManagerLogin />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/create-new-user" element={<CreateNewUser />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/user-dashboard" element={<UserDashboard />} />
