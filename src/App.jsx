@@ -21,6 +21,7 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import UserList from "./pages/UserList/UserList";
 import NotFound from "./pages/NotFound/NotFound";
+import Feedback from "./pages/Feedback/Feedback";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -42,6 +43,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/manager-dashboard" element={<ManagerDashboard />} />
             <Route path="/user-list" element={<UserList />} />
+            <Route path= "/feedback" element={<Feedback />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

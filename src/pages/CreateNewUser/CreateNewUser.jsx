@@ -4,6 +4,7 @@ import { registerUser } from '../../services/AuthService';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './CreateNewUser.module.css';
+import { Link } from 'react-router-dom';
 
 const CreateNewUser = () => {
     const [formData, setFormData] = useState({
@@ -240,7 +241,10 @@ const CreateNewUser = () => {
                 </div>
 
                 <div className="col-12">
+                    <Link to = '/feedback'>
                     <button type="submit" className="btn btn-primary">Submit Request</button>
+                    </Link>
+                    
                 </div>
               </form>
                 <Modal show={requestSent || !!errorMessage} onHide={handleClose}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { forgotPassword } from '../../services/AuthService';
+import { Link } from 'react-router-dom';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './ForgotPassword.module.css';
 
@@ -127,7 +128,9 @@ const ForgotPassword = () => {
 
 
                 <div className="col-12">
+                    <Link to = "/feedback">
                     <button type="submit" className="btn btn-primary">Submit Request</button>
+                    </Link>
                 </div>
               </form>
               

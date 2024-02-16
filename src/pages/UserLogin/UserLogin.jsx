@@ -30,6 +30,9 @@ const UserLogin = () => {
         setError('Invalid username or password');
         console.error('Login error:', err);
     }
+    finally{
+      navi.push('/user-dashboard');
+    }
   }
   
   
@@ -49,7 +52,7 @@ const UserLogin = () => {
           <h1 className = {styles.header}> Ledger Logic</h1>
           <p>A logical approach to accounting.</p>
           <Link className = {styles.fixLinks} to="/create-new-user">
-            <button className = {styles.forgotPassword}>Register Now</button>
+            <button className = {styles.button}>Register Now</button>
             </Link>
               
         </div>
@@ -59,22 +62,27 @@ const UserLogin = () => {
             <div>
             <label>
               <p>Username</p>
-              <input className = {styles.inputBox} type = 'text' value = {username} onChange={e => setUsername(e.target.value)} /> 
+              <input className = {styles.inputBox} type = "text" value = {username} onChange={e => setUsername(e.target.value)} /> 
             </label>
             </div>
             <div>
               <label>
                 <p>Password</p>
-                <input className = {styles.inputBox} type = 'password' value = {password} onChange={e => setPassword(e.target.value)} />
+                <input className = {styles.inputBox} type = "password" value = {password} onChange={e => setPassword(e.target.value)} />
               </label>
             </div>
             
             <div>
-              <button className = {styles.loginButton} type = 'submit'>Login</button>
+              <Link className = {styles.fixLinks} to="/user-dashboard">
+                <button className = {styles.button} type = "submit">Login</button>
+              </Link>
+              
+              
+              
             </div>
             <div>
               <Link className = {styles.fixLinks} to="/forgot-password">
-              <button className = {styles.forgotPassword}>Forgot Password?</button>
+              <button className = {styles.button}>Forgot Password?</button>
                 </Link>
             </div>
             

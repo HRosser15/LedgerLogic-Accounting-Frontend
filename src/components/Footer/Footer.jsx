@@ -22,6 +22,7 @@ const Footer = () => {
           <Link to="/forgot-password">ForgotPassword</Link>
           <Link to="/manager-dashboard">ManagerDashboard</Link>
           <Link to="/user-list">UserList</Link>
+          <Link to="/feedback">Feedback</Link>
         </div>
     </div>
   )

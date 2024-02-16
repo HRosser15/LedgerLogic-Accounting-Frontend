@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from './ManagerDashboard.module.css';
 
 const AdminDashboard = () => {
@@ -10,7 +11,11 @@ const AdminDashboard = () => {
   return (
     <div className={styles.dashboardContainer}>
       <h1>Manager Dashboard</h1>
-      {/* Your admin dashboard content */}
+      <div>
+      <Link to="/">
+                    <button className = {styles.button}>Logout</button>
+                </Link>
+      </div>
     </div>
   );
 };

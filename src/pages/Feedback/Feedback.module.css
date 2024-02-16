@@ -1,9 +1,4 @@
-.userDashboardContainer {
-    margin: auto;
-    width: 80%;
-  }
-
-  .button{
+.button{
     border: 3px solid #5EC57E;
     background: transparent;
     border-radius: 10px;
@@ -11,4 +6,8 @@
     color:#5EC57E;
     margin: 5%;
   }
-  
+
+   .fixLinks{
+    text-decoration: none;
+    color: #5EC57E;
+   }

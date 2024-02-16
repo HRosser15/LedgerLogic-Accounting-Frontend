@@ -62,14 +62,9 @@
     margin: auto;
   }
 
-  .loginButton{
-    background-color: #5EC57E;
-    border-radius: 10px;
-    width: 60%;
-    margin: 5%;
-  }
+  
 
-  .forgotPassword{
+  .button{
     border: 3px solid #5EC57E;
     background: transparent;
     border-radius: 10px;
@@ -78,7 +73,4 @@
     margin: 5%;
   }
 
-   .fixLinks{
-    text-decoration: none;
-    color: #5EC57E;
-   }
+   
