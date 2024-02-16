@@ -9,9 +9,13 @@ const Footer = () => {
         Elevate Your Accounting Game with Ledger Logic - Balancing the Books, Unleashing Potential
         </p>
 
-        <h3>Quick Nav (temporary for dev use)</h3>
+        <h6>Quick Nav (temporary for dev use)</h6>
         <div className={styles.flex}>
           <Link to="/">Login</Link>
+          <Link to="/login-choice">LoginChoice</Link>
+          <Link to="/user-login">UserLogin</Link>
+          <Link to="/manager-login">ManagerLogin</Link>
+          <Link to="/admin-login">AdminLogin</Link>
           <Link to="/admin-dashboard">AdminDashboard</Link>
           <Link to="/user-dashboard">UserDashboard</Link>
           <Link to="/create-new-user">CreateNewUser</Link>
@@ -23,4 +27,4 @@ const Footer = () => {
   )
 }
 
-export default Footer
+export default Footer;

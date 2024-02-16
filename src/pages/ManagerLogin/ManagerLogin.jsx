@@ -1,16 +1,16 @@
-// Login.jsx
+// ManagerLogin.jsx
 
 import React, { useState } from 'react';
 import { loginUser } from '../../services/UserService';
 
-import styles from './Login.module.css';
+import styles from '../ManagerLogin.module.css';
 import logo from "../../assets/logoNoWords.png";
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 
 
-const LoginPage = () => {
+const ManagerLogin = () => {
   // Add your component logic here
   
   const [username, setUsername] = useState('');
@@ -25,7 +25,7 @@ const LoginPage = () => {
     try {
         const response = await loginUser(username, password);
         console.log('Login successful:', response.data);
-        navi.push('/UserDashboard');
+        navi.push('/ManagerDashboard');
     } catch (err) {
         setError('Invalid username or password');
         console.error('Login error:', err);
@@ -55,7 +55,7 @@ const LoginPage = () => {
         </div>
         <div className = {styles.column}>
           <form onSubmit={handleSubmit} className = {styles.forms}>
-          <h1 className = {styles.header}>User Login</h1>
+          <h1 className = {styles.header}>Manager Login</h1>
             <div>
             <label>
               <p>Username</p>
@@ -86,4 +86,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ManagerLogin;

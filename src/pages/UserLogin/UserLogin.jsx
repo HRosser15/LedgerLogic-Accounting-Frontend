@@ -1,16 +1,16 @@
-// Login.jsx
+// UserLogin.jsx
 
 import React, { useState } from 'react';
 import { loginUser } from '../../services/UserService';
 
-import styles from './Login.module.css';
+import styles from '../UserLogin.module.css';
 import logo from "../../assets/logoNoWords.png";
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 
 
-const LoginPage = () => {
+const UserLogin = () => {
   // Add your component logic here
   
   const [username, setUsername] = useState('');
@@ -86,4 +86,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default UserLogin;
