@@ -8,4 +8,13 @@ export const registerUser = (userData) => {
 
 export const forgotPassword = (userData) => {
     return axios.post(`${BASE_URL}/forgotPassword`, userData);
-  };
+};
+
+export const loginUser = async (username, password) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/login`, { username, password });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
