@@ -1,7 +1,5 @@
-// UserDashboard.jsx
-
-import React from 'react';
-import styles from './UserDashboard.module.css';
+import React from "react";
+import styles from "./UserDashboard.module.css";
 
 const UserDashboard = () => {
   // Add your component logic here
@@ -11,8 +9,7 @@ const UserDashboard = () => {
       <h1>User Dashboard</h1>
       {/* Your user dashboard content */}
 
-      
-      <div style={{ height: '200px' }}></div>
+      <div style={{ height: "200px" }}></div>
     </div>
   );
 };

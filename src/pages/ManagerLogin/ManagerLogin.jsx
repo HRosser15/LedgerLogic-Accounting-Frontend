@@ -1,18 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import logo from "../../assets/logo.png";
 import styles from "./ManagerLogin.module.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import * as userService from "../../services/AuthService";
+import AppContext from "../../../context/AppContext";
 
 const ManagerLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { state, setState } = useContext(AppContext);
 
   const handleLogin = async () => {
     try {
       const user = await userService.loginUser(username, password);
       console.log("Login successful:", user);
+      setState({ ...state, isLoggedIn: true, username: user.username });
       // You can handle successful login, e.g., redirect to a dashboard page.
     } catch (error) {
       console.error("Login failed:", error);
