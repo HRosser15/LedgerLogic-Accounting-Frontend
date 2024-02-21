@@ -15,7 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard/UserDashboard";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
-import UserList from "./pages/UserList/UserList";
+import UserList from "./pages/AdminDashboard/UserList";
 import NotFound from "./pages/NotFound/NotFound";
 import EnterNewPassword from "./pages/ForgotPassword/EnterNewPassword";
 import ManagerLogin from "./pages/ManagerLogin/ManagerLogin";
