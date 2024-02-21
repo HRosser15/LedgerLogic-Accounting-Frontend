@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext} from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -8,6 +8,7 @@ import {
 import "./App.css";
 import NavBar from "./components/NavBar/NavBar";
 import ContextProvider from "../context/ContextProvider";
+import AppContext from "../context/AppContext";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login/Login";
 import CreateNewUser from "./pages/CreateNewUser/CreateNewUser";
@@ -26,6 +27,12 @@ import AdminLogin from "./pages/AdminLogin/AdminLogin";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [state, setState] = useState({
+    isLoggedIn: false,
+    username: "",
+    role: "",
+  });
+  
 
   return (
     <ContextProvider>
@@ -49,7 +56,8 @@ function App() {
             {/* Dashboard pages */}
             <Route path="/user-dashboard" element={<UserDashboard />} />
             <Route path="/manager-dashboard" element={<ManagerDashboard />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard username={state.username} />} />
+
 
             {/* User list page */}
             <Route path="/user-list" element={<UserList />} />

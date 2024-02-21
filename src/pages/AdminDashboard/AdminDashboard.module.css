@@ -2,6 +2,16 @@
   margin: auto;
   width: 80%;
 }
+
+.welcomeMessage {
+  color: #096900;
+}
+
+.image {
+  width: 300px;
+  height: 300px;
+}
+
 .custom-col {
   width: 400px;
   height: 200px;

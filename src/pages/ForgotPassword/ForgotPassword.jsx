@@ -105,7 +105,7 @@ const ForgotPassword = () => {
           <div>
             {/* Button for Reset Password */}
             <button
-              className={styles.button}
+              className={styles.buttonGreen}
               type="button"
               onClick={() =>
                 handleUpdatePassword(

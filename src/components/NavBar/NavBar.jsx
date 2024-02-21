@@ -10,17 +10,51 @@ const NavBar = () => {
   const { state, setState } = useContext(AppContext);
   console.log(state);
 
+const renderLinks = () => {
+    if (state.isLoggedIn) {
+      switch (state.userRole) {
+        case "admin":
+          return (
+            <>
+              <Link to="/admin-dashboard">Admin Dashboard</Link>
+              <Link to="/user-list">View User List</Link>
+              <Link to="/user-list">View Expired Passwords</Link>
+              <Link to="/user-list">Email User</Link>
+              {/* Add other admin links here */}
+            </>
+          );
+        case "manager":
+          return (
+            <>
+              <Link to="/manager-dashboard">Manager Dashboard</Link>
+              {/* Add other manager links here */}
+            </>
+          );
+        case "user":
+          return (
+            <>
+              <Link to="/user-dashboard">User Dashboard</Link>
+              {/* Add other user links here */}
+            </>
+          );
+        default:
+          return null;
+      }
+    }
+    return null;
+  };
+
   return (
     <div className={`${styles.container} pd-hz`}>
+      {renderLinks()}
       <Link to="/"></Link>
-
       <div>
-        {!state.isLoggedIn ? (
+        {state.isLoggedIn ? (
           <div className={styles.toggle}>
             <img alt="Ledger Logic LOGO" src={logo} className={styles.logo} />
-            <Link to="/login-choice"></Link>
-            <Link to="/login-choice">
-              Log In
+            
+            <Link to="/">
+              {state.username}
               <img
                 className={styles.userIcon}
                 alt="user profile icon"
@@ -33,9 +67,9 @@ const NavBar = () => {
         ) : (
           <div className={styles.toggle}>
             <img alt="Ledger Logic LOGO" src={logo} className={styles.logo} />
-            <Link to="/admin-dashboard"></Link>
-            <Link to="/admin-dashboard">
-              {state.username}
+            <Link to="/login-choice"></Link>
+            <Link to="/login-choice">
+              Log In
               <img
                 className={styles.userIcon}
                 alt="user profile icon"

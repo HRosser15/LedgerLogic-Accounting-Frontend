@@ -9,14 +9,28 @@ import AppContext from "../../../context/AppContext";
 const ManagerLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { state, setState } = useContext(AppContext);
+  const { state, setState } = useContext(AppContext);  
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       const user = await userService.loginUser(username, password);
       console.log("Login successful:", user);
-      setState({ ...state, isLoggedIn: true, username: user.username });
-      // You can handle successful login, e.g., redirect to a dashboard page.
+      setState({ 
+        ...state, 
+        isLoggedIn: true, 
+        username: user.username, 
+        userRole: user.role 
+      });
+
+      // You can handle successful login, e.g., redirect to a dashboard page based on the user role.
+      if (user.role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (user.role === "manager") {
+        navigate("/manager-dashboard");
+      } else {
+        // Handle other roles or redirect to a default dashboard
+      }
     } catch (error) {
       console.error("Login failed:", error);
       // Handle login failure, e.g., display an error message.

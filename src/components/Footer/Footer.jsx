@@ -22,6 +22,8 @@ const Footer = () => {
         <Link to="/create-new-user">CreateNewUser</Link>
         <Link to="/forgot-password">ForgotPassword</Link>
         <Link to="/enter-new-password">EnterNewPassword</Link>
+        </div>
+        <div className={styles.flex}>
 
         <Link to="/admin-dashboard">AdminDashboard</Link>
         <Link to="/user-list">UserList</Link>

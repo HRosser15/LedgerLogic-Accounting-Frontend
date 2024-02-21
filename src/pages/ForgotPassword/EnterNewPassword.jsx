@@ -77,7 +77,7 @@ const EnterNewPassword = () => {
               onClick={handleUpdatePassword}
             >
               <button
-                className={styles.button}
+                className={styles.buttonGreen}
                 type="submit"
                 onClick={handleUpdatePassword}
               >

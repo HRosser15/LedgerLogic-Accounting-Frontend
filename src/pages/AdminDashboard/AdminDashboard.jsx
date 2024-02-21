@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import Sidebar from "./Sidebar";
+import React, { useState, useContext} from "react";
 import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashboard.module.css";
+import AppContext from "../../../context/AppContext";
+import logo from "../../assets/logoNoWords.png";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ username }) => {
+  const { state } = useContext(AppContext); 
   const navigate = useNavigate();
   const [userId, setUserId] = useState("");
   const [email, setEmail] = useState("");
@@ -73,12 +75,12 @@ const AdminDashboard = () => {
 
   return (
     <Container className={styles.dashboardContainer}>
-      <Row>
-        <Col md={3}>
-          <Sidebar />
-        </Col>
-        <Col md={9}>
+      
           <h1>Admin Dashboard</h1>
+          
+          <div style={{ height: "50px" }}></div>
+          <img className={styles.image} src={logo} alt="Logo"></img>
+          <h2 className={styles.welcomeMessage}> Welcome {state.username}!</h2>
 
           <Row className="mt-4">
             <Col>
@@ -232,8 +234,7 @@ const AdminDashboard = () => {
           </Row>
 
           <div style={{ height: "200px" }}></div>
-        </Col>
-      </Row>
+        
     </Container>
   );
 };

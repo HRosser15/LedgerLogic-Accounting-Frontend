@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "./Sidebar";
 import { fetchUsers } from "../../services/UserService";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashboard.module.css";
@@ -11,6 +10,7 @@ const UserList = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState("");
   const [email, setEmail] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
     fetchUsers()
@@ -22,13 +22,49 @@ const UserList = () => {
       });
   }, []);
 
+  const handleButtonClick = (action) => {
+    switch (action) {
+      
+
+      case "ActivateUser":
+        console.log(`Activate User with ID: ${userId}`);
+        setModalMessage("User activated successfully.");
+        handleShowModal();
+        // Logic is still needed to activate the user using the userId
+        break;
+
+      case "DeactivateUser":
+        console.log(`Deactivate User with ID: ${userId}`);
+        setModalMessage("User deactivated successfully.");
+        handleShowModal();
+        // Logic is still needed to deactivate the user using the userId
+        break;
+
+      case "SendEmailToUser":
+        // Logic is still needed to send an email to the user using the email
+        console.log(`Send Email to User with ID: ${userId}`);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
   return (
     <Container className={styles.dashboardContainer}>
       <Row>
-        <Col md={3}>
-          <Sidebar />
-        </Col>
-        <Col md={9}>
+        
+        <Col>
           <div className="container">
             <h2 className="text-center">User List</h2>
             <table className="table table-striped table-bordered">
@@ -86,6 +122,17 @@ const UserList = () => {
             >
               Deactivate User
             </Button>
+            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Action Success</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{modalMessage}</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModal}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
             <hr className="my-4" />
 
@@ -141,6 +188,7 @@ const UserList = () => {
           </div>
         </Col>
       </Row>
+      
     </Container>
   );
 };

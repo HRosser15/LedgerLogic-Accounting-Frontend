@@ -7,6 +7,7 @@ const ContextProvider = ({ children }) => {
     ///Departure: ""
     isLoggedIn: false,
     username: "",
+    role: "",
   });
   const contextValue = {
     state,
