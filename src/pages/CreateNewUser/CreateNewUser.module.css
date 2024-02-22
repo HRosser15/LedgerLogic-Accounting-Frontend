@@ -1,9 +1,17 @@
-/* CreateNewUser.module.css */
-
 .createNewUserContainer {
-    /* Styles specific to the create new user container */
     margin: auto;
     width: 50%;
-    /* ... */
   }
-  
+
+.formContainer {
+    min-width: 320px; /* Adjust the value as needed */
+    margin: 0 auto; /* Center the content horizontally */
+    padding: 0 50px; /* Add left and right padding to create margins */
+  }  
+
+.passwordContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }

@@ -25,6 +25,10 @@
     align-items: center;
 }
 
+.userIcon {
+    margin-left: 20px;
+}
+
 .toggle img {
     margin-right: 20px;
 }
