@@ -1,43 +1,69 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { fetchUsers } from "../../services/UserService";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashboard.module.css";
 
+import AppContext from "../../../context/AppContext";
+
+import { activateUser, deactivateUser } from "../../services/UserService";
+
 import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 
 const UserList = () => {
+  const { state } = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
   const [userId, setUserId] = useState("");
   const [email, setEmail] = useState("");
   const [modalMessage, setModalMessage] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
 
   useEffect(() => {
-    fetchUsers()
-      .then((response) => {
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
+    if (state.isLoggedIn && state.role === "admin") {
+      fetchUsers()
+        .then((response) => {
+          setUsers(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      console.log(
+        "Error fetching data. isLoggedIn may be false or the role may not be admin."
+      );
+    }
+  }, [state.isLoggedIn, state.role]);
 
-  const handleButtonClick = (action) => {
+  const handleButtonClick = async (action) => {
     switch (action) {
-      
-
       case "ActivateUser":
-        console.log(`Activate User with ID: ${userId}`);
-        setModalMessage("User activated successfully.");
-        handleShowModal();
-        // Logic is still needed to activate the user using the userId
+        try {
+          console.log(`Activate User with ID: ${userId}`);
+          await activateUser(userId);
+          setModalTitle("Action Success");
+          setModalMessage("User activated successfully.");
+          handleShowModal();
+        } catch (error) {
+          console.error("Error activating user:", error);
+          setModalTitle("Action Failed");
+          setModalMessage("Error activating user.");
+          handleShowModal();
+        }
         break;
 
       case "DeactivateUser":
-        console.log(`Deactivate User with ID: ${userId}`);
-        setModalMessage("User deactivated successfully.");
-        handleShowModal();
-        // Logic is still needed to deactivate the user using the userId
+        try {
+          console.log(`Deactivate User with ID: ${userId}`);
+          await deactivateUser(userId);
+          setModalTitle("Action Success");
+          setModalMessage("User deactivated successfully.");
+          handleShowModal();
+        } catch (error) {
+          console.error("Error deactivating user:", error);
+          setModalTitle("Action Failed");
+          setModalMessage("Error deactivating user.");
+          handleShowModal();
+        }
         break;
 
       case "SendEmailToUser":
@@ -63,76 +89,98 @@ const UserList = () => {
   return (
     <Container className={styles.dashboardContainer}>
       <Row>
-        
         <Col>
           <div className="container">
             <h2 className="text-center">User List</h2>
             <table className="table table-striped table-bordered">
               <thead>
                 <tr>
+                  <th>User Id</th>
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Role</th>
                   <th>Username</th>
                   <th>Email</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
                   <tr key={user.userId}>
+                    <td>{user.userId}</td>
                     <td>{user.firstName}</td>
                     <td>{user.lastName}</td>
                     <td>{user.role}</td>
                     <td>{user.username}</td>
                     <td>{user.email}</td>
+                    <td>{user.status ? "Active" : "Inactive"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <hr className="my-4" />
 
-            <h2 className="text-center">Activate / Deactivate a User</h2>
-            <Form.Group controlId="userId">
-              <Form.Label>User ID</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter User ID"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-              />
-            </Form.Group>
+            <h2 className="text-center">Activate or Deactivate a User</h2>
+            <Row className="align-items-center justify-content-center">
+              <Col md={6}>
+                <Form.Group
+                  controlId="userId"
+                  className="d-flex justify-content-center"
+                >
+                  <Form.Label>User ID</Form.Label>
+                  <div className={styles.inputBoxContainer}>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter User ID"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                      className={styles.inputBox}
+                    />
+                  </div>
+                </Form.Group>
+              </Col>
 
-            <Button
-              variant="success"
-              onClick={() => {
-                handleButtonClick("ActivateUser");
-                handleShowModal();
-              }}
-            >
-              Activate User
-            </Button>
+              <Col md={6} className="text-md-right">
+                <Row>
+                  <Button
+                    variant="success"
+                    className="mr-2 mb-2 "
+                    style={{ maxWidth: "200px" }}
+                    onClick={() => {
+                      handleButtonClick("ActivateUser");
+                      handleShowModal();
+                    }}
+                  >
+                    Activate User
+                  </Button>
+                </Row>
+                <Row>
+                  <Button
+                    variant="warning"
+                    className="mb-2"
+                    style={{ maxWidth: "200px" }}
+                    onClick={() => {
+                      handleButtonClick("DeactivateUser");
+                      handleShowModal();
+                    }}
+                  >
+                    Deactivate User
+                  </Button>
+                </Row>
+              </Col>
+            </Row>
 
-            <Button
-              variant="warning"
-              padding-left="10px"
-              onClick={() => {
-                handleButtonClick("DeactivateUser");
-                handleShowModal();
-              }}
-            >
-              Deactivate User
-            </Button>
             <Modal show={showModal} onHide={handleCloseModal}>
-            <Modal.Header closeButton>
-              <Modal.Title>Action Success</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>{modalMessage}</Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseModal}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
+              <Modal.Header closeButton>
+                <Modal.Title>{modalTitle}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>{modalMessage}</Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseModal}>
+                  Close
+                </Button>
+              </Modal.Footer>
+            </Modal>
 
             <hr className="my-4" />
 
@@ -188,7 +236,6 @@ const UserList = () => {
           </div>
         </Col>
       </Row>
-      
     </Container>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useContext} from "react";
+import { useState, useContext } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -8,7 +8,7 @@ import {
 import "./App.css";
 import NavBar from "./components/NavBar/NavBar";
 import ContextProvider from "../context/ContextProvider";
-import AppContext from "../context/AppContext";
+import { AuthProvider } from "../context/AuthContext";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login/Login";
 import CreateNewUser from "./pages/CreateNewUser/CreateNewUser";
@@ -32,41 +32,47 @@ function App() {
     username: "",
     role: "",
   });
-  
 
   return (
     <ContextProvider>
-      <Router>
-        <NavBar />
-        <div className="pd-hz ht-100 pd-vt bg-light-gray">
-          <Routes>
-            {/* Login options */}
-            <Route path="/" element={<LoginChoice />} />
-            <Route path="/login-choice" element={<LoginChoice />} />
-            <Route path="/user-login" element={<UserLogin />} />
-            <Route path="/manager-login" element={<ManagerLogin />} />
-            <Route path="/admin-login" element={<AdminLogin />} />
+      <AuthProvider>
+        <Router>
+          <NavBar />
+          <div className="pd-hz ht-100 pd-vt bg-light-gray">
+            <Routes>
+              {/* Login options */}
+              <Route path="/" element={<LoginChoice />} />
+              <Route path="/login-choice" element={<LoginChoice />} />
+              <Route path="/user-login" element={<UserLogin />} />
+              <Route path="/manager-login" element={<ManagerLogin />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
 
-            <Route path="/create-new-user" element={<CreateNewUser />} />
+              <Route path="/create-new-user" element={<CreateNewUser />} />
 
-            {/* Forgot password pages */}
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/enter-new-password" element={<EnterNewPassword />} />
+              {/* Forgot password pages */}
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/enter-new-password"
+                element={<EnterNewPassword />}
+              />
 
-            {/* Dashboard pages */}
-            <Route path="/user-dashboard" element={<UserDashboard />} />
-            <Route path="/manager-dashboard" element={<ManagerDashboard />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard username={state.username} />} />
+              {/* Dashboard pages */}
+              <Route path="/user-dashboard" element={<UserDashboard />} />
+              <Route path="/manager-dashboard" element={<ManagerDashboard />} />
+              <Route
+                path="/admin-dashboard"
+                element={<AdminDashboard username={state.username} />}
+              />
 
+              {/* User list page */}
+              <Route path="/user-list" element={<UserList />} />
 
-            {/* User list page */}
-            <Route path="/user-list" element={<UserList />} />
-
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-        <Footer />
-      </Router>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+          <Footer />
+        </Router>
+      </AuthProvider>
     </ContextProvider>
   );
 }

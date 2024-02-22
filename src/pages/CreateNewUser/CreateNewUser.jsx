@@ -10,11 +10,27 @@ const CreateNewUser = () => {
     firstName: "",
     lastName: "",
     email: "",
-    password: "",
+    passwordContent: "",
     role: "",
     streetAddress: "",
     status: "false",
+    passwordSecurityQuestions: [
+      { answer: "", question: { content: "Question 1" } },
+      { answer: "", question: { content: "Question 2" } },
+      { answer: "", question: { content: "Question 3" } },
+    ],
   });
+
+  const handleChangeSecurityQuestion = (e, index) => {
+    const { value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      passwordSecurityQuestions: prevFormData.passwordSecurityQuestions.map(
+        (question, i) =>
+          i === index ? { ...question, answer: value } : question
+      ),
+    }));
+  };
 
   const [requestSent, setRequestSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -114,9 +130,9 @@ const CreateNewUser = () => {
           <input
             type="password"
             className="form-control"
-            id="password"
-            name="password"
-            value={formData.password}
+            id="passwordContent"
+            name="passwordContent"
+            value={formData.passwordContent}
             onChange={handleChange}
             placeholder="Password"
           />
@@ -244,7 +260,7 @@ const CreateNewUser = () => {
           />
         </div>
 
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label htmlFor="securityAnswer1" className="form-label">
             What was the name of your first pet?
           </label>
@@ -265,7 +281,26 @@ const CreateNewUser = () => {
             id="securityAnswer2"
             name="securityAnswer2"
           />
-        </div>
+        </div> */}
+
+        {formData.passwordSecurityQuestions.map((question, index) => (
+          <div className="mb-3" key={index}>
+            <label
+              htmlFor={`securityAnswer${index + 1}`}
+              className="form-label"
+            >
+              {`Security Question ${index + 1}`}
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id={`securityAnswer${index + 1}`}
+              name={`securityAnswer${index + 1}`}
+              value={question.answer}
+              onChange={(e) => handleChangeSecurityQuestion(e, index)}
+            />
+          </div>
+        ))}
 
         <div className="col-12">
           <button type="submit" className="btn btn-primary">

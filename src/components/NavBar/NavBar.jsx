@@ -10,9 +10,9 @@ const NavBar = () => {
   const { state, setState } = useContext(AppContext);
   console.log(state);
 
-const renderLinks = () => {
+  const renderLinks = () => {
     if (state.isLoggedIn) {
-      switch (state.userRole) {
+      switch (state.role) {
         case "admin":
           return (
             <>
@@ -52,7 +52,7 @@ const renderLinks = () => {
         {state.isLoggedIn ? (
           <div className={styles.toggle}>
             <img alt="Ledger Logic LOGO" src={logo} className={styles.logo} />
-            
+
             <Link to="/">
               {state.username}
               <img

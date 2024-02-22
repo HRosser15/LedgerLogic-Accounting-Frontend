@@ -31,3 +31,10 @@
 .dashboardContainer {
   margin-top: 20px;
 }
+
+.inputBox {
+  align-items: center;
+  max-width: 200px;
+      
+    
+}

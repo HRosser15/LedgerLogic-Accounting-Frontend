@@ -1,30 +1,45 @@
-import React, { useState } from "react";
-import { loginUser } from "../../services/UserService";
+import React, { useState, useContext } from "react";
+import logo from "../../assets/logo.png";
 import styles from "./AdminLogin.module.css";
-import logo from "../../assets/logoNoWords.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import * as userService from "../../services/AuthService";
+import AppContext from "../../../context/AppContext";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navi = useNavigate();
+  const { state, setState } = useContext(AppContext);
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     try {
-      const response = await loginUser(username, password);
-      console.log("Login successful:", response.data);
-      navi.push("/AdminDashboard");
-    } catch (err) {
-      setError("Invalid username or password");
-      console.error("Login error:", err);
+      const user = await userService.loginUser(username, password);
+      console.log("Login successful:", user);
+      setState({
+        ...state,
+        isLoggedIn: true,
+        username: user.username,
+        role: user.role,
+      });
+
+      // handle successful login based on the user role.
+      if (user.role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (user.role === "manager") {
+        navigate("/manager-dashboard");
+      } else {
+        navigate("/user-dashboard");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
     }
   };
 
   return (
     <div className={styles.main}>
+      {/* Your login page content */}
+
       <div className={styles.row}>
         <div className={styles.column}>
           <img className={styles.image} src={logo} alt="Logo"></img>
@@ -35,7 +50,7 @@ const AdminLogin = () => {
           </Link>
         </div>
         <div className={styles.column}>
-          <form onSubmit={handleSubmit} className={styles.forms}>
+          <form className={styles.forms}>
             <h1 className={styles.header}>Admin Login</h1>
             <div>
               <label>
@@ -61,8 +76,12 @@ const AdminLogin = () => {
             </div>
 
             <div>
-              <Link className={styles.fixLinks} to="/admin-dashboard">
-                <button className={styles.button} type="submit">
+              <Link className={styles.fixLinks} to="/manager-dashboard">
+                <button
+                  className={styles.button}
+                  type="submit"
+                  onClick={handleLogin}
+                >
                   Login
                 </button>
               </Link>
