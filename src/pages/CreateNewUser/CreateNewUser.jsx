@@ -15,9 +15,18 @@ const CreateNewUser = () => {
     streetAddress: "",
     status: "false",
     passwordSecurityQuestions: [
-      { answer: "", question: { content: "Question 1" } },
-      { answer: "", question: { content: "Question 2" } },
-      { answer: "", question: { content: "Question 3" } },
+      {
+        answer: "",
+        question: { content: "What was the name of your first pet?" },
+      },
+      {
+        answer: "",
+        question: { content: "What is your mother's maiden name?" },
+      },
+      {
+        answer: "",
+        question: { content: "What was the make of your first car?" },
+      },
     ],
   });
 
@@ -260,36 +269,13 @@ const CreateNewUser = () => {
           />
         </div>
 
-        {/* <div className="mb-3">
-          <label htmlFor="securityAnswer1" className="form-label">
-            What was the name of your first pet?
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="securityAnswer1"
-            name="securityAnswer1"
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="securityAnswer2" className="form-label">
-            What is your mother's maiden name?
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="securityAnswer2"
-            name="securityAnswer2"
-          />
-        </div> */}
-
         {formData.passwordSecurityQuestions.map((question, index) => (
           <div className="mb-3" key={index}>
             <label
               htmlFor={`securityAnswer${index + 1}`}
               className="form-label"
             >
-              {`Security Question ${index + 1}`}
+              {question.question.content}
             </label>
             <input
               type="text"
