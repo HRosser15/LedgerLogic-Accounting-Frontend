@@ -1,17 +1,22 @@
-// AdminDashboard.jsx
+import React, { useContext } from "react";
+import { Container } from "react-bootstrap";
+import styles from "./AdminDashboard.module.css";
+import AppContext from "../../../context/AppContext";
+import logo from "../../assets/logoNoWords.png";
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import styles from './AdminDashboard.module.css';
+const AdminDashboard = ({ username }) => {
+  const { state } = useContext(AppContext);
 
-const AdminDashboard = () => {
-  // Add your component logic here
-  
   return (
-    <div className={styles.dashboardContainer}>
+    <Container className={styles.dashboardContainer}>
       <h1>Admin Dashboard</h1>
-      {/* Your admin dashboard content */}
-    </div>
+      <div style={{ height: "50px" }}></div>
+      <img className={styles.image} src={logo} alt="Logo"></img>
+      <h2 className={styles.welcomeMessage}> Welcome {state.username}!</h2>
+      <div style={{ height: "200px" }}></div>
+      <p>Some general info can be displayed here eventually</p>
+      <div style={{ height: "200px" }}></div>
+    </Container>
   );
 };
 

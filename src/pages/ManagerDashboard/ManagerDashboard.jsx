@@ -1,18 +1,15 @@
-// AdminDashboard.jsx
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from './ManagerDashboard.module.css';
+import styles from "./ManagerDashboard.module.css";
 
-const AdminDashboard = () => {
-  // Add your component logic here
-
+const ManagerDashboard = () => {
   return (
     <div className={styles.dashboardContainer}>
       <h1>Manager Dashboard</h1>
-      {/* Your admin dashboard content */}
+
+      <div style={{ height: "200px" }}></div>
     </div>
   );
 };
 
-export default AdminDashboard;
+export default ManagerDashboard;

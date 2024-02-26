@@ -1,18 +1,20 @@
 .container {
+  display: flex;
   position: fixed;
+  left: 0;
+  overflow-x: hidden;
   bottom: 0;
   width: 100%;
-  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  background-color: #ffffff;
-  border-top: solid 1px #2c7417;
+  background-color: #336b45;
+  border-top: inset 2px #6bd14c;
 }
 
 .container h3 {
-  margin-top: 1em;
+  margin-top: 0em;
 }
 
 .logo {
@@ -28,9 +30,26 @@
   display: block;
   margin: 5px;
   text-decoration: none;
-  color: rgb(0, 0, 255);
+  color: #fff; /* Set default text color to white */
+}
+
+.flex a:hover {
+  text-decoration: underline;
+  color: #b0ff6f; /* Set hover color to #b0ff6f */
 }
 
 .container p {
-    margin-top: 0; /* Remove default margin for the paragraph */
-  }
+  margin-top: 0; /* Remove default margin for the paragraph */
+}
+
+.footer {
+  background-color: #336b45;
+  color: white;
+  text-align: center;
+  padding: 0px;
+  width: 100;
+}
+.footer a:hover {
+  text-decoration: underline;
+  color: #b0ff6f;
+}
