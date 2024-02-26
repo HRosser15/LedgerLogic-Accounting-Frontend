@@ -3,8 +3,6 @@ import AppContext from "./AppContext";
 
 const ContextProvider = ({ children }) => {
   const [state, setState] = useState({
-    ///User: ""
-    ///Departure: ""
     isLoggedIn: false,
     username: "",
     role: "",

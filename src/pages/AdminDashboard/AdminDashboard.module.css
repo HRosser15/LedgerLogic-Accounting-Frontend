@@ -34,7 +34,24 @@
 
 .inputBox {
   align-items: center;
+  max-width: 100px;
+  padding: 6px;
+}
+
+.inputDateBox {
+  align-items: center;
+  max-width: 100px;
+  color:black;
+  background-color: #f5f5f5;
+  border: 2px solid #c2c2c2;
+  border-radius: 8px;
+  padding: 4px;
+  background-clip: padding-box;
+}
+
+.inputBoxContainer {
+  align-items: center;
   max-width: 200px;
-      
-    
+  margin-left: 20px;
+
 }

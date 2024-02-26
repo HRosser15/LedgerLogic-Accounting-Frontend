@@ -2,18 +2,23 @@ import React, { useEffect, useState, useContext } from "react";
 import { fetchUsers } from "../../services/UserService";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashboard.module.css";
-
 import AppContext from "../../../context/AppContext";
-
-import { activateUser, deactivateUser } from "../../services/UserService";
-
+import {
+  activateUser,
+  deactivateUser,
+  suspendUser,
+} from "../../services/UserService";
 import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
+import DatePicker from "react-datepicker";
+// import "react-datepicker/dist/react-datepicker.css";
 
 const UserList = () => {
   const { state } = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
   const [userId, setUserId] = useState("");
+  const [suspensionStartDate, setSuspensionStartDate] = useState(null);
+  const [suspensionEndDate, setSuspensionEndDate] = useState(null);
   const [email, setEmail] = useState("");
   const [modalMessage, setModalMessage] = useState("");
   const [modalTitle, setModalTitle] = useState("");
@@ -40,6 +45,9 @@ const UserList = () => {
         try {
           console.log(`Activate User with ID: ${userId}`);
           await activateUser(userId);
+          fetchUsers().then((response) => {
+            setUsers(response.data);
+          });
           setModalTitle("Action Success");
           setModalMessage("User activated successfully.");
           handleShowModal();
@@ -55,6 +63,9 @@ const UserList = () => {
         try {
           console.log(`Deactivate User with ID: ${userId}`);
           await deactivateUser(userId);
+          fetchUsers().then((response) => {
+            setUsers(response.data);
+          });
           setModalTitle("Action Success");
           setModalMessage("User deactivated successfully.");
           handleShowModal();
@@ -62,6 +73,21 @@ const UserList = () => {
           console.error("Error deactivating user:", error);
           setModalTitle("Action Failed");
           setModalMessage("Error deactivating user.");
+          handleShowModal();
+        }
+        break;
+
+      case "SuspendUser":
+        try {
+          console.log(`Suspended User with ID: ${userId}`);
+          await suspendUser(userId, suspensionStartDate, suspensionEndDate);
+          setModalTitle("Action Success");
+          setModalMessage("User suspended successfully.");
+          handleShowModal();
+        } catch (error) {
+          console.error("Error suspending user:", error);
+          setModalTitle("Action Failed");
+          setModalMessage("Error suspending user.");
           handleShowModal();
         }
         break;
@@ -91,6 +117,9 @@ const UserList = () => {
       <Row>
         <Col>
           <div className="container">
+            {/* ===============
+                USER LIST TABLE
+                =============== */}
             <h2 className="text-center">User List</h2>
             <table className="table table-striped table-bordered">
               <thead>
@@ -118,6 +147,10 @@ const UserList = () => {
                 ))}
               </tbody>
             </table>
+
+            {/* ===========================
+                ACTIVATE OR DEACTIVATE USER
+                =========================== */}
             <hr className="my-4" />
 
             <h2 className="text-center">Activate or Deactivate a User</h2>
@@ -167,6 +200,103 @@ const UserList = () => {
                     Deactivate User
                   </Button>
                 </Row>
+              </Col>
+            </Row>
+
+            <Modal show={showModal} onHide={handleCloseModal}>
+              <Modal.Header closeButton>
+                <Modal.Title>{modalTitle}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>{modalMessage}</Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseModal}>
+                  Close
+                </Button>
+              </Modal.Footer>
+            </Modal>
+
+            <hr className="my-4" />
+
+            {/* ============
+                SUSPEND USER
+                ============ */}
+            <h2 className="text-center">Suspend a User</h2>
+            <Row className="align-items-center justify-content-center">
+              <Col md={3}>
+                <Form.Label>User ID</Form.Label>
+              </Col>
+              <Col md={3}>
+                <Form.Label>Suspension Start Date</Form.Label>
+              </Col>
+              <Col md={3}>
+                <Form.Label>Suspension End Date</Form.Label>
+              </Col>
+              <Col md={3}>
+                <Form.Label></Form.Label>
+              </Col>
+            </Row>
+            <Row className="align-items-center justify-content-center">
+              <Col md={3}>
+                <Form.Group
+                  controlId="userId"
+                  className="d-flex justify-content-center"
+                >
+                  <div className={styles.inputBoxContainer}>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter User ID"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                      className={styles.inputBox}
+                    />
+                  </div>
+                </Form.Group>
+              </Col>
+
+              <Col md={3}>
+                <Form.Group
+                  controlId="suspensionStartDate"
+                  className="d-flex justify-content-center"
+                >
+                  <div className={styles.inputBoxContainer}>
+                    <DatePicker
+                      selected={suspensionStartDate}
+                      onChange={(date) => setSuspensionStartDate(date)}
+                      placeholderText="Start Date"
+                      className={styles.inputDateBox}
+                    />
+                  </div>
+                </Form.Group>
+              </Col>
+
+              <Col md={3}>
+                <Form.Group
+                  controlId="suspensionEndDate"
+                  className="d-flex justify-content-center"
+                >
+                  <div className={styles.inputBoxContainer}>
+                    <DatePicker
+                      selected={suspensionEndDate}
+                      onChange={(date) => setSuspensionEndDate(date)}
+                      placeholderText="End Date"
+                      className={styles.inputDateBox}
+                    />
+                  </div>
+                </Form.Group>
+              </Col>
+
+              <Col md={3} className="text-md-right">
+                <Button
+                  variant="warning"
+                  className="mb-2"
+                  style={{ maxWidth: "200px" }}
+                  onClick={() => {
+                    handleButtonClick("SuspendUser");
+                    handleShowModal();
+                  }}
+                >
+                  Suspend User
+                </Button>
               </Col>
             </Row>
 

@@ -5,17 +5,27 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import * as userService from "../../services/AuthService";
 import AppContext from "../../../context/AppContext";
+import { Modal, Button } from "react-bootstrap";
 
 const ManagerLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const { state, setState } = useContext(AppContext);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       const user = await userService.loginUser(username, password);
+
+      if (!user) {
+        console.error("Login failed: User data not found in the response");
+        setShowModal(true);
+        return;
+      }
+
       console.log("Login successful:", user);
+
       setState({
         ...state,
         isLoggedIn: true,
@@ -32,14 +42,18 @@ const ManagerLogin = () => {
         navigate("/user-dashboard");
       }
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error(
+        "Login failed:",
+        error.response ? error.response.data : error.message
+      );
+      setShowModal(true);
     }
   };
 
+  const handleCloseModal = () => setShowModal(false);
+
   return (
     <div className={styles.main}>
-      {/* Your login page content */}
-
       <div className={styles.row}>
         <div className={styles.column}>
           <img className={styles.image} src={logo} alt="Logo"></img>
@@ -76,15 +90,13 @@ const ManagerLogin = () => {
             </div>
 
             <div>
-              <Link className={styles.fixLinks} to="/manager-dashboard">
-                <button
-                  className={styles.button}
-                  type="submit"
-                  onClick={handleLogin}
-                >
-                  Login
-                </button>
-              </Link>
+              <button
+                className={styles.button}
+                type="button"
+                onClick={handleLogin}
+              >
+                Login
+              </button>
             </div>
             <div>
               <Link className={styles.fixLinks} to="/forgot-password">
@@ -94,6 +106,18 @@ const ManagerLogin = () => {
           </form>
         </div>
       </div>
+
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Login Failed</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Please try again.</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

@@ -19,7 +19,7 @@ const NavBar = () => {
               <Link to="/admin-dashboard">Admin Dashboard</Link>
               <Link to="/user-list">View User List</Link>
               <Link to="/user-list">View Expired Passwords</Link>
-              <Link to="/user-list">Email User</Link>
+              <Link to="/create-new-user">Create New User</Link>
               {/* Add other admin links here */}
             </>
           );

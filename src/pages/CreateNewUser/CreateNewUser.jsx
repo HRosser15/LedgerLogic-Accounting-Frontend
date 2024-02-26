@@ -6,37 +6,76 @@ import "react-datepicker/dist/react-datepicker.css";
 import styles from "./CreateNewUser.module.css";
 
 const CreateNewUser = () => {
+  const securityQuestionOptions = [
+    [
+      "What was the name of your favorite childhood pet?",
+      "What was the name of your best friend growing up?",
+      "What year was your grandmother born?",
+    ],
+    [
+      "What is your mother's maiden name?",
+      "What was your nickname growing up?",
+      "What year was your grandmother born?",
+    ],
+    [
+      "What was the make of your first car?",
+      "What was the name of the school you attended for first grade?",
+      "What is your favorite movie quote?",
+    ],
+  ];
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     passwordContent: "",
     role: "",
+    birthDay: null,
     streetAddress: "",
     status: "false",
     passwordSecurityQuestions: [
       {
         answer: "",
-        question: { content: "What was the name of your first pet?" },
+        question: {
+          content: "",
+        },
       },
       {
         answer: "",
-        question: { content: "What is your mother's maiden name?" },
+        question: {
+          content: "",
+        },
       },
       {
         answer: "",
-        question: { content: "What was the make of your first car?" },
+        question: {
+          content: "",
+        },
       },
     ],
   });
 
   const handleChangeSecurityQuestion = (e, index) => {
-    const { value } = e.target;
+    const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
       passwordSecurityQuestions: prevFormData.passwordSecurityQuestions.map(
         (question, i) =>
-          i === index ? { ...question, answer: value } : question
+          i === index
+            ? {
+                ...question,
+                question: {
+                  content:
+                    name === `securityQuestion${index + 1}`
+                      ? value
+                      : question.question.content,
+                },
+                answer:
+                  name === `securityAnswer${index + 1}`
+                    ? value
+                    : question.answer,
+              }
+            : question
       ),
     }));
   };
@@ -48,7 +87,7 @@ const CreateNewUser = () => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value,
+      [name]: name === "birthDay" ? new Date(value) : value,
     }));
   };
 
@@ -151,7 +190,7 @@ const CreateNewUser = () => {
           </p>
         </div>
 
-        <div className="col-md-6">
+        <div className="col-md-3">
           <label htmlFor="role" className="form-label">
             Role
           </label>
@@ -162,10 +201,25 @@ const CreateNewUser = () => {
             value={formData.role}
             onChange={handleChange}
           >
-            <option value="user">Accountant</option>
+            <option value="accountant">Accountant</option>
             <option value="manager">Manager</option>
             <option value="admin">Admin</option>
           </select>
+        </div>
+
+        <div className="col-md-3">
+          <label htmlFor="birthDay" className="form-label">
+            Birthday
+          </label>
+          <DatePicker
+            id="birthDay"
+            className="form-control"
+            selected={formData.birthDay}
+            onChange={(date) =>
+              handleChange({ target: { name: "birthDay", value: date } })
+            }
+            dateFormat="MM/dd/yyyy" // We can customize the date format as needed
+          />
         </div>
 
         <div className="col-md-6">
@@ -271,20 +325,31 @@ const CreateNewUser = () => {
 
         {formData.passwordSecurityQuestions.map((question, index) => (
           <div className="mb-3" key={index}>
-            <label
-              htmlFor={`securityAnswer${index + 1}`}
-              className="form-label"
-            >
-              {question.question.content}
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id={`securityAnswer${index + 1}`}
-              name={`securityAnswer${index + 1}`}
-              value={question.answer}
-              onChange={(e) => handleChangeSecurityQuestion(e, index)}
-            />
+            <p>{`Question ${index + 1}:`}</p>
+            <div className="d-flex">
+              <select
+                className="form-select me-3"
+                id={`securityQuestion${index + 1}`}
+                name={`securityQuestion${index + 1}`}
+                value={question.selectedOption}
+                onChange={(e) => handleChangeSecurityQuestion(e, index)}
+              >
+                <option value="">Select a question</option>
+                {securityQuestionOptions[index].map((option, optionIndex) => (
+                  <option key={optionIndex} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="text"
+                className="form-control"
+                id={`securityAnswer${index + 1}`}
+                name={`securityAnswer${index + 1}`}
+                value={question.answer}
+                onChange={(e) => handleChangeSecurityQuestion(e, index)}
+              />
+            </div>
           </div>
         ))}
 
