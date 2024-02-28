@@ -36,11 +36,11 @@ const ForgotPassword = () => {
     try {
       // Verify that variables hold correct values
       console.log(
-        "ForgotPassword.jsx:..." +
+        "ForgotPassword.jsx:...   email:" +
           email +
-          ", " +
+          ", question: " +
           securityQuestion +
-          " , " +
+          " , answer: " +
           securityAnswer
       );
       const response = await verifySecurityAnswer(
@@ -100,25 +100,29 @@ const ForgotPassword = () => {
                 <label className={styles.label50}>{securityQuestion}</label>
               )}
             </div>
-            <div className={styles.row}>
-              <input
-                type="text"
-                className={styles.textField50Center}
-                value={securityAnswer}
-                onChange={(e) => setSecurityAnswer(e.target.value)}
-              />
-            </div>
+            {securityQuestion && (
+              <div className={styles.row}>
+                <input
+                  type="text"
+                  className={styles.textField50Center}
+                  value={securityAnswer}
+                  onChange={(e) => setSecurityAnswer(e.target.value)}
+                />
+              </div>
+            )}
           </div>
 
           <div>
             {/* Button for verifying answer */}
-            <button
-              className={styles.buttonGreen}
-              type="button"
-              onClick={verifyAnswer}
-            >
-              Set new Password
-            </button>
+            {securityQuestion && (
+              <button
+                className={styles.buttonGreen}
+                type="button"
+                onClick={verifyAnswer}
+              >
+                Set new Password
+              </button>
+            )}
           </div>
           <div>
             <Link className={styles.fixLinks} to="/login-choice">
