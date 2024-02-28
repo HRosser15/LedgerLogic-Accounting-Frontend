@@ -3,7 +3,19 @@ import axios from "axios";
 const BASE_URL = "http://localhost:8080/users";
 
 export const fetchUsers = () => {
-    return axios.get(`${BASE_URL}/allUsers`);
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+
+  if (user) {
+    const headers = {
+      "username": user.username,
+      "role": user.role,
+    };
+
+    return axios.get(`${BASE_URL}/allUsers`, { headers });
+  } else {
+    console.error("User information not found in local storage");
+    return Promise.reject("User information not found");
+  }
 };
 
 export const loginUser = async (username, password) => {

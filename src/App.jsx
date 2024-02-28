@@ -27,10 +27,11 @@ import AdminLogin from "./pages/AdminLogin/AdminLogin";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [state, setState] = useState({
-    isLoggedIn: false,
-    username: "",
-    role: "",
+  const [state, setState] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser
+      ? { isLoggedIn: true, ...JSON.parse(storedUser) }
+      : { isLoggedIn: false, username: "", role: "" };
   });
 
   return (

@@ -11,12 +11,36 @@ export const registerUser = (userData) => {
     email: userData.email,
     passwordContent: userData.passwordContent,
     role: userData.role,
+    birthDay: userData.birthDay,
     streetAddress: userData.streetAddress,
     status: userData.status,
     passwordSecurityQuestions: userData.passwordSecurityQuestions,
   });
 };
 
+export const getSecurityQuestions = async (email) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/forgotPassword/passwordSecurityQuestion?email=${email}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching security questions:", error);
+    throw error;
+  }
+};
+
+export const verifySecurityAnswer = async (email, questionContent, answer) => {
+  try {
+    const response = await axios.post(`/forgotPassword/verifyAnswer`, {
+      email,
+      questionContent,
+      answer,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying security answer:", error);
+    throw error;
+  }
+};
 
 export const forgotPassword = (userData) => {
     return axios.post(`${BASE_URL}/forgotPassword`, userData);

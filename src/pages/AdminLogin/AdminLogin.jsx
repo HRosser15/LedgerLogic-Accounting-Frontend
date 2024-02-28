@@ -11,7 +11,7 @@ const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const { state, setState } = useContext(AppContext);
+  const { setState } = useContext(AppContext);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -24,13 +24,13 @@ const AdminLogin = () => {
         return;
       }
 
+      // Upon successful login...
       console.log("Login successful:", user);
+      localStorage.setItem("user", JSON.stringify(user));
 
       setState({
-        ...state,
+        ...user,
         isLoggedIn: true,
-        username: user.username,
-        role: user.role,
       });
 
       // handle successful login based on the user role.
