@@ -1,8 +1,5 @@
-// UserDashboard.jsx
-
-import React from 'react';
-import styles from './UserDashboard.module.css';
-import { Link } from 'react-router-dom';
+import React from "react";
+import styles from "./UserDashboard.module.css";
 
 const UserDashboard = () => {
   // Add your component logic here
@@ -10,11 +7,9 @@ const UserDashboard = () => {
   return (
     <div className={styles.dashboardContainer}>
       <h1>User Dashboard</h1>
-      <div>
-      <Link to="/">
-                    <button className = {styles.button}>Logout</button>
-                </Link>
-      </div>
+      {/* Your user dashboard content */}
+
+      <div style={{ height: "200px" }}></div>
     </div>
   );
 };

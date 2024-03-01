@@ -4,20 +4,21 @@
 }
 
 .formContainer {
-  min-width: 320px;
-  margin: 0 auto;
-  padding: 0 50px; 
-}  
+    min-width: 320px;
+    margin: 0 auto;
+    padding: 0 50px; 
+  }  
 
 .passwordContainer {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-.password-requirements {
-  font-size: 8px !important;
-  color: #888;
-  margin-top: 5px;
-}
+  .password-requirements {
+    font-size: 8px !important;
+    color: #888;
+    margin-top: 5px;
+  }
+  

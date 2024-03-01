@@ -1,9 +1,4 @@
-/* ManagerLogin.module.css */
-
-
-
 .main {
-    /* Styles specific to the login container */
     margin: auto;
     width: 100%;
     text-align: center;
@@ -37,8 +32,8 @@
   }
 
   .image{
-    width: 300px;
-    height: 300px;
+    width: 500px;
+    height: 500px;
   }
 
   .forms{
