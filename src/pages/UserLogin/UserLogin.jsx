@@ -11,7 +11,7 @@ const UserLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const { state, setState } = useContext(AppContext);
+  const { setState } = useContext(AppContext);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -24,13 +24,13 @@ const UserLogin = () => {
         return;
       }
 
+      // Upon successful login...
       console.log("Login successful:", user);
+      localStorage.setItem("user", JSON.stringify(user));
 
       setState({
-        ...state,
+        ...user,
         isLoggedIn: true,
-        username: user.username,
-        role: user.role,
       });
 
       // handle successful login based on the user role.
@@ -65,13 +65,14 @@ const UserLogin = () => {
         </div>
         <div className={styles.column}>
           <form className={styles.forms}>
-            <h1 className={styles.header}>User Login</h1>
+            <h1 className={styles.header}>Login</h1>
             <div>
               <label>
                 <p>Username</p>
                 <input
                   className={styles.inputBox}
                   type="text"
+                  name="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
@@ -83,6 +84,7 @@ const UserLogin = () => {
                 <input
                   className={styles.inputBox}
                   type="password"
+                  name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -118,6 +120,8 @@ const UserLogin = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <div style={{ height: "200px" }}></div>
     </div>
   );
 };

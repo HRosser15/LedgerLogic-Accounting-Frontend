@@ -9,8 +9,10 @@ export const AuthProvider = ({ children }) => {
     setAuthToken(token);
   };
 
-  const logout = () => {
+  const logout = (setState) => {
     setAuthToken(null);
+    localStorage.removeItem("user");
+    setState({ isLoggedIn: false, username: "", role: "" });
   };
 
   return (

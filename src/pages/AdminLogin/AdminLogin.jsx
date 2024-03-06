@@ -72,6 +72,7 @@ const AdminLogin = () => {
                 <input
                   className={styles.inputBox}
                   type="text"
+                  name="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
@@ -83,6 +84,7 @@ const AdminLogin = () => {
                 <input
                   className={styles.inputBox}
                   type="password"
+                  name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />

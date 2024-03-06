@@ -1,8 +1,6 @@
 import axios from "axios";
 
-
 const BASE_URL = "http://localhost:8080/auth";
-
 
 export const registerUser = (userData) => {
   return axios.post(`${BASE_URL}/register`, {
@@ -18,35 +16,6 @@ export const registerUser = (userData) => {
   });
 };
 
-export const getSecurityQuestions = async (email) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/forgotPassword/passwordSecurityQuestion?email=${email}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching security questions:", error);
-    throw error;
-  }
-};
-
-export const verifySecurityAnswer = async (email, questionContent, answer) => {
-  try {
-    const response = await axios.post(`/forgotPassword/verifyAnswer`, {
-      email,
-      questionContent,
-      answer,
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error verifying security answer:", error);
-    throw error;
-  }
-};
-
-export const forgotPassword = (userData) => {
-    return axios.post(`${BASE_URL}/forgotPassword`, userData);
-};
-
-
 export const loginUser = async (username, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/login`, { username, password });
@@ -56,4 +25,15 @@ export const loginUser = async (username, password) => {
     console.error("Login failed:", error);
     throw error;
   }
+};
+
+export const logoutUser = (setState, history) => {
+  // Clear user information from local storage
+  localStorage.removeItem("user");
+
+  // Update the state to reflect the user being logged out
+  setState({ isLoggedIn: false, username: "", role: "" });
+
+  // Redirect to the login page
+  history.push("/login-choices"); 
 };
