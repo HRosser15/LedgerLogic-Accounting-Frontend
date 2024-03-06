@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -8,6 +8,7 @@ import {
 import "./App.css";
 import NavBar from "./components/NavBar/NavBar";
 import ContextProvider from "../context/ContextProvider";
+import AppContext from "../context/AppContext";
 import { AuthProvider } from "../context/AuthContext";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login/Login";
@@ -19,11 +20,12 @@ import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import UserList from "./pages/AdminDashboard/UserList";
 import NotFound from "./pages/NotFound/NotFound";
 import EnterNewPassword from "./pages/ForgotPassword/EnterNewPassword";
-import ManagerLogin from "./pages/ManagerLogin/ManagerLogin";
-import LoginChoice from "./pages/LoginChoice/LoginChoice";
+// import ManagerLogin from "./pages/ManagerLogin/ManagerLogin";
+// import LoginChoice from "./pages/LoginChoice/LoginChoice";
 import React from "react";
-import UserLogin from "./pages/UserLogin/UserLogin";
-import AdminLogin from "./pages/AdminLogin/AdminLogin";
+import UserLogin from "./pages/UserLogin/UserLogin"; // main login
+// import AdminLogin from "./pages/AdminLogin/AdminLogin";
+import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -34,6 +36,10 @@ function App() {
       : { isLoggedIn: false, username: "", role: "" };
   });
 
+  useEffect(() => {
+    console.log("Initial State in App.jsx:", state);
+  }, []);
+
   return (
     <ContextProvider>
       <AuthProvider>
@@ -42,12 +48,11 @@ function App() {
           <div className="pd-hz ht-100 pd-vt bg-light-gray">
             <Routes>
               {/* Login options */}
-              <Route path="/" element={<LoginChoice />} />
-              <Route path="/login-choice" element={<LoginChoice />} />
+              <Route path="/" element={<UserLogin />} />
+              {/* <Route path="/login-choice" element={<LoginChoice />} /> */}
               <Route path="/user-login" element={<UserLogin />} />
-              <Route path="/manager-login" element={<ManagerLogin />} />
-              <Route path="/admin-login" element={<AdminLogin />} />
-
+              {/* <Route path="/manager-login" element={<ManagerLogin />} /> */}
+              {/* <Route path="/admin-login" element={<AdminLogin />} /> */}
               <Route path="/create-new-user" element={<CreateNewUser />} />
 
               {/* Forgot password pages */}
@@ -64,10 +69,16 @@ function App() {
                 path="/admin-dashboard"
                 element={<AdminDashboard username={state.username} />}
               />
+              <Route path="/navbar" element={<NavBar />}></Route>
+
+              {/* Accounts Management*/}
+              <Route
+                path="admin-accounts-management"
+                element={<AdminAccountsManagement />}
+              />
 
               {/* User list page */}
               <Route path="/user-list" element={<UserList />} />
-
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
