@@ -7,18 +7,19 @@ export const fetchUsers = () => {
   console.log("User Information in fetchUsers:", user);
 
   if (user) {
-    const headers = {
-      "username": user.username,
-      "role": user.role,
-    };
+    // HEADERS REMOVED AS THEY MAY NOT BE
+    // const headers = {
+    //   "username": user.username,
+    //   "role": user.role,
+    // };
 
     // Include withCredentials in the request options
     const requestOptions = {
       withCredentials: true,
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json',
-      },
+      // headers: {
+      //   ...headers,
+      //   'Content-Type': 'application/json',
+      // },
     };
 
     return axios.get(`${BASE_URL}/allUsers`, requestOptions);

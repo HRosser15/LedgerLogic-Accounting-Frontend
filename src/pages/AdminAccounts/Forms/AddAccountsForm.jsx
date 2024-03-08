@@ -1,14 +1,25 @@
-import React, { useState } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import React, { useState, useContext } from "react";
+import { Form, Button, Container, Row, Col, Modal } from "react-bootstrap";
+import AppContext from "../../../../context/AppContext";
+import { addAccount } from "../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 
 const AddAccountsForm = () => {
+  const { state } = useContext(AppContext);
   const [accountName, setAccountName] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
   const [initialDebit, setInitialDebit] = useState("");
   const [initialCredit, setInitialCredit] = useState("");
   const [balance, setBalance] = useState("");
   const [normalSide, setNormalSide] = useState("");
+  const [category, setCategory] = useState("");
+  const [accountSubcategory, setAccountSubcategory] = useState("");
+  const [accountDescription, setAccountDescription] = useState("");
+  const [order, setOrder] = useState("");
+  const [statement, setStatement] = useState("");
+  const [comment, setComment] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
+  const toggleModal = () => setShowModal(!showModal);
 
   const handleDebitChange = (event) => {
     setInitialDebit(event.target.value);
@@ -36,8 +47,98 @@ const AddAccountsForm = () => {
     setBalance(calculatedBalance.toFixed(2));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const requiredFields = [
+      "accountName",
+      "normalSide",
+      "category",
+      "accountSubcategory",
+      "accountDescription",
+      "order",
+      "statement",
+    ];
+
+    const isAnyFieldEmpty = requiredFields.some(
+      (field) => !eval(`${field}`) // Use the state variable directly
+    );
+
+    if (isAnyFieldEmpty) {
+      // Display the modal for validation error
+      toggleModal();
+      return;
+    }
+
+    const userId = state.userId;
+    const currentDate = new Date().toISOString();
+
+    const categoryDigits = {
+      Assets: "1",
+      Liabilities: "3",
+      Equity: "5",
+      Revenue: "6",
+      Expenses: "7",
+    };
+
+    const firstDigit = categoryDigits[category] || "0";
+
+    const orderString = order.toString().padStart(3, "0");
+
+    const accountNumber = `${firstDigit}${orderString}`;
+
+    console.log("Calculated Account Number:", accountNumber);
+
+    const enteredAccountName = accountName;
+    const enteredInitialDebit = initialDebit || "0.00";
+    const enteredInitialCredit = initialCredit || "0.00";
+    const enteredBalance = balance || "0.00";
+    const enteredNormalSide = normalSide;
+    const enteredCategory = category;
+    const enteredAccountSubcategory = accountSubcategory;
+    const enteredAccountDescription = accountDescription;
+    const enteredOrder = order;
+    const enteredStatement = statement;
+    const enteredComment = comment;
+
+    console.log("Entered Account Details:", {
+      enteredAccountName,
+      enteredInitialDebit,
+      enteredInitialCredit,
+      enteredBalance,
+      enteredNormalSide,
+      enteredCategory,
+      enteredAccountSubcategory,
+      enteredAccountDescription,
+      enteredOrder,
+      enteredStatement,
+      enteredComment,
+    });
+
+    const requestData = {
+      ownerUserId: userId,
+      creationDate: currentDate,
+      accountName: enteredAccountName,
+      accountNumber: accountNumber,
+      debit: enteredInitialDebit,
+      credit: enteredInitialCredit,
+      initialBalance: enteredBalance,
+      normalSide: enteredNormalSide,
+      category: enteredCategory,
+      subCategory: enteredAccountSubcategory,
+      description: enteredAccountDescription,
+      orderNumber: enteredOrder,
+      statement: enteredStatement,
+      comment: enteredComment,
+    };
+
+    try {
+      const response = await addAccount(requestData);
+
+      console.log(response);
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   return (
@@ -50,15 +151,11 @@ const AddAccountsForm = () => {
             <Col>
               <Form.Group controlId="accountName">
                 <Form.Label>Account's Name</Form.Label>
-                <Form.Control type="text" placeholder="Enter account name" />
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="accountNumber">
-                <Form.Label>Account's Number</Form.Label>
                 <Form.Control
-                  type="number"
-                  placeholder="Enter account number"
+                  type="text"
+                  placeholder="Enter account name"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
                 />
               </Form.Group>
             </Col>
@@ -83,7 +180,15 @@ const AddAccountsForm = () => {
             <Col>
               <Form.Group controlId="accountCategory">
                 <Form.Label>Account Category</Form.Label>
-                <Form.Control as="select">
+                <Form.Control
+                  as="select"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  <option value="" disabled className={styles.grayOption}>
+                    Select
+                  </option>
+                  <option>Dividends</option>
                   <option>Assets</option>
                   <option>Liabilities</option>
                   <option>Equity</option>
@@ -98,6 +203,8 @@ const AddAccountsForm = () => {
                 <Form.Control
                   type="text"
                   placeholder="Enter account subcategory"
+                  value={accountSubcategory}
+                  onChange={(e) => setAccountSubcategory(e.target.value)}
                 />
               </Form.Group>
             </Col>
@@ -109,7 +216,9 @@ const AddAccountsForm = () => {
                 <Form.Control
                   as="textarea"
                   placeholder="Enter account description"
-                  rows="3" // Set the initial number of rows
+                  rows="3"
+                  value={accountDescription}
+                  onChange={(e) => setAccountDescription(e.target.value)}
                 />
               </Form.Group>
             </Col>
@@ -117,7 +226,36 @@ const AddAccountsForm = () => {
             <Col>
               <Form.Group controlId="order">
                 <Form.Label>Order</Form.Label>
-                <Form.Control type="number" placeholder="Enter order" />
+                <Form.Control
+                  type="number"
+                  placeholder="Enter order"
+                  value={order}
+                  onChange={(e) => setOrder(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row className="mb-4">
+            <Col>
+              <Form.Group controlId="statement">
+                <Form.Label>Statement</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter statement (e.g., IS, BS, RE)"
+                  value={statement}
+                  onChange={(e) => setStatement(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="comment">
+                <Form.Label>Comment</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter comment"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
               </Form.Group>
             </Col>
           </Row>
@@ -158,14 +296,36 @@ const AddAccountsForm = () => {
               </Form.Group>
             </Col>
           </Row>
-          <Button variant="success" type="submit">
-            Add Account
-          </Button>
-          <Button variant="secondary" type="button">
-            Cancel
-          </Button>
+          <Row>
+            <Col></Col>
+            <Col>
+              <Button variant="secondary" type="button">
+                Cancel
+              </Button>
+            </Col>
+            <Col>
+              <Button variant="success" type="submit">
+                Add Account
+              </Button>
+            </Col>
+            <Col></Col>
+          </Row>
         </Container>
       </Form>
+
+      <Modal show={showModal} onHide={toggleModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Validation Error</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Please fill out all required fields before submitting the form.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={toggleModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <div style={{ height: "200px" }}></div>
     </Container>
