@@ -13,7 +13,7 @@ const NavBar = () => {
   const { logout } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(state.isLoggedIn);
   const navigate = useNavigate();
-  console.log(state);
+  // console.log(state);
 
   useEffect(() => {
     setIsLoggedIn(state.isLoggedIn);

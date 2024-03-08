@@ -10,7 +10,7 @@ const ContextProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    console.log("Initial Context State in ContextProvider:", state);
+    // console.log("Initial Context State in ContextProvider:", state);
   }, [state]);
 
   const contextValue = {

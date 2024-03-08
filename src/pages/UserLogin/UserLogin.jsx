@@ -14,6 +14,8 @@ const UserLogin = () => {
   const { setState } = useContext(AppContext);
   const navigate = useNavigate();
 
+  // UserLogin.jsx
+
   const handleLogin = async () => {
     try {
       const user = await userService.loginUser(username, password);
@@ -26,7 +28,9 @@ const UserLogin = () => {
 
       // Upon successful login...
       console.log("Login successful:", user);
-      localStorage.setItem("user", JSON.stringify(user));
+
+      // Use sessionStorage instead of localStorage
+      sessionStorage.setItem("user", JSON.stringify(user));
 
       setState({
         ...user,

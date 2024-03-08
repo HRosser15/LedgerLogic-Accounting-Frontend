@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from "react";
+import { createRoot } from "react-dom/client";
 import {
   BrowserRouter as Router,
   Route,
@@ -37,7 +38,7 @@ function App() {
   });
 
   useEffect(() => {
-    console.log("Initial State in App.jsx:", state);
+    // console.log("Initial State in App.jsx:", state);
   }, []);
 
   return (
