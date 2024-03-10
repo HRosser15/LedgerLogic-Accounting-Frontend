@@ -56,6 +56,11 @@ const UserLogin = () => {
 
   const handleCloseModal = () => setShowModal(false);
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleLogin();
+  };
+
   return (
     <div className={styles.main}>
       <div className={styles.row}>
@@ -68,7 +73,7 @@ const UserLogin = () => {
           </Link>
         </div>
         <div className={styles.column}>
-          <form className={styles.forms}>
+          <form className={styles.forms} onSubmit={handleFormSubmit}>
             <h1 className={styles.header}>Login</h1>
             <div>
               <label>
@@ -89,18 +94,16 @@ const UserLogin = () => {
                   className={styles.inputBox}
                   type="password"
                   name="password"
+                  id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                 />
               </label>
             </div>
 
             <div>
-              <button
-                className={styles.button}
-                type="button"
-                onClick={handleLogin}
-              >
+              <button className={styles.button} type="submit">
                 Login
               </button>
             </div>

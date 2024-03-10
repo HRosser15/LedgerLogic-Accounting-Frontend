@@ -18,6 +18,26 @@ const AddAccountsForm = () => {
   const [statement, setStatement] = useState("");
   const [comment, setComment] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [successTitle, setSuccessTitle] = useState("Success");
+  const [successMessage, setSuccessMessage] = useState(
+    "Account Added Successfully"
+  );
+  const [errorTitle, setErrorTitle] = useState("Validation Error");
+  const [errorMessage, setErrorMessage] = useState(
+    "Please fill out all required fields before submitting the form."
+  );
+
+  const handleOrderChange = (event) => {
+    const value = event.target.value.replace(/[^0-9]/g, "");
+    setOrder(value);
+  };
+
+  if (!Number.isInteger(Number(order))) {
+    setErrorTitle("Validation Error");
+    setErrorMessage("Order must be a valid integer.");
+    toggleModal();
+    return;
+  }
 
   const toggleModal = () => setShowModal(!showModal);
 
@@ -136,8 +156,28 @@ const AddAccountsForm = () => {
       const response = await addAccount(requestData);
 
       console.log(response);
+      if (response === "Account added successfully!") {
+        setSuccessTitle("Success!");
+        setSuccessMessage("Account Added Successfully");
+        toggleModal();
+      }
     } catch (error) {
       console.error(error.message);
+
+      if (error.response && error.response.status === 400) {
+        if (error.message === "Account name already exists!") {
+          setErrorTitle("Validation Error");
+          setErrorMessage("Account name already exists!"); // Use the specific error message
+        } else {
+          setErrorTitle("Validation Error");
+          setErrorMessage(error.message); // Use the error message from the thrown error
+        }
+      } else {
+        setErrorTitle("Error");
+        setErrorMessage(error.message);
+      }
+
+      toggleModal();
     }
   };
 
@@ -230,7 +270,7 @@ const AddAccountsForm = () => {
                   type="number"
                   placeholder="Enter order"
                   value={order}
-                  onChange={(e) => setOrder(e.target.value)}
+                  onChange={handleOrderChange}
                 />
               </Form.Group>
             </Col>
@@ -315,10 +355,18 @@ const AddAccountsForm = () => {
 
       <Modal show={showModal} onHide={toggleModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Validation Error</Modal.Title>
+          {successTitle === "Success!" ? (
+            <Modal.Title>{successTitle}</Modal.Title>
+          ) : (
+            <Modal.Title>{errorTitle}</Modal.Title>
+          )}
         </Modal.Header>
         <Modal.Body>
-          Please fill out all required fields before submitting the form.
+          {successTitle === "Success!" ? (
+            <p>{successMessage}</p>
+          ) : (
+            <p>{errorMessage}</p>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={toggleModal}>
