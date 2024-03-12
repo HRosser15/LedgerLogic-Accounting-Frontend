@@ -4,8 +4,10 @@ import { fetchAccounts } from "../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 import AppContext from "../../../../context/AppContext";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const ViewAccountsForm = ({ selectedDate }) => {
+  const [filterCriteria, setFilterCriteria] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [accounts, setAccounts] = useState([]);
 
@@ -19,6 +21,7 @@ const ViewAccountsForm = ({ selectedDate }) => {
       });
   }, []);
 
+  // We can use this format if we prefer it (YYYY-MM-DD)
   const formatDate1 = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -28,6 +31,7 @@ const ViewAccountsForm = ({ selectedDate }) => {
     return `${year}${month}${day}`;
   };
 
+  // We are currently using this format (YYYY, Month, DD)
   const formatDate2 = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -56,6 +60,47 @@ const ViewAccountsForm = ({ selectedDate }) => {
   const equityAccounts = filterAccountsByRange(5000, 5999);
   const revenueAccounts = filterAccountsByRange(6000, 6999);
   const expenseAccounts = filterAccountsByRange(7000, 7999);
+
+  const filterAccounts = (accounts, filterCriteria) => {
+    return accounts.filter((account) => {
+      const {
+        accountName,
+        accountNumber,
+        category,
+        subCategory,
+        initialBalance,
+      } = account;
+
+      const searchTerms = filterCriteria.toLowerCase().split(" ");
+
+      const nameMatch = accountName
+        .toLowerCase()
+        .includes(filterCriteria.toLowerCase());
+      const numberMatch = accountNumber
+        .toString()
+        .includes(filterCriteria.toLowerCase());
+      const categoryMatch = category
+        .toLowerCase()
+        .includes(filterCriteria.toLowerCase());
+      const subCategoryMatch = subCategory
+        .toLowerCase()
+        .includes(filterCriteria.toLowerCase());
+      const amountMatch = initialBalance
+        .toString()
+        .includes(filterCriteria.toLowerCase());
+
+      const allMatches = searchTerms.every(
+        (term) =>
+          nameMatch ||
+          numberMatch ||
+          categoryMatch ||
+          subCategoryMatch ||
+          amountMatch
+      );
+
+      return allMatches;
+    });
+  };
 
   const renderTable = (tableTitle, tableAccounts) => {
     const filteredTableAccounts = tableAccounts.filter(
@@ -86,7 +131,11 @@ const ViewAccountsForm = ({ selectedDate }) => {
             {filteredTableAccounts.map((account) => (
               <tr key={account.accountNumber}>
                 <td>{account.accountNumber}</td>
-                <td>{account.accountName}</td>
+                <td>
+                  <Link to={`/account/${account.accountNumber}`}>
+                    {account.accountName}
+                  </Link>
+                </td>
                 <td>{account.normalSide}</td>
                 <td>{account.description}</td>
                 <td>
@@ -103,6 +152,88 @@ const ViewAccountsForm = ({ selectedDate }) => {
       </form>
     );
   };
+
+  const handleFilterChange = (event) => {
+    setFilterCriteria(event.target.value);
+  };
+
+  const filteredAssetAccounts = filterAccounts(assetAccounts, filterCriteria);
+  const filteredLiabilityAccounts = filterAccounts(
+    liabilityAccounts,
+    filterCriteria
+  );
+  const filteredEquityAccounts = filterAccounts(equityAccounts, filterCriteria);
+  const filteredRevenueAccounts = filterAccounts(
+    revenueAccounts,
+    filterCriteria
+  );
+  const filteredExpenseAccounts = filterAccounts(
+    expenseAccounts,
+    filterCriteria
+  );
+
+  return (
+    <Container className={styles.dashboardContainer}>
+      <Row className="mb-4">
+        <Col>
+          <div className="container">
+            <Form.Group
+              controlId="searchTerm"
+              className="d-flex align-items-center"
+            >
+              <Form.Label className="mr-2">Search Accounts:</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Account Name or Account No."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                style={{
+                  maxWidth: "250px",
+                  marginLeft: "10px",
+                  marginRight: "10px",
+                }}
+              />
+            </Form.Group>
+          </div>
+        </Col>
+        <Col>
+          <div className="container">
+            <Form.Group
+              controlId="filterCriteria"
+              className="d-flex align-items-center"
+            >
+              <Form.Label className="mr-2">Filter Accounts:</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Account Name, Number, Category, Sub-Category, or Amount"
+                value={filterCriteria}
+                onChange={handleFilterChange}
+                style={{
+                  maxWidth: "400px",
+                  marginLeft: "10px",
+                  marginRight: "10px",
+                }}
+              />
+            </Form.Group>
+          </div>
+        </Col>
+      </Row>
+      {/* ... */}
+      <Row className="mb-4">
+        <Col>
+          <div className="container">
+            {renderTable("Assets", filteredAssetAccounts)}
+            {renderTable("Liabilities", filteredLiabilityAccounts)}
+            {renderTable("Equity", filteredEquityAccounts)}
+            {renderTable("Revenue", filteredRevenueAccounts)}
+            {renderTable("Expenses", filteredExpenseAccounts)}
+
+            <div style={{ height: "200px" }}></div>
+          </div>
+        </Col>
+      </Row>
+    </Container>
+  );
 
   return (
     <Container className={styles.dashboardContainer}>

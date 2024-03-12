@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Form, Button, Container, Row, Col, Modal } from "react-bootstrap";
 import AppContext from "../../../../context/AppContext";
 import { addAccount } from "../../../services/AccountService";
@@ -27,6 +27,20 @@ const AddAccountsForm = () => {
     "Please fill out all required fields before submitting the form."
   );
 
+  useEffect(() => {
+    const categoryNormalSides = {
+      Assets: "Debit",
+      Liabilities: "Credit",
+      Equity: "Credit",
+      Revenue: "Credit",
+      Expenses: "Debit",
+      Dividends: "Debit",
+    };
+
+    setNormalSide(categoryNormalSides[category] || "");
+    calculateBalance(initialCredit, initialDebit);
+  }, [category]);
+
   const handleOrderChange = (event) => {
     const value = event.target.value.replace(/[^0-9]/g, "");
     setOrder(value);
@@ -51,17 +65,11 @@ const AddAccountsForm = () => {
     calculateBalance(initialDebit, event.target.value);
   };
 
-  const handleNormalSideChange = (event) => {
-    setNormalSide(event.target.value);
-    calculateBalance(initialDebit, initialCredit, event.target.value);
-  };
-
   const calculateBalance = (debit, credit) => {
     const debitAmount = parseFloat(debit) || 0;
     const creditAmount = parseFloat(credit) || 0;
 
-    const sign =
-      document.getElementById("normalSide").value === "Debit" ? 1 : -1;
+    const sign = normalSide === "Debit" ? 1 : -1;
 
     const calculatedBalance = sign * (debitAmount - creditAmount);
     setBalance(calculatedBalance.toFixed(2));
@@ -80,12 +88,9 @@ const AddAccountsForm = () => {
       "statement",
     ];
 
-    const isAnyFieldEmpty = requiredFields.some(
-      (field) => !eval(`${field}`) // Use the state variable directly
-    );
+    const isAnyFieldEmpty = requiredFields.some((field) => !eval(`${field}`));
 
     if (isAnyFieldEmpty) {
-      // Display the modal for validation error
       toggleModal();
       return;
     }
@@ -199,22 +204,7 @@ const AddAccountsForm = () => {
                 />
               </Form.Group>
             </Col>
-            <Col>
-              <Form.Group controlId="normalSide">
-                <Form.Label>Normal Side</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={normalSide}
-                  onChange={handleNormalSideChange}
-                >
-                  <option value="" disabled className={styles.grayOption}>
-                    Select
-                  </option>
-                  <option value="Debit">Debit</option>
-                  <option value="Credit">Credit</option>
-                </Form.Control>
-              </Form.Group>
-            </Col>
+            <Col></Col>
           </Row>
           <Row className="mb-4">
             <Col>
@@ -237,6 +227,7 @@ const AddAccountsForm = () => {
                 </Form.Control>
               </Form.Group>
             </Col>
+
             <Col>
               <Form.Group controlId="accountSubcategory">
                 <Form.Label>Account's Subcategory</Form.Label>
@@ -248,6 +239,32 @@ const AddAccountsForm = () => {
                 />
               </Form.Group>
             </Col>
+          </Row>
+          <Row>
+            <Col className="col-md-2">
+              <p
+                style={{
+                  margin: 0,
+                  paddingBottom: 20,
+                  textAlign: "right",
+                  fontWeight: "bold",
+                }}
+              >
+                Normal Side:
+              </p>
+            </Col>
+            <Col className="col-md-1">
+              <p
+                style={{
+                  margin: 0,
+                  padding: 0,
+                  textAlign: "left",
+                }}
+              >
+                {normalSide}
+              </p>{" "}
+            </Col>
+            <Col className="col-md-1"></Col>
           </Row>
           <Row className="mb-4">
             <Col className="col-md-9">

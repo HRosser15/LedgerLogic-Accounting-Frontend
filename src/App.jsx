@@ -27,6 +27,7 @@ import React from "react";
 import UserLogin from "./pages/UserLogin/UserLogin"; // main login
 // import AdminLogin from "./pages/AdminLogin/AdminLogin";
 import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
+import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -77,6 +78,7 @@ function App() {
                 path="admin-accounts-management"
                 element={<AdminAccountsManagement />}
               />
+              <Route path="/account/:accountNumber" element={<ViewLedger />} />
 
               {/* User list page */}
               <Route path="/user-list" element={<UserList />} />
