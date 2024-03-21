@@ -11,8 +11,10 @@ const UserLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const { state, setState } = useContext(AppContext);
+  const { setState } = useContext(AppContext);
   const navigate = useNavigate();
+
+  // UserLogin.jsx
 
   const handleLogin = async () => {
     try {
@@ -24,13 +26,15 @@ const UserLogin = () => {
         return;
       }
 
+      // Upon successful login...
       console.log("Login successful:", user);
 
+      // Use sessionStorage instead of localStorage
+      sessionStorage.setItem("user", JSON.stringify(user));
+
       setState({
-        ...state,
+        ...user,
         isLoggedIn: true,
-        username: user.username,
-        role: user.role,
       });
 
       // handle successful login based on the user role.
@@ -52,6 +56,11 @@ const UserLogin = () => {
 
   const handleCloseModal = () => setShowModal(false);
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleLogin();
+  };
+
   return (
     <div className={styles.main}>
       <div className={styles.row}>
@@ -64,14 +73,15 @@ const UserLogin = () => {
           </Link>
         </div>
         <div className={styles.column}>
-          <form className={styles.forms}>
-            <h1 className={styles.header}>User Login</h1>
+          <form className={styles.forms} onSubmit={handleFormSubmit}>
+            <h1 className={styles.header}>Login</h1>
             <div>
               <label>
                 <p>Username</p>
                 <input
                   className={styles.inputBox}
                   type="text"
+                  name="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
@@ -83,18 +93,17 @@ const UserLogin = () => {
                 <input
                   className={styles.inputBox}
                   type="password"
+                  name="password"
+                  id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                 />
               </label>
             </div>
 
             <div>
-              <button
-                className={styles.button}
-                type="button"
-                onClick={handleLogin}
-              >
+              <button className={styles.button} type="submit">
                 Login
               </button>
             </div>
@@ -118,6 +127,8 @@ const UserLogin = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <div style={{ height: "200px" }}></div>
     </div>
   );
 };

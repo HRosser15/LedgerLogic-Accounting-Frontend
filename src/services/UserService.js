@@ -4,19 +4,31 @@ const BASE_URL = "http://localhost:8080/users";
 
 export const fetchUsers = () => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
+  console.log("User Information in fetchUsers:", user);
 
   if (user) {
-    const headers = {
-      "username": user.username,
-      "role": user.role,
+    // HEADERS REMOVED AS THEY MAY NOT BE
+    // const headers = {
+    //   "username": user.username,
+    //   "role": user.role,
+    // };
+
+    // Include withCredentials in the request options
+    const requestOptions = {
+      withCredentials: true,
+      // headers: {
+      //   ...headers,
+      //   'Content-Type': 'application/json',
+      // },
     };
 
-    return axios.get(`${BASE_URL}/allUsers`, { headers });
+    return axios.get(`${BASE_URL}/allUsers`, requestOptions);
   } else {
     console.error("User information not found in local storage");
     return Promise.reject("User information not found");
   }
 };
+
 
 export const loginUser = async (username, password) => {
   try {
