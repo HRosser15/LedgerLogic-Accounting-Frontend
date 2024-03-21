@@ -12,7 +12,7 @@ import ViewAccountsForm from "./Forms/ViewAccountsForm";
 
 const AdminAccountsManagement = ({ username }) => {
   const { state } = useContext(AppContext);
-  const [activeTab, setActiveTab] = useState("add");
+  const [activeTab, setActiveTab] = useState("view");
   const [selectedDate, setSelectedDate] = useState(null);
 
   const handleTabSelect = (tab) => {
@@ -22,7 +22,7 @@ const AdminAccountsManagement = ({ username }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "add":
-        return <AddAccountsForm />;
+        return <AddAccountsForm onCancel={() => handleCancel()} />;
       case "edit":
         return <div>Edit Account Form</div>;
       case "view":
@@ -32,6 +32,10 @@ const AdminAccountsManagement = ({ username }) => {
       default:
         return null;
     }
+  };
+
+  const handleCancel = () => {
+    setActiveTab("view");
   };
 
   return (
@@ -50,16 +54,6 @@ const AdminAccountsManagement = ({ username }) => {
               onChange={(date) => setSelectedDate(date)}
             />
           </div>
-          {/* BUTTON for DATEPICKER 
-          <div>
-            <button
-              className={styles.button}
-              type="button"
-              //   onClick={handleDateSelect}
-            >
-              Choose Date
-            </button>
-          </div> */}
         </Col>
         <Col>
           <h1>Account Management</h1>
@@ -74,8 +68,13 @@ const AdminAccountsManagement = ({ username }) => {
         onSelect={handleTabSelect}
         className={styles.tabs}
       >
+        <Tab
+          eventKey="view"
+          title={<span title="View existing accounts">View</span>}
+        >
+          <div style={{ height: "20px" }}></div>
+        </Tab>
         <Tab eventKey="add" title={<span title="Add a new account">Add</span>}>
-          {/* Add Account Form Component Goes Here */}
           <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
@@ -85,13 +84,6 @@ const AdminAccountsManagement = ({ username }) => {
           {/* Edit Account Form Component Goes Here */}
           <div style={{ height: "20px" }}></div>
           <h2>Edit Account</h2>
-        </Tab>
-        <Tab
-          eventKey="view"
-          title={<span title="View existing accounts">View</span>}
-        >
-          {/* View Accounts Component Goes Here */}
-          <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
           eventKey="deactivate"

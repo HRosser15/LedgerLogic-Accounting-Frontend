@@ -21,8 +21,7 @@ export const loginUser = async (username, password) => {
     const response = await axios.post(`${BASE_URL}/login`, { username, password });
     console.log("Login successful:", response.data);
 
-    // Use sessionStorage instead of localStorage
-    sessionStorage.setItem("user", JSON.stringify(response.data));
+    localStorage.setItem("user", JSON.stringify(response.data));
     
     return response.data;
   } catch (error) {

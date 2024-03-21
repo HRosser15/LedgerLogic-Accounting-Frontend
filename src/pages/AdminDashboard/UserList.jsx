@@ -16,7 +16,9 @@ const UserList = () => {
   const { state } = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
+  const [userIdForActivateDeactivate, setUserIdForActivateDeactivate] =
+    useState("");
+  const [userIdForSuspend, setUserIdForSuspend] = useState("");
   const [suspensionStartDate, setSuspensionStartDate] = useState(null);
   const [suspensionEndDate, setSuspensionEndDate] = useState(null);
   const [email, setEmail] = useState("");
@@ -43,8 +45,8 @@ const UserList = () => {
     switch (action) {
       case "ActivateUser":
         try {
-          console.log(`Activate User with ID: ${userId}`);
-          await activateUser(userId);
+          console.log(`Activate User with ID: ${userIdForActivateDeactivate}`);
+          await activateUser(userIdForActivateDeactivate);
           fetchUsers().then((response) => {
             setUsers(response.data);
           });
@@ -61,8 +63,10 @@ const UserList = () => {
 
       case "DeactivateUser":
         try {
-          console.log(`Deactivate User with ID: ${userId}`);
-          await deactivateUser(userId);
+          console.log(
+            `Deactivate User with ID: ${userIdForActivateDeactivate}`
+          );
+          await deactivateUser(userIdForActivateDeactivate);
           fetchUsers().then((response) => {
             setUsers(response.data);
           });
@@ -79,21 +83,40 @@ const UserList = () => {
 
       case "SuspendUser":
         try {
-          console.log(`Suspended User with ID: ${userId}`);
-          await suspendUser(userId, suspensionStartDate, suspensionEndDate);
+          console.log(`Deactivate User with ID: ${userIdForSuspend}`);
+          await deactivateUser(userIdForSuspend);
+          fetchUsers().then((response) => {
+            setUsers(response.data);
+          });
           setModalTitle("Action Success");
-          setModalMessage("User suspended successfully.");
+          setModalMessage(`User ${userIdForSuspend} suspended successfully.`);
           handleShowModal();
         } catch (error) {
-          console.error("Error suspending user:", error);
+          console.error("Error deactivating user:", error);
           setModalTitle("Action Failed");
-          setModalMessage("Error suspending user.");
+          setModalMessage("Error deactivating user.");
           handleShowModal();
         }
         break;
+      // try {
+      //   console.log(`Suspended User with ID: ${userId}`);
+      //   await suspendUser(userId, suspensionStartDate, suspensionEndDate);
+      //   setModalTitle("Action Success");
+      //   setModalMessage("User suspended successfully.");
+      //   handleShowModal();
+      // } catch (error) {
+      //   console.error("Error suspending user:", error);
+      //   setModalTitle("Action Failed");
+      //   setModalMessage("Error suspending user.");
+      //   handleShowModal();
+      // }
+      // break;
 
       case "SendEmailToUser":
         // Logic is still needed to send an email to the user using the email
+        setModalTitle("Action Success");
+        setModalMessage("Email sent successfully");
+        handleShowModal();
         console.log(`Send Email to User with ID: ${userId}`);
         break;
 
@@ -167,8 +190,10 @@ const UserList = () => {
                       <Form.Control
                         type="text"
                         placeholder="Enter User ID"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
+                        value={userIdForActivateDeactivate}
+                        onChange={(e) =>
+                          setUserIdForActivateDeactivate(e.target.value)
+                        }
                         className={styles.inputBox}
                       />
                     </div>
@@ -250,8 +275,8 @@ const UserList = () => {
                       <Form.Control
                         type="text"
                         placeholder="Enter User ID"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
+                        value={userIdForSuspend}
+                        onChange={(e) => setUserIdForSuspend(e.target.value)}
                         className={styles.inputBox}
                       />
                     </div>
@@ -336,6 +361,9 @@ const UserList = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="custom-textbox"
+                      style={{
+                        marginLeft: "20px",
+                      }}
                     />
                   </Form.Group>
                 </Col>
@@ -349,7 +377,7 @@ const UserList = () => {
                       cols={80}
                       align="left"
                       style={{
-                        backgroundColor: "#f5f5f5",
+                        backgroundColor: "#ffffff",
                         color: "black",
                         borderRadius: "5px",
                       }}

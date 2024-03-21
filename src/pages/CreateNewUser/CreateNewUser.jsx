@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { registerUser } from "../../services/AuthService";
 import DatePicker from "react-datepicker";
+import "./DatePickerStyles.css";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "./CreateNewUser.module.css";
 
@@ -185,8 +186,8 @@ const CreateNewUser = () => {
             placeholder="Password"
           />
           <p className="password-requirements">
-            Password must be 8 or characters and at least one of each:
-            uppercase, number, special character{" "}
+            Password must be 8 or more characters and contain at least one of
+            each: uppercase, number, special character{" "}
           </p>
         </div>
 
@@ -208,18 +209,24 @@ const CreateNewUser = () => {
         </div>
 
         <div className="col-md-3">
-          <label htmlFor="birthDay" className="form-label">
+          <label htmlFor="birthDay" className={`${styles.datePickerContainer}`}>
             Birthday
           </label>
-          <DatePicker
-            id="birthDay"
-            className="form-control"
-            selected={formData.birthDay}
-            onChange={(date) =>
-              handleChange({ target: { name: "birthDay", value: date } })
-            }
-            dateFormat="MM/dd/yyyy" // We can customize the date format as needed
-          />
+          <div>
+            <DatePicker
+              id="birthDay"
+              className="form-control"
+              selected={formData.birthDay}
+              onChange={(date) =>
+                handleChange({ target: { name: "birthDay", value: date } })
+              }
+              dateFormat="MM/dd/yyyy" // We can customize the date format as needed
+              style={{
+                border: "2px solid #cccccc",
+                height: "50px",
+              }}
+            />
+          </div>
         </div>
 
         <div className="col-md-6">

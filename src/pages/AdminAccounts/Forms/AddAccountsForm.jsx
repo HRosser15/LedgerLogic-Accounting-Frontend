@@ -1,10 +1,19 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Form, Button, Container, Row, Col, Modal } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+  Modal,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import AppContext from "../../../../context/AppContext";
 import { addAccount } from "../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 
-const AddAccountsForm = () => {
+const AddAccountsForm = ({ onCancel }) => {
   const { state } = useContext(AppContext);
   const [accountName, setAccountName] = useState("");
   const [initialDebit, setInitialDebit] = useState("");
@@ -195,7 +204,7 @@ const AddAccountsForm = () => {
           <Row className="mb-4">
             <Col>
               <Form.Group controlId="accountName">
-                <Form.Label>Account's Name</Form.Label>
+                <Form.Label>Account Name</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Enter account name"
@@ -218,7 +227,7 @@ const AddAccountsForm = () => {
                   <option value="" disabled className={styles.grayOption}>
                     Select
                   </option>
-                  <option>Dividends</option>
+                  {/* <option>Dividends</option> */}
                   <option>Assets</option>
                   <option>Liabilities</option>
                   <option>Equity</option>
@@ -230,7 +239,7 @@ const AddAccountsForm = () => {
 
             <Col>
               <Form.Group controlId="accountSubcategory">
-                <Form.Label>Account's Subcategory</Form.Label>
+                <Form.Label>Account Subcategory</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Enter account subcategory"
@@ -356,14 +365,33 @@ const AddAccountsForm = () => {
           <Row>
             <Col></Col>
             <Col>
-              <Button variant="secondary" type="button">
-                Cancel
-              </Button>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={
+                  <Tooltip id="tooltip-add-account">
+                    Cancel the creation of this account and return to the
+                    accounts page
+                  </Tooltip>
+                }
+              >
+                <Button variant="secondary" type="button" onClick={onCancel}>
+                  Cancel
+                </Button>
+              </OverlayTrigger>
             </Col>
             <Col>
-              <Button variant="success" type="submit">
-                Add Account
-              </Button>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={
+                  <Tooltip id="tooltip-add-account">
+                    Add account with the entered information
+                  </Tooltip>
+                }
+              >
+                <Button variant="success" type="submit">
+                  Add Account
+                </Button>
+              </OverlayTrigger>
             </Col>
             <Col></Col>
           </Row>

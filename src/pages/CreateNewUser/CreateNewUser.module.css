@@ -22,3 +22,12 @@
     margin-top: 5px;
   }
   
+    .customDatePicker {
+      border: 2px solid #cccccc;
+      height: yourDesiredHeight;
+    }
+
+    #birthDay {
+      border: 2px solid #cccccc;
+      height: yourDesiredHeight;
+    }

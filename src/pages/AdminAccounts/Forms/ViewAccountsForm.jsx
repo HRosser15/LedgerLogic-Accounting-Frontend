@@ -2,36 +2,49 @@ import React, { useState, useContext, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { fetchAccounts } from "../../../services/AccountService";
 import styles from "./AccountForm.module.css";
+import DatePicker from "react-datepicker";
+import "./DatePickerStyles.css";
 import AppContext from "../../../../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const ViewAccountsForm = ({ selectedDate }) => {
-  const [filterCriteria, setFilterCriteria] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [accounts, setAccounts] = useState([]);
+  const [selectedFilterOption, setSelectedFilterOption] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([
+    "Assets",
+    "Liabilities",
+    "equity",
+    "revenue",
+    "expenses",
+  ]);
+  const [subcategoryFilter, setSubcategoryFilter] = useState("");
+  const [normalSideFilter, setNormalSideFilter] = useState("");
+  const [balanceFilter, setBalanceFilter] = useState({ min: "", max: "" });
+  const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
 
   useEffect(() => {
     fetchAccounts()
       .then((response) => {
-        setAccounts(response.data);
+        const sortedAccounts = response.data.sort(
+          (a, b) => a.accountNumber - b.accountNumber
+        );
+        setAccounts(sortedAccounts);
       })
       .catch((error) => {
         console.error(error);
       });
   }, []);
 
-  // We can use this format if we prefer it (YYYY-MM-DD)
-  const formatDate1 = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
+  const filterOptions = [
+    { value: "category", label: "Account Category", type: "checkbox" },
+    { value: "subcategory", label: "Account Subcategory", type: "text" },
+    { value: "balance", label: "Account Balance", type: "range" },
+    { value: "normalSide", label: "Normal Side", type: "radio" },
+    { value: "date", label: "Date Created", type: "date" },
+  ];
 
-    return `${year}${month}${day}`;
-  };
-
-  // We are currently using this format (YYYY, Month, DD)
   const formatDate2 = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -61,49 +74,222 @@ const ViewAccountsForm = ({ selectedDate }) => {
   const revenueAccounts = filterAccountsByRange(6000, 6999);
   const expenseAccounts = filterAccountsByRange(7000, 7999);
 
-  const filterAccounts = (accounts, filterCriteria) => {
-    return accounts.filter((account) => {
-      const {
-        accountName,
-        accountNumber,
-        category,
-        subCategory,
-        initialBalance,
-      } = account;
+  const handleFilterChange = (event) => {
+    const selectedOption = filterOptions.find(
+      (option) => option.value === event.target.value
+    );
 
-      const searchTerms = filterCriteria.toLowerCase().split(" ");
+    setSelectedFilterOption(selectedOption.value);
+    setSelectedFilterOptionText(selectedOption.label);
+  };
 
-      const nameMatch = accountName
-        .toLowerCase()
-        .includes(filterCriteria.toLowerCase());
-      const numberMatch = accountNumber
-        .toString()
-        .includes(filterCriteria.toLowerCase());
-      const categoryMatch = category
-        .toLowerCase()
-        .includes(filterCriteria.toLowerCase());
-      const subCategoryMatch = subCategory
-        .toLowerCase()
-        .includes(filterCriteria.toLowerCase());
-      const amountMatch = initialBalance
-        .toString()
-        .includes(filterCriteria.toLowerCase());
+  const handleCategoryChange = (category) => {
+    const updatedCategories = [...selectedCategories];
+    const index = updatedCategories.indexOf(category);
 
-      const allMatches = searchTerms.every(
-        (term) =>
-          nameMatch ||
-          numberMatch ||
-          categoryMatch ||
-          subCategoryMatch ||
-          amountMatch
-      );
+    if (index === -1) {
+      updatedCategories.push(category);
+    } else {
+      updatedCategories.splice(index, 1);
+    }
 
-      return allMatches;
-    });
+    setSelectedCategories(updatedCategories);
+  };
+
+  const handleSubcategoryFilterChange = (event) => {
+    setSubcategoryFilter(event.target.value);
+  };
+
+  const handleNormalSideFilterChange = (event) => {
+    setNormalSideFilter(event.target.value);
+  };
+
+  const handleBalanceFilterChange = (event, field) => {
+    const value = event.target.value.replace(/[^0-9.]/g, "");
+    setBalanceFilter((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
+  const handleDateFilterChange = (date, field) => {
+    setDateFilter((prevState) => ({
+      ...prevState,
+      [field]: date ? date.toISOString() : "",
+    }));
+  };
+
+  const renderFilterOptions = () => {
+    switch (selectedFilterOption) {
+      case "category":
+        return (
+          <div>
+            <Form.Check
+              type="checkbox"
+              id="assetCheckbox"
+              label="Assets"
+              checked={selectedCategories.includes("Assets")}
+              onChange={() => handleCategoryChange("Assets")}
+            />
+            <Form.Check
+              type="checkbox"
+              id="liabilityCheckbox"
+              label="Liabilities"
+              checked={selectedCategories.includes("Liabilities")}
+              onChange={() => handleCategoryChange("Liabilities")}
+            />
+            <Form.Check
+              type="checkbox"
+              id="equityCheckbox"
+              label="Equity"
+              checked={selectedCategories.includes("equity")}
+              onChange={() => handleCategoryChange("equity")}
+            />
+            <Form.Check
+              type="checkbox"
+              id="revenueCheckbox"
+              label="Revenue"
+              checked={selectedCategories.includes("revenue")}
+              onChange={() => handleCategoryChange("revenue")}
+            />
+            <Form.Check
+              type="checkbox"
+              id="expenseCheckbox"
+              label="Expenses"
+              checked={selectedCategories.includes("expenses")}
+              onChange={() => handleCategoryChange("expenses")}
+            />
+          </div>
+        );
+      case "subcategory":
+        return (
+          <Form.Control
+            type="text"
+            value={subcategoryFilter}
+            onChange={handleSubcategoryFilterChange}
+            placeholder="Enter subcategory"
+          />
+        );
+      case "normalSide":
+        return (
+          <div>
+            <Form.Check
+              type="radio"
+              id="debitRadio"
+              label="Debit"
+              value="Debit"
+              checked={normalSideFilter === "Debit"}
+              onChange={handleNormalSideFilterChange}
+            />
+            <Form.Check
+              type="radio"
+              id="creditRadio"
+              label="Credit"
+              value="Credit"
+              checked={normalSideFilter === "Credit"}
+              onChange={handleNormalSideFilterChange}
+            />
+          </div>
+        );
+      case "balance":
+        return (
+          <div>
+            <Form.Control
+              type="text"
+              placeholder="Minimum"
+              value={balanceFilter.min}
+              onChange={(e) => handleBalanceFilterChange(e, "min")}
+            />
+            <Form.Control
+              type="text"
+              placeholder="Maximum"
+              value={balanceFilter.max}
+              onChange={(e) => handleBalanceFilterChange(e, "max")}
+            />
+          </div>
+        );
+      case "date":
+        return (
+          <div>
+            <div
+              className={`${styles.datePickerContainer} ${styles.leftAlignedDatePicker}`}
+            >
+              <DatePicker
+                selected={dateFilter.start ? new Date(dateFilter.start) : null}
+                onChange={(date) => handleDateFilterChange(date, "start")}
+                placeholderText="Start Date"
+              />
+            </div>
+            <div
+              className={`${styles.datePickerContainer} ${styles.leftAlignedDatePicker}`}
+            >
+              <DatePicker
+                selected={dateFilter.end ? new Date(dateFilter.end) : null}
+                onChange={(date) => handleDateFilterChange(date, "end")}
+                placeholderText="End Date"
+              />
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   const renderTable = (tableTitle, tableAccounts) => {
-    const filteredTableAccounts = tableAccounts.filter(
+    let filteredTableAccounts = tableAccounts;
+
+    // Filter by category
+    if (selectedFilterOption === "category") {
+      filteredTableAccounts = tableAccounts.filter((account) =>
+        selectedCategories.some(
+          (category) =>
+            category.toLowerCase() === account.category.toLowerCase()
+        )
+      );
+    }
+
+    // Filter by subcategory
+    if (selectedFilterOption === "subcategory") {
+      filteredTableAccounts = tableAccounts.filter((account) =>
+        account.subCategory
+          .toLowerCase()
+          .includes(subcategoryFilter.toLowerCase())
+      );
+    }
+
+    // Filter by normal side
+    if (selectedFilterOption === "normalSide") {
+      filteredTableAccounts = tableAccounts.filter(
+        (account) => account.normalSide === normalSideFilter
+      );
+    }
+
+    // Filter by balance
+    if (selectedFilterOption === "balance") {
+      filteredTableAccounts = tableAccounts.filter(
+        (account) =>
+          account.balance >= parseFloat(balanceFilter.min) &&
+          account.balance <= parseFloat(balanceFilter.max)
+      );
+    }
+
+    // Filter by creation date
+    // Filter by creation date
+    // Filter by creation date
+    if (selectedFilterOption === "date") {
+      filteredTableAccounts = tableAccounts.filter((account) => {
+        const creationDate = new Date(account.creationDate);
+        const startDate = new Date(dateFilter.start);
+        const endDate = new Date(dateFilter.end);
+        endDate.setHours(23, 59, 59, 999); // Set the end date to the end of the day
+
+        return creationDate >= startDate && creationDate <= endDate;
+      });
+    }
+
+    // Additional filtering based on the search term
+    filteredTableAccounts = filteredTableAccounts.filter(
       (account) =>
         account.accountName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         account.accountNumber.toString().includes(searchTerm.toLowerCase())
@@ -121,6 +307,7 @@ const ViewAccountsForm = ({ selectedDate }) => {
             <tr>
               <th>No.</th>
               <th>Account Name</th>
+              <th>Subcategory</th>
               <th>Normal Side</th>
               <th>Description</th>
               <th>Balance</th>
@@ -136,6 +323,7 @@ const ViewAccountsForm = ({ selectedDate }) => {
                     {account.accountName}
                   </Link>
                 </td>
+                <td>{account.subCategory}</td>
                 <td>{account.normalSide}</td>
                 <td>{account.description}</td>
                 <td>
@@ -153,25 +341,6 @@ const ViewAccountsForm = ({ selectedDate }) => {
     );
   };
 
-  const handleFilterChange = (event) => {
-    setFilterCriteria(event.target.value);
-  };
-
-  const filteredAssetAccounts = filterAccounts(assetAccounts, filterCriteria);
-  const filteredLiabilityAccounts = filterAccounts(
-    liabilityAccounts,
-    filterCriteria
-  );
-  const filteredEquityAccounts = filterAccounts(equityAccounts, filterCriteria);
-  const filteredRevenueAccounts = filterAccounts(
-    revenueAccounts,
-    filterCriteria
-  );
-  const filteredExpenseAccounts = filterAccounts(
-    expenseAccounts,
-    filterCriteria
-  );
-
   return (
     <Container className={styles.dashboardContainer}>
       <Row className="mb-4">
@@ -179,7 +348,7 @@ const ViewAccountsForm = ({ selectedDate }) => {
           <div className="container">
             <Form.Group
               controlId="searchTerm"
-              className="d-flex align-items-center"
+              className="d-flex flex-column align-items-start"
             >
               <Form.Label className="mr-2">Search Accounts:</Form.Label>
               <Form.Control
@@ -188,8 +357,7 @@ const ViewAccountsForm = ({ selectedDate }) => {
                 value={searchTerm}
                 onChange={handleSearchChange}
                 style={{
-                  maxWidth: "250px",
-                  marginLeft: "10px",
+                  maxWidth: "400px",
                   marginRight: "10px",
                 }}
               />
@@ -200,67 +368,28 @@ const ViewAccountsForm = ({ selectedDate }) => {
           <div className="container">
             <Form.Group
               controlId="filterCriteria"
-              className="d-flex align-items-center"
+              className="d-flex flex-column align-items-start"
             >
               <Form.Label className="mr-2">Filter Accounts:</Form.Label>
               <Form.Control
-                type="text"
-                placeholder="Account Name, Number, Category, Sub-Category, or Amount"
-                value={filterCriteria}
+                as="select"
+                value={selectedFilterOption || ""} // Display the selected filter option text
                 onChange={handleFilterChange}
-                style={{
-                  maxWidth: "400px",
-                  marginLeft: "10px",
-                  marginRight: "10px",
-                }}
-              />
+                style={{ maxWidth: "400px", marginBottom: "10px" }}
+              >
+                <option value="">Select Filter</option>
+                {filterOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Form.Control>
+
+              {renderFilterOptions()}
             </Form.Group>
           </div>
         </Col>
       </Row>
-      {/* ... */}
-      <Row className="mb-4">
-        <Col>
-          <div className="container">
-            {renderTable("Assets", filteredAssetAccounts)}
-            {renderTable("Liabilities", filteredLiabilityAccounts)}
-            {renderTable("Equity", filteredEquityAccounts)}
-            {renderTable("Revenue", filteredRevenueAccounts)}
-            {renderTable("Expenses", filteredExpenseAccounts)}
-
-            <div style={{ height: "200px" }}></div>
-          </div>
-        </Col>
-      </Row>
-    </Container>
-  );
-
-  return (
-    <Container className={styles.dashboardContainer}>
-      <Row className="mb-4">
-        <Col>
-          <div className="container">
-            <Form.Group
-              controlId="searchTerm"
-              className="d-flex align-items-center"
-            >
-              <Form.Label className="mr-2">Search Accounts:</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Account Name or Account No."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                style={{
-                  maxWidth: "250px",
-                  marginLeft: "10px",
-                  marginRight: "10px",
-                }}
-              />
-            </Form.Group>
-          </div>
-        </Col>
-      </Row>
-      <h1>Chart of Accounts</h1>
       <Row className="mb-4">
         <Col>
           <div className="container">
@@ -269,7 +398,6 @@ const ViewAccountsForm = ({ selectedDate }) => {
             {renderTable("Equity", equityAccounts)}
             {renderTable("Revenue", revenueAccounts)}
             {renderTable("Expenses", expenseAccounts)}
-
             <div style={{ height: "200px" }}></div>
           </div>
         </Col>
