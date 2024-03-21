@@ -20,6 +20,7 @@ const Footer = () => {
         <Link to="/user-login">UserLogin</Link>
 
         <Link to="/create-new-user">CreateNewUser</Link>
+        <Link to="/edit-user">EditUser</Link>
         <Link to="/forgot-password">ForgotPassword</Link>
         <Link to="/enter-new-password">EnterNewPassword</Link>
         </div>

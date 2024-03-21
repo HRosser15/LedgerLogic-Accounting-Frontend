@@ -12,6 +12,7 @@ import { AuthProvider } from "../context/AuthContext";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login/Login";
 import CreateNewUser from "./pages/CreateNewUser/CreateNewUser";
+import EditUser from "./pages/EditUser/EditUser";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard/UserDashboard";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
@@ -48,6 +49,7 @@ function App() {
               <Route path="/admin-login" element={<AdminLogin />} />
 
               <Route path="/create-new-user" element={<CreateNewUser />} />
+              <Route path="/edit-user" element={<EditUser />} />
 
               {/* Forgot password pages */}
               <Route path="/forgot-password" element={<ForgotPassword />} />
