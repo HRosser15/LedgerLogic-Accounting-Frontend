@@ -34,6 +34,18 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
       })
       .catch((error) => {
         console.error(error);
+        concole.log(
+          "Make sure you alter the column size of previous_state and current_state (in the h2 database)"
+        );
+        console.log(
+          "This can be done in the h2 console at 'http://localhost:8080/h2-console' (Password is 'password' with:"
+        );
+        console.log(
+          "ALTER TABLE event_log ALTER COLUMN previous_state VARCHAR(60000);"
+        );
+        console.log(
+          "ALTER TABLE event_log ALTER COLUMN current_state VARCHAR(60000);"
+        );
       });
   }, []);
 
@@ -319,7 +331,7 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
               <tr key={account.accountNumber}>
                 <td>{account.accountNumber}</td>
                 <td>
-                  <Link to={`/account/${account.accountNumber}`}>
+                  <Link to={`/accountant/account/${account.accountNumber}`}>
                     {account.accountName}
                   </Link>
                 </td>

@@ -7,6 +7,7 @@ const ViewLedger = () => {
 
   return (
     <div>
+      <div style={{ height: "20px" }}></div>
       <h1>Account Ledger for Account {accountNumber}</h1>
       {/* Render the transactions for the account */}
     </div>

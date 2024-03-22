@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import { Container, Tab, Tabs, Tooltip, Row, Col } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import styles from "./ManagerAccountsManagement.module.css";
+import styles from "./AccountsManagement.module.css";
 import "./DatePickerStyles.css";
 import AppContext from "../../../context/AppContext";
-import ManagerViewAccountsForm from "./Forms/ManagerViewAccountsForm";
+import ManagerViewAccountsForm from "./Forms/ViewAccountsForm";
 
 const ManagerAccountsManagement = ({ username }) => {
   const { state } = useContext(AppContext);

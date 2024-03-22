@@ -12,7 +12,6 @@ import ContextProvider from "../context/ContextProvider";
 import AppContext from "../context/AppContext";
 import { AuthProvider } from "../context/AuthContext";
 import Footer from "./components/Footer/Footer";
-import Login from "./pages/Login/Login";
 import CreateNewUser from "./pages/CreateNewUser/CreateNewUser";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
@@ -23,14 +22,15 @@ import ManagerUserList from "./pages/ManagerDashboard/ManagerUserList";
 import NotFound from "./pages/NotFound/NotFound";
 import EnterNewPassword from "./pages/ForgotPassword/EnterNewPassword";
 import UserLogin from "./pages/UserLogin/UserLogin"; // main login
+
 import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
 import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
 
-import ManagerAccountsManagement from "./pages/ManagerAccounts/ManagerAccountsManagement";
-import ManagerViewLedger from "./pages/ManagerAccounts/Forms/ManagerViewLedger";
+import ManagerAccountsManagement from "./pages/ManagerAccounts/AccountsManagement";
+import ManagerViewLedger from "./pages/ManagerAccounts/Forms/ViewLedger";
 
-import AccountantAccountsManagement from "./pages/AccountantAccounts/AccountantAccountsManagement";
-import AccountantViewLedger from "./pages/AccountantAccounts/Forms/AccountantViewLedger";
+import AccountantAccountsManagement from "./pages/AccountantAccounts/AccountsManagement";
+import AccountantViewLedger from "./pages/AccountantAccounts/Forms/ViewLedger";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -100,7 +100,7 @@ function App() {
                 element={<AccountantAccountsManagement />}
               />
               <Route
-                path="accountant/account/:accountNumber"
+                path="/accountant/account/:accountNumber"
                 element={<AccountantViewLedger />}
               />
 

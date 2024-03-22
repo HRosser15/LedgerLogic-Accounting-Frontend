@@ -14,8 +14,6 @@ const UserLogin = () => {
   const { setState } = useContext(AppContext);
   const navigate = useNavigate();
 
-  // UserLogin.jsx
-
   const handleLogin = async () => {
     try {
       const user = await AuthService.loginUser(username, password);
@@ -42,7 +40,7 @@ const UserLogin = () => {
       } else if (user.role === "manager") {
         navigate("/manager-dashboard");
       } else {
-        navigate("/user-dashboard");
+        navigate("/accountant-dashboard");
       }
     } catch (error) {
       console.error(
