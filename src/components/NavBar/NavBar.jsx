@@ -48,11 +48,10 @@ const NavBar = () => {
               {/* Add other MANAGER links here */}
             </>
           );
-        case "user":
+        case "accountant":
           return (
             <>
-              <Link to="/user-dashboard">User Dashboard</Link>
-              <Link to="/accountant-user-list">View User List</Link>
+              <Link to="/user-dashboard">Accountant Dashboard</Link>
               <Link to="/accountant-accounts-management">Accounts</Link>
               {/* Add other ACCOUNTANT links here */}
             </>

@@ -30,6 +30,12 @@ import UserLogin from "./pages/UserLogin/UserLogin"; // main login
 import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
 import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
 
+import ManagerAccountsManagement from "./pages/AdminAccounts copy/ManagerAccountsManagement";
+import ManagerViewLedger from "./pages/AdminAccounts copy/Forms/ManagerViewLedger";
+
+// import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
+// import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
+
 function App() {
   const [count, setCount] = useState(0);
   const [state, setState] = useState(() => {
@@ -52,10 +58,7 @@ function App() {
             <Routes>
               {/* Login options */}
               <Route path="/" element={<UserLogin />} />
-              {/* <Route path="/login-choice" element={<LoginChoice />} /> */}
               <Route path="/user-login" element={<UserLogin />} />
-              {/* <Route path="/manager-login" element={<ManagerLogin />} /> */}
-              {/* <Route path="/admin-login" element={<AdminLogin />} /> */}
               <Route path="/create-new-user" element={<CreateNewUser />} />
 
               {/* Forgot password pages */}
@@ -80,6 +83,15 @@ function App() {
                 element={<AdminAccountsManagement />}
               />
               <Route path="/account/:accountNumber" element={<ViewLedger />} />
+
+              <Route
+                path="manager-accounts-management"
+                element={<ManagerAccountsManagement />}
+              />
+              <Route
+                path="manager/account/:accountNumber"
+                element={<ManagerViewLedger />}
+              />
 
               {/* User list page */}
               <Route path="/user-list" element={<UserList />} />
