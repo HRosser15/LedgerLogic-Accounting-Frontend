@@ -19,6 +19,7 @@ import UserDashboard from "./pages/UserDashboard/UserDashboard";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import UserList from "./pages/AdminDashboard/UserList";
+import ManagerUserList from "./pages/ManagerDashboard/ManagerUserList";
 import NotFound from "./pages/NotFound/NotFound";
 import EnterNewPassword from "./pages/ForgotPassword/EnterNewPassword";
 // import ManagerLogin from "./pages/ManagerLogin/ManagerLogin";
@@ -82,6 +83,8 @@ function App() {
 
               {/* User list page */}
               <Route path="/user-list" element={<UserList />} />
+              <Route path="/manager-user-list" element={<ManagerUserList />} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

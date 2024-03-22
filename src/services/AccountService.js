@@ -37,3 +37,21 @@ export const fetchAccounts = () => {
     return Promise.reject("User information not found");
   }
 };
+
+export const deactivateAccount = async (accountID) => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/deactivate/${accountID}`)
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      // The request was made, but the server responded with a non-2xx status code
+      throw new Error(`Error adding account: ${error.response.data}`);
+    } else if (error.request) {
+      // The request was made, but no response was received
+      throw new Error("No response received from the server.");
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      throw new Error(`Error setting up the request: ${error.message}`);
+    }
+  }
+};
