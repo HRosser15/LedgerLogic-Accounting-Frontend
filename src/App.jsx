@@ -26,8 +26,8 @@ import UserLogin from "./pages/UserLogin/UserLogin"; // main login
 import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
 import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
 
-import ManagerAccountsManagement from "./pages/AdminAccounts copy/ManagerAccountsManagement";
-import ManagerViewLedger from "./pages/AdminAccounts copy/Forms/ManagerViewLedger";
+import ManagerAccountsManagement from "./pages/ManagerAccounts/ManagerAccountsManagement";
+import ManagerViewLedger from "./pages/ManagerAccounts/Forms/ManagerViewLedger";
 
 import AccountantAccountsManagement from "./pages/AccountantAccounts/AccountantAccountsManagement";
 import AccountantViewLedger from "./pages/AccountantAccounts/Forms/AccountantViewLedger";
