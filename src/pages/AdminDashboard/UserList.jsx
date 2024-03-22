@@ -82,9 +82,19 @@ const UserList = () => {
         break;
 
       case "SuspendUser":
+        if (!suspensionStartDate || !suspensionEndDate) {
+          setModalTitle("Action Failed");
+          setModalMessage("Please select both suspension start and end dates.");
+          handleShowModal();
+          return;
+        }
         try {
-          console.log(`Deactivate User with ID: ${userIdForSuspend}`);
-          await deactivateUser(userIdForSuspend);
+          console.log(`Suspend User with ID: ${userIdForSuspend}`);
+          await suspendUser(
+            userIdForSuspend,
+            suspensionStartDate,
+            suspensionEndDate
+          );
           fetchUsers().then((response) => {
             setUsers(response.data);
           });
@@ -92,25 +102,12 @@ const UserList = () => {
           setModalMessage(`User ${userIdForSuspend} suspended successfully.`);
           handleShowModal();
         } catch (error) {
-          console.error("Error deactivating user:", error);
+          console.error("Error suspending user:", error);
           setModalTitle("Action Failed");
-          setModalMessage("Error deactivating user.");
+          setModalMessage("Error suspending user.");
           handleShowModal();
         }
         break;
-      // try {
-      //   console.log(`Suspended User with ID: ${userId}`);
-      //   await suspendUser(userId, suspensionStartDate, suspensionEndDate);
-      //   setModalTitle("Action Success");
-      //   setModalMessage("User suspended successfully.");
-      //   handleShowModal();
-      // } catch (error) {
-      //   console.error("Error suspending user:", error);
-      //   setModalTitle("Action Failed");
-      //   setModalMessage("Error suspending user.");
-      //   handleShowModal();
-      // }
-      // break;
 
       case "SendEmailToUser":
         // Logic is still needed to send an email to the user using the email

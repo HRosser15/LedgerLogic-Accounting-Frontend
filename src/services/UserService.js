@@ -29,10 +29,12 @@ export const fetchUsers = () => {
   }
 };
 
-
 export const loginUser = async (username, password) => {
   try {
-    const response = await axios.post("http://localhost:8080/auth/login", { username, password });
+    const response = await axios.post("http://localhost:8080/auth/login", {
+      username,
+      password,
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -48,5 +50,8 @@ export const deactivateUser = (userId) => {
 };
 
 export const suspendUser = (userId, suspensionStartDate, suspensionEndDate) => {
-  return axios.put(`${BASE_URL}/suspend/${userId}`);
-}
+  return axios.put(`${BASE_URL}/suspend/${userId}`, {
+    suspensionStartDate: suspensionStartDate,
+    suspensionEndDate: suspensionEndDate,
+  });
+};
