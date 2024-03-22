@@ -15,7 +15,7 @@ import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login/Login";
 import CreateNewUser from "./pages/CreateNewUser/CreateNewUser";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
-import UserDashboard from "./pages/UserDashboard/UserDashboard";
+import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import UserList from "./pages/AdminDashboard/UserList";
@@ -65,7 +65,10 @@ function App() {
               />
 
               {/* Dashboard pages */}
-              <Route path="/user-dashboard" element={<UserDashboard />} />
+              <Route
+                path="/accountant-dashboard"
+                element={<AccountantDashboard />}
+              />
               <Route path="/manager-dashboard" element={<ManagerDashboard />} />
               <Route
                 path="/admin-dashboard"
