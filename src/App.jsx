@@ -22,19 +22,15 @@ import UserList from "./pages/AdminDashboard/UserList";
 import ManagerUserList from "./pages/ManagerDashboard/ManagerUserList";
 import NotFound from "./pages/NotFound/NotFound";
 import EnterNewPassword from "./pages/ForgotPassword/EnterNewPassword";
-// import ManagerLogin from "./pages/ManagerLogin/ManagerLogin";
-// import LoginChoice from "./pages/LoginChoice/LoginChoice";
-import React from "react";
 import UserLogin from "./pages/UserLogin/UserLogin"; // main login
-// import AdminLogin from "./pages/AdminLogin/AdminLogin";
 import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
 import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
 
 import ManagerAccountsManagement from "./pages/AdminAccounts copy/ManagerAccountsManagement";
 import ManagerViewLedger from "./pages/AdminAccounts copy/Forms/ManagerViewLedger";
 
-// import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
-// import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
+import AccountantAccountsManagement from "./pages/AccountantAccounts/AccountantAccountsManagement";
+import AccountantViewLedger from "./pages/AccountantAccounts/Forms/AccountantViewLedger";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -78,12 +74,14 @@ function App() {
               <Route path="/navbar" element={<NavBar />}></Route>
 
               {/* Accounts Management*/}
+              {/* Admin */}
               <Route
                 path="admin-accounts-management"
                 element={<AdminAccountsManagement />}
               />
               <Route path="/account/:accountNumber" element={<ViewLedger />} />
 
+              {/* Manager */}
               <Route
                 path="manager-accounts-management"
                 element={<ManagerAccountsManagement />}
@@ -91,6 +89,16 @@ function App() {
               <Route
                 path="manager/account/:accountNumber"
                 element={<ManagerViewLedger />}
+              />
+
+              {/* Accountant */}
+              <Route
+                path="accountant-accounts-management"
+                element={<AccountantAccountsManagement />}
+              />
+              <Route
+                path="accountant/account/:accountNumber"
+                element={<AccountantViewLedger />}
               />
 
               {/* User list page */}

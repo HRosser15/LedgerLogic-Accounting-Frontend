@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-const ViewLedger = () => {
+const AccountantViewLedger = () => {
   const { accountNumber } = useParams();
 
   // Fetch transactions for the account with the given accountNumber
@@ -13,4 +13,4 @@ const ViewLedger = () => {
   );
 };
 
-export default ViewLedger;
+export default AccountantViewLedger;

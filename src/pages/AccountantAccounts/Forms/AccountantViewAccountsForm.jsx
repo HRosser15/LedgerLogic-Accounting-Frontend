@@ -8,7 +8,7 @@ import AppContext from "../../../../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const ViewAccountsForm = ({ selectedDate }) => {
+const AccountantViewAccountsForm = ({ selectedDate }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [accounts, setAccounts] = useState([]);
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
@@ -406,4 +406,4 @@ const ViewAccountsForm = ({ selectedDate }) => {
   );
 };
 
-export default ViewAccountsForm;
+export default AccountantViewAccountsForm;

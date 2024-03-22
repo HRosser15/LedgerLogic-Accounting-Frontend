@@ -2,15 +2,12 @@ import React, { useContext, useState } from "react";
 import { Container, Tab, Tabs, Tooltip, Row, Col } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import styles from "./AdminAccountsManagement.module.css";
+import styles from "./AccountantAccountsManagement.module.css";
 import "./DatePickerStyles.css";
 import AppContext from "../../../context/AppContext";
-import AddAccountsForm from "./Forms/AddAccountsForm";
-import EditAccountsForm from "./Forms/EditAccountsForm";
-import ViewAccountsForm from "./Forms/ViewAccountsForm";
-import DeactivateAccountsForm from "./Forms/DeactivateAccountsForm";
+import AccountantViewAccountsForm from "./Forms/AccountantViewAccountsForm";
 
-const AdminAccountsManagement = ({ username }) => {
+const AccountantAccountsManagement = ({ username }) => {
   const { state } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState("view");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -21,14 +18,9 @@ const AdminAccountsManagement = ({ username }) => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case "add":
-        return <AddAccountsForm onCancel={() => handleCancel()} />;
-      case "edit":
-        return <EditAccountsForm />;
       case "view":
-        return <ViewAccountsForm selectedDate={selectedDate} />;
-      case "deactivate":
-        return <DeactivateAccountsForm />;
+        return <AccountantViewAccountsForm selectedDate={selectedDate} />;
+      // More tabs here
       default:
         return null;
     }
@@ -63,7 +55,7 @@ const AdminAccountsManagement = ({ username }) => {
 
       {/* Tabbed Interface */}
       <Tabs
-        id="admin-tabs"
+        id="accountant-tabs"
         activeKey={activeTab}
         onSelect={handleTabSelect}
         className={styles.tabs}
@@ -74,24 +66,7 @@ const AdminAccountsManagement = ({ username }) => {
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
-        <Tab eventKey="add" title={<span title="Add a new account">Add</span>}>
-          <div style={{ height: "20px" }}></div>
-        </Tab>
-        <Tab
-          eventKey="edit"
-          title={<span title="Edit an existing account">Edit</span>}
-        >
-          {/* Edit Account Form Component Goes Here */}
-          <div style={{ height: "20px" }}></div>
-        </Tab>
-        <Tab
-          eventKey="deactivate"
-          title={<span title="Deactivate an existing account">Deactivate</span>}
-        >
-          {/* Deactivate Account Form Component Goes Here */}
-          <div style={{ height: "20px" }}></div>
-          <h2>Deactivate Account</h2>
-        </Tab>
+        {/* Add more tabs here */}
       </Tabs>
 
       {renderTabContent(selectedDate)}
@@ -99,4 +74,4 @@ const AdminAccountsManagement = ({ username }) => {
   );
 };
 
-export default AdminAccountsManagement;
+export default AccountantAccountsManagement;
