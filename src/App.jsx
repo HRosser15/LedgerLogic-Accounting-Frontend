@@ -6,6 +6,9 @@ import {
   Routes,
   NavLink,
 } from "react-router-dom";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import NavBar from "./components/NavBar/NavBar";
 import ContextProvider from "../context/ContextProvider";
@@ -31,6 +34,8 @@ import ManagerViewLedger from "./pages/ManagerAccounts/Forms/ViewLedger";
 
 import AccountantAccountsManagement from "./pages/AccountantAccounts/AccountsManagement";
 import AccountantViewLedger from "./pages/AccountantAccounts/Forms/ViewLedger";
+
+import Help from "./pages/Help/Help";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -76,7 +81,9 @@ function App() {
               />
               <Route path="/navbar" element={<NavBar />}></Route>
 
-              {/* Accounts Management*/}
+              {/* ===================
+                  Accounts Management
+                  ===================*/}
               {/* Admin */}
               <Route
                 path="admin-accounts-management"
@@ -104,10 +111,20 @@ function App() {
                 element={<AccountantViewLedger />}
               />
 
-              {/* User list page */}
+              {/* =========
+                  User List
+                  =========*/}
               <Route path="/user-list" element={<UserList />} />
               <Route path="/manager-user-list" element={<ManagerUserList />} />
 
+              {/* =========
+                     Help
+                  =========*/}
+              <Route path="/help" element={<Help />} />
+
+              {/* =========
+                  Not Found
+                  =========*/}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

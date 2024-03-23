@@ -10,6 +10,9 @@ const Footer = () => {
         Elevate Your Accounting Game with Ledger Logic - Balancing the Books,
         Unleashing Potential
       </p>
+      <div className={styles.flex}>
+        <Link to="/help">Help</Link>
+      </div>
       <br></br>
 
       {/* <p className={styles.footer}>Quick Nav (temporary for dev use)</p>
