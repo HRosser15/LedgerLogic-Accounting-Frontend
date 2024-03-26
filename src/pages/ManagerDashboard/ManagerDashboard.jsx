@@ -1,22 +1,25 @@
-import React, { useContext } from "react";
-import { Container } from "react-bootstrap";
+import React, { useState } from "react";
+import ViewAccountsForm from "../AdminAccounts/Forms/ViewAccountsForm";
 import styles from "./ManagerDashboard.module.css";
-import AppContext from "../../../context/AppContext";
-import logo from "../../assets/logoNoWords.png";
 
-const ManagerDashbaord = ({ username }) => {
-  const { state } = useContext(AppContext);
+
+const toggleModal = async (e) => {
+  var modal = <ViewAccountsForm />;
+        if (modal) {
+            modal.style.display = modal.style.display === "block" ? "none" : "block";
+        }
+}
+const ManagerDashboard = () => {
+  // Add your component logic here
+
 
   return (
-    <Container className={styles.dashboardContainer}>
-      <h1>Admin Dashboard</h1>
-      <div style={{ height: "50px" }}></div>
-      <img className={styles.image} src={logo} alt="Logo"></img>
-      <h2 className={styles.welcomeMessage}> Welcome {state.username}!</h2>
+    <div className={styles.dashboardContainer}>
+      <h1>Manager Dashboard</h1>
+      {/* Your manager dashboard content */}
+      <button className="button" onClick={toggleModal}>View Current Users</button>
       <div style={{ height: "200px" }}></div>
-      <p>Some general info can be displayed here eventually</p>
-      <div style={{ height: "200px" }}></div>
-    </Container>
+    </div>
   );
 };
 
