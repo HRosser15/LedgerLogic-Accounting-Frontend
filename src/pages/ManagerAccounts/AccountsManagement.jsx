@@ -6,21 +6,38 @@ import styles from "./AccountsManagement.module.css";
 import "./DatePickerStyles.css";
 import AppContext from "../../../context/AppContext";
 import ManagerViewAccountsForm from "./Forms/ViewAccountsForm";
+import ManagerViewLedger from "./Forms/ViewLedger";
 
 const ManagerAccountsManagement = ({ username }) => {
   const { state } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState("view");
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedAccountNumber, setSelectedAccountNumber] = useState(null);
 
   const handleTabSelect = (tab) => {
     setActiveTab(tab);
   };
 
+  const handleAccountSelection = (accountNumber) => {
+    setSelectedAccountNumber(accountNumber);
+  };
+
   const renderTabContent = () => {
+    console.log("selectedAccountNumber:", selectedAccountNumber);
     switch (activeTab) {
       case "view":
-        return <ManagerViewAccountsForm selectedDate={selectedDate} />;
-      // Add more tabs here
+        return selectedAccountNumber ? (
+          <ManagerViewLedger
+            accountNumber={selectedAccountNumber}
+            handleAccountSelection={handleAccountSelection}
+          />
+        ) : (
+          <ManagerViewAccountsForm
+            selectedDate={selectedDate}
+            setSelectedAccountNumber={setSelectedAccountNumber}
+            handleAccountSelection={handleAccountSelection}
+          />
+        );
       default:
         return null;
     }

@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
 import { Link } from "react-router-dom";
 
-const ManagerViewAccountsForm = ({ selectedDate }) => {
+const ManagerViewAccountsForm = ({ selectedDate, handleAccountSelection }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [accounts, setAccounts] = useState([]);
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
@@ -327,9 +327,15 @@ const ManagerViewAccountsForm = ({ selectedDate }) => {
               <tr key={account.accountNumber}>
                 <td>{account.accountNumber}</td>
                 <td>
-                  <Link to={`/manager/account/${account.accountNumber}`}>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account.accountNumber);
+                      handleAccountSelection(account.accountNumber);
+                    }}
+                  >
                     {account.accountName}
-                  </Link>
+                  </span>
                 </td>
                 <td>{account.subCategory}</td>
                 <td>{account.normalSide}</td>
