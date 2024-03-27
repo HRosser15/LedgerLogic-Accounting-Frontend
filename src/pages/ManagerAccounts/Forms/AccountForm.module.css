@@ -130,3 +130,17 @@
   visibility: visible;
   opacity: 1;
 }
+
+.filterTitle {
+  margin-left: 20px;
+}
+
+.leftAlignedDatePicker {
+  display: flex;
+  align-items: left;
+  margin-top: 0px;
+}
+
+.leftAlignedDatePicker .react-datepicker__input-container input {
+  text-align: left;
+}

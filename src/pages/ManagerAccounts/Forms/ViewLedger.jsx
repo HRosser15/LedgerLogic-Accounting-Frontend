@@ -1,4 +1,8 @@
+import React, { useState } from "react";
+import ReactDatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
+import SearchAccounts from "./SearchAccounts";
 import styles from "./AccountForm.module.css";
 import previous from "../../../assets/previous.png";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -9,16 +13,27 @@ const ManagerViewLedger = ({
   accountNumber,
   handleBackToAccounts,
   accounts,
+  handleAccountSelection,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
   const handleBackClick = () => {
     handleBackToAccounts();
+    handleTabSelect("view");
   };
 
   const handleAddJournalEntry = () => {
     console.log("Add Journal Entry button clicked");
   };
 
-  const handleViewPR = () => {
+  const handleViewPR = (e) => {
+    e.preventDefault();
     console.log("View PR button clicked");
   };
 
@@ -50,9 +65,11 @@ const ManagerViewLedger = ({
   ];
 
   const isDebitAccount =
-    accountNumber.toString().startsWith("1") ||
-    accountNumber.toString().startsWith("5");
+    accountNumber !== null &&
+    (accountNumber.toString().startsWith("1") ||
+      accountNumber.toString().startsWith("5"));
   const isCreditAccount =
+    accountNumber !== null &&
     !isDebitAccount &&
     (accountNumber.toString().startsWith("3") ||
       accountNumber.toString().startsWith("6") ||
@@ -78,6 +95,27 @@ const ManagerViewLedger = ({
     0
   );
 
+  const filteredData = updatedDummyData.filter((entry) => {
+    if (!startDate || !endDate) return true; // If no dates selected, show all entries
+    const entryDate = new Date(entry.date);
+    return entryDate >= startDate && entryDate <= endDate;
+  });
+
+  if (accountNumber === null) {
+    console.log("yep it is null");
+    return (
+      <Container>
+        <h2>Search for an account to view its ledger</h2>
+        <SearchAccounts
+          accounts={accounts}
+          onAccountSelect={handleAccountSelection}
+        />
+      </Container>
+    );
+  } else {
+    console.log(`AccountNumber: ${accountNumber}`);
+  }
+
   return (
     <Container className={styles.dashboardContainer}>
       <Row>
@@ -93,7 +131,7 @@ const ManagerViewLedger = ({
                   placement="top"
                   overlay={
                     <Tooltip id="view-pr-tooltip">
-                      View the Post Reference for this Journal Entry
+                      Back to Chart of Accounts
                     </Tooltip>
                   }
                 >
@@ -106,8 +144,66 @@ const ManagerViewLedger = ({
               <h1>Ledger for Account {accountNumber}</h1>
               <p>(Manager View)</p>
             </div>
-            {/* Render the transactions for the account */}
-            <Row>{/* Search and Filter inputs... */}</Row>
+
+            {/* =================
+                SEARCH AND FILTER
+                ================= */}
+            <Row>
+              <Col>
+                <div className="container">
+                  <Form.Group
+                    controlId="searchTerm"
+                    className="d-flex flex-column align-items-start"
+                  >
+                    <Form.Label className="mr-2">
+                      Search Journal Entries:
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Account Name or Dollar Amount"
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                      style={{
+                        maxWidth: "400px",
+                        marginRight: "10px",
+                      }}
+                    />
+                  </Form.Group>
+                </div>
+              </Col>
+              <Col>
+                <div className="container">
+                  <Form.Group
+                    controlId="filterCriteria"
+                    className="d-flex flex-column align-items-start"
+                  >
+                    <Form.Label className={styles.filterTitle}>
+                      Filter by Date:
+                    </Form.Label>
+                    <div className="container">
+                      <div
+                        className={`${styles.datePickerContainer} ${styles.leftAlignedDatePicker}`}
+                      >
+                        <ReactDatePicker
+                          selected={startDate}
+                          onChange={(date) => setStartDate(date)}
+                          placeholderText="Start Date"
+                          className={styles.datePicker}
+                        />
+                        <ReactDatePicker
+                          selected={endDate}
+                          onChange={(date) => setEndDate(date)}
+                          placeholderText="End Date"
+                          className={styles.datePicker}
+                        />
+                      </div>
+                    </div>
+
+                    {/* {renderFilterOptions()} */}
+                  </Form.Group>
+                </div>
+              </Col>
+            </Row>
 
             {/* ===============
                   LEDGER TABLE
@@ -125,7 +221,7 @@ const ManagerViewLedger = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {updatedDummyData.map((entry) => (
+                  {filteredData.map((entry) => (
                     <tr key={entry.ledgerId}>
                       <td>{entry.date}</td>
                       <td>{entry.description}</td>
@@ -151,6 +247,7 @@ const ManagerViewLedger = ({
                         <div className={styles.tooltipContainer}>
                           <button
                             className={`${styles.prButton} ${styles.tooltip}`}
+                            onClick={handleViewPR}
                           >
                             View PR
                             <span className={styles.tooltipText}>

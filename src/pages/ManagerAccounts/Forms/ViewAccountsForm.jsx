@@ -6,10 +6,14 @@ import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
 import { Link } from "react-router-dom";
 
-const ManagerViewAccountsForm = ({ selectedDate, handleAccountSelection }) => {
+const ManagerViewAccountsForm = ({
+  selectedDate,
+  handleAccountSelection,
+  accounts,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [accounts, setAccounts] = useState([]);
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
+  const [selectedFilterOptionText, setSelectedFilterOptionText] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([
     "Assets",
     "Liabilities",
@@ -21,31 +25,6 @@ const ManagerViewAccountsForm = ({ selectedDate, handleAccountSelection }) => {
   const [normalSideFilter, setNormalSideFilter] = useState("");
   const [balanceFilter, setBalanceFilter] = useState({ min: "", max: "" });
   const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
-
-  useEffect(() => {
-    fetchAccounts()
-      .then((response) => {
-        const sortedAccounts = response.data.sort(
-          (a, b) => a.accountNumber - b.accountNumber
-        );
-        setAccounts(sortedAccounts);
-      })
-      .catch((error) => {
-        console.error(error);
-        concole.log(
-          "Make sure you alter the column size of previous_state and current_state (in the h2 database)"
-        );
-        console.log(
-          "This can be done in the h2 console at 'http://localhost:8080/h2-console' (Password is 'password' with:"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN previous_state VARCHAR(60000);"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN current_state VARCHAR(60000);"
-        );
-      });
-  }, []);
 
   const filterOptions = [
     { value: "category", label: "Account Category", type: "checkbox" },
@@ -330,8 +309,8 @@ const ManagerViewAccountsForm = ({ selectedDate, handleAccountSelection }) => {
                   <span
                     style={{ cursor: "pointer", textDecoration: "underline" }}
                     onClick={() => {
-                      console.log("Clicked account:", account.accountNumber);
-                      handleAccountSelection(account.accountNumber);
+                      console.log("Clicked account:", account.accountName);
+                      handleAccountSelection(account.accountName);
                     }}
                   >
                     {account.accountName}
