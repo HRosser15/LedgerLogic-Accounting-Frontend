@@ -18,11 +18,14 @@ export const registerUser = (userData) => {
 
 export const loginUser = async (username, password) => {
   try {
-    const response = await axios.post(`${BASE_URL}/login`, { username, password });
+    const response = await axios.post(`${BASE_URL}/login`, {
+      username,
+      password,
+    });
     console.log("Login successful:", response.data);
 
     localStorage.setItem("user", JSON.stringify(response.data));
-    
+
     return response.data;
   } catch (error) {
     console.error("Login failed:", error);
@@ -38,5 +41,5 @@ export const logoutUser = (setState, history) => {
   setState({ isLoggedIn: false, username: "", role: "" });
 
   // Redirect to the login page
-  history.push("/login-choices"); 
+  history.push("/user-login");
 };

@@ -50,7 +50,7 @@ const ForgotPassword = () => {
       );
 
       if (response) {
-        navigate("/enter-new-password");
+        navigate("/enter-new-password", { state: { email } });
       } else {
         console.error(
           "Incorrect security answer. Unable to set a new password."
@@ -78,6 +78,7 @@ const ForgotPassword = () => {
                 type="text"
                 className={styles.textField50Center}
                 value={email}
+                name="email"
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>

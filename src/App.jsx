@@ -10,21 +10,25 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
-import NavBar from "./components/NavBar/NavBar";
 import ContextProvider from "../context/ContextProvider";
 import AppContext from "../context/AppContext";
 import { AuthProvider } from "../context/AuthContext";
+
+import NavBar from "./components/NavBar/NavBar";
 import Footer from "./components/Footer/Footer";
+
 import CreateNewUser from "./pages/CreateNewUser/CreateNewUser";
+import UserLogin from "./pages/UserLogin/UserLogin"; // main login
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import EnterNewPassword from "./pages/ForgotPassword/EnterNewPassword";
+
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
-import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
+
 import UserList from "./pages/AdminDashboard/UserList";
 import ManagerUserList from "./pages/ManagerDashboard/ManagerUserList";
-import NotFound from "./pages/NotFound/NotFound";
-import EnterNewPassword from "./pages/ForgotPassword/EnterNewPassword";
-import UserLogin from "./pages/UserLogin/UserLogin"; // main login
+import ExpiredPasswords from "./pages/AdminDashboard/ExpiredPasswords";
 
 import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
 import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
@@ -36,6 +40,8 @@ import AccountantAccountsManagement from "./pages/AccountantAccounts/AccountsMan
 import AccountantViewLedger from "./pages/AccountantAccounts/Forms/ViewLedger";
 
 import Help from "./pages/Help/Help";
+
+import NotFound from "./pages/NotFound/NotFound";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -116,6 +122,7 @@ function App() {
                   =========*/}
               <Route path="/user-list" element={<UserList />} />
               <Route path="/manager-user-list" element={<ManagerUserList />} />
+              <Route path="/expired-passwords" element={<ExpiredPasswords />} />
 
               {/* =========
                      Help
