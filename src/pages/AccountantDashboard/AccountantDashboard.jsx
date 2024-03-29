@@ -1,16 +1,16 @@
 import React, { useContext } from "react";
 import { Container } from "react-bootstrap";
-import styles from "./ManagerDashboard.module.css";
+import styles from "./AccountantDashboard.module.css";
 import AppContext from "../../../context/AppContext";
 import logo from "../../assets/logoNoWords.png";
 
-const ManagerDashboard = ({ username }) => {
+const AccountantDashboard = ({ username }) => {
   const { state } = useContext(AppContext);
 
   return (
     <Container className={styles.dashboardContainer}>
       <div style={{ height: "50px" }}></div>
-      <h1>Manager Dashboard</h1>
+      <h1>Accountant Dashboard</h1>
       <div style={{ height: "50px" }}></div>
       <img className={styles.image} src={logo} alt="Logo"></img>
       <h2 className={styles.welcomeMessage}> Welcome {state.username}!</h2>
@@ -21,4 +21,4 @@ const ManagerDashboard = ({ username }) => {
   );
 };
 
-export default ManagerDashboard;
+export default AccountantDashboard;

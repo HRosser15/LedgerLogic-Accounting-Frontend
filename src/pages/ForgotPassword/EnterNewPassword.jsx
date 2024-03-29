@@ -1,40 +1,54 @@
 import styles from "./EnterNewPassword.module.css";
 import React, { useState } from "react";
-import logo from "../../assets/logo.png";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-
-const checkPassword = (password, confirmPassword) => {
-  if (password.length < 8) {
-    return false;
-  }
-  if (!/[A-Z]/.test(password)) {
-    return false;
-  }
-  if (!/[0-9]/.test(password)) {
-    return false;
-  }
-  if (!/[!@#$%^&*]/.test(password)) {
-    return false;
-  }
-  if (password !== confirmPassword) {
-    return false;
-  }
-  return true;
-};
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { resetPassword } from "../../services/PasswordService";
 
 const EnterNewPassword = () => {
+  const location = useLocation();
+  const { email } = location.state;
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+  let errorMessage = "";
 
-  const handleUpdatePassword = (e) => {
+  const checkPassword = (password, confirmPassword) => {
+    if (password.length < 8) {
+      errorMessage = "Password must be at least 8 characters";
+      return false;
+    }
+    if (!/[A-Z]/.test(password)) {
+      errorMessage = "Password must contain at least one capital letter";
+      return false;
+    }
+    if (!/[0-9]/.test(password)) {
+      errorMessage = "Password must contain at least one digit";
+      return false;
+    }
+    if (!/[!@#$%^&*]/.test(password)) {
+      errorMessage =
+        "Password must contain at least one special character: !@#$%^&*)";
+      return false;
+    }
+    if (password !== confirmPassword) {
+      errorMessage = "Passwords must match";
+      return false;
+    }
+    return true;
+  };
+
+  const handleUpdatePassword = async (e) => {
     e.preventDefault();
 
     if (checkPassword(password, confirmPassword)) {
-      alert("Password Updated");
-      navigate("/manager-dashboard");
+      try {
+        await resetPassword(email, password);
+        alert("Password Updated");
+        navigate("/user-login");
+      } catch (error) {
+        alert(error);
+      }
     } else {
-      alert("Password invalid");
+      alert(errorMessage);
     }
   };
 
