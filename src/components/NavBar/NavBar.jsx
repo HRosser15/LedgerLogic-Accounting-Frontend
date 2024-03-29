@@ -1,14 +1,29 @@
 "use client";
 import styles from "./NavBar.module.css";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import AppContext from "../../../context/AppContext";
+import { useAuth } from "../../../context/AuthContext";
 import userIcon from "../../assets/icon.png";
 import logo from "../../assets/logo.png";
-import { Link } from "react-router-dom";
+import { Dropdown } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 
 const NavBar = () => {
   const { state, setState } = useContext(AppContext);
-  console.log(state);
+  const { logout } = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(state.isLoggedIn);
+  const navigate = useNavigate();
+  // console.log(state);
+
+  useEffect(() => {
+    setIsLoggedIn(state.isLoggedIn);
+  }, [state.isLoggedIn]);
+
+  const handleLogout = () => {
+    logout(setState);
+    setIsLoggedIn(false);
+    navigate("/user-login");
+  };
 
   const renderLinks = () => {
     if (state.isLoggedIn) {
@@ -17,24 +32,26 @@ const NavBar = () => {
           return (
             <>
               <Link to="/admin-dashboard">Admin Dashboard</Link>
-              <Link to="/user-list">View User List</Link>
-              <Link to="/user-list">View Expired Passwords</Link>
-              <Link to="/create-new-user">Create New User</Link>
-              {/* Add other admin links here */}
+              <Link to="/admin-user-management">Users</Link>
+              <Link to="/admin-accounts-management">Accounts</Link>
+              {/* Add other ADMIN links here */}
             </>
           );
         case "manager":
           return (
             <>
               <Link to="/manager-dashboard">Manager Dashboard</Link>
-              {/* Add other manager links here */}
+              <Link to="/manager-user-list">Users</Link>
+              <Link to="/manager-accounts-management">Accounts</Link>
+              {/* Add other MANAGER links here */}
             </>
           );
-        case "user":
+        case "accountant":
           return (
             <>
-              <Link to="/user-dashboard">User Dashboard</Link>
-              {/* Add other user links here */}
+              <Link to="/accountant-dashboard">Accountant Dashboard</Link>
+              <Link to="/accountant-accounts-management">Accounts</Link>
+              {/* Add other ACCOUNTANT links here */}
             </>
           );
         default:
@@ -53,22 +70,37 @@ const NavBar = () => {
           <div className={styles.toggle}>
             <img alt="Ledger Logic LOGO" src={logo} className={styles.logo} />
 
-            <Link to="/">
-              {state.username}
-              <img
-                className={styles.userIcon}
-                alt="user profile icon"
-                src={userIcon}
-                width={30}
-                height={30}
-              />
-            </Link>
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="primary"
+                id="dropdown-basic"
+                style={{
+                  backgroundColor: "transparent",
+                  border: "none",
+                  color: "black",
+                }}
+              >
+                {state.username}
+                <img
+                  className={styles.userIcon}
+                  alt="user profile icon"
+                  src={userIcon}
+                  width={30}
+                  height={30}
+                />
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                {/* Add other dropdown items here */}
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
         ) : (
           <div className={styles.toggle}>
             <img alt="Ledger Logic LOGO" src={logo} className={styles.logo} />
-            <Link to="/login-choice"></Link>
-            <Link to="/login-choice">
+            <Link to="/user-login"></Link>
+            <Link to="/user-login">
               Log In
               <img
                 className={styles.userIcon}

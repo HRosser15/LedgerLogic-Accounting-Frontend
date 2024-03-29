@@ -36,7 +36,6 @@
   align-items: center;
   max-width: 100px;
   padding: 6px;
-  min-width: 120px;
 }
 
 .inputDateBox {
@@ -54,13 +53,28 @@
   align-items: center;
   max-width: 200px;
   margin-left: 20px;
-  min-width: 200px;
 }
 
 .forms {
+  margin-top: 20px;
   text-align: center;
   box-shadow: 6px 10px 15px #9d9c9c;
   border-radius: 20px;
   padding-top: 20px;
   padding-bottom: 20px;
+}
+
+.textLeft {
+  text-align: left !important;
+}
+
+.formContainer {
+  min-width: 320px;
+  margin: 0 auto;
+  padding: 0 50px;
+}
+
+.prevButton {
+  align-self: start;
+  background: transparent;
 }

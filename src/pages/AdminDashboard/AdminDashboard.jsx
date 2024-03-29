@@ -9,6 +9,7 @@ const AdminDashboard = ({ username }) => {
 
   return (
     <Container className={styles.dashboardContainer}>
+      <div style={{ height: "50px" }}></div>
       <h1>Admin Dashboard</h1>
       <div style={{ height: "50px" }}></div>
       <img className={styles.image} src={logo} alt="Logo"></img>

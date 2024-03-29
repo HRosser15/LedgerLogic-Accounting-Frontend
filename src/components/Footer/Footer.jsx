@@ -5,12 +5,17 @@ const Footer = () => {
   return (
     <div className={styles.container}>
       {/* <img src={logo} alt="logo" className={styles.logo}/> */}
+      <br></br>
       <p className={styles.footer}>
         Elevate Your Accounting Game with Ledger Logic - Balancing the Books,
         Unleashing Potential
       </p>
+      <div className={styles.flex}>
+        <Link to="/help">Help</Link>
+      </div>
+      <br></br>
 
-      <p className={styles.footer}>Quick Nav (temporary for dev use)</p>
+      {/* <p className={styles.footer}>Quick Nav (temporary for dev use)</p>
       <div className={styles.flex}>
         <Link to="/">Login</Link>
 
@@ -29,7 +34,7 @@ const Footer = () => {
         <Link to="/user-list">UserList</Link>
         <Link to="/user-dashboard">UserDashboard</Link>
         <Link to="/manager-dashboard">ManagerDashboard</Link>
-      </div>
+      </div> */}
     </div>
   );
 };
