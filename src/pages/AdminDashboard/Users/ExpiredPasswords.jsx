@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
-import { fetchUsers, fetchExpiredPasswords } from "../../services/UserService";
-import styles from "./AdminDashboard.module.css";
-import AppContext from "../../../context/AppContext";
+import {
+  fetchUsers,
+  fetchExpiredPasswords,
+} from "../../../services/UserService";
+import styles from "../AdminDashboard.module.css";
+import AppContext from "../../../../context/AppContext";
 import { Container, Row, Col } from "react-bootstrap";
 
 const ExpiredPasswords = () => {

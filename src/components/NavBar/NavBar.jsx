@@ -32,9 +32,10 @@ const NavBar = () => {
           return (
             <>
               <Link to="/admin-dashboard">Admin Dashboard</Link>
-              <Link to="/user-list">User List</Link>
-              <Link to="/expired-passwords">View Expired Passwords</Link>
-              <Link to="/create-new-user">Add User</Link>
+              <Link to="/admin-user-management">Users</Link>
+              {/* <Link to="/user-list">User List</Link> */}
+              {/* <Link to="/expired-passwords">View Expired Passwords</Link>
+              <Link to="/create-new-user">Add User</Link> */}
               <Link to="/admin-accounts-management">Accounts</Link>
               {/* Add other ADMIN links here */}
             </>

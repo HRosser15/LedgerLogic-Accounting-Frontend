@@ -36,12 +36,13 @@
   align-items: center;
   max-width: 100px;
   padding: 6px;
+  min-width: 120px;
 }
 
 .inputDateBox {
   align-items: center;
   max-width: 100px;
-  color:black;
+  color: black;
   background-color: #f5f5f5;
   border: 2px solid #c2c2c2;
   border-radius: 8px;
@@ -53,14 +54,13 @@
   align-items: center;
   max-width: 200px;
   margin-left: 20px;
-
+  min-width: 200px;
 }
 
- .forms {
-   text-align: center;
-   box-shadow: 6px 10px 15px #9D9C9C;
-   border-radius: 20px;
-   padding-top: 20px;
-   padding-bottom: 20px;
-
- }
+.forms {
+  text-align: center;
+  box-shadow: 6px 10px 15px #9d9c9c;
+  border-radius: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}

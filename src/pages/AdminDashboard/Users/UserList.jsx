@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useContext } from "react";
-import { fetchUsers } from "../../services/UserService";
+import { fetchUsers } from "../../../services/UserService";
 import { useNavigate } from "react-router-dom";
-import styles from "./AdminDashboard.module.css";
-import AppContext from "../../../context/AppContext";
+import styles from "../AdminDashboard.module.css";
+import AppContext from "../../../../context/AppContext";
 import {
   activateUser,
   deactivateUser,
   suspendUser,
-} from "../../services/UserService";
+} from "../../../services/UserService";
 import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";

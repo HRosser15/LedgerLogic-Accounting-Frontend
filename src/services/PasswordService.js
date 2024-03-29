@@ -44,15 +44,3 @@ export const resetPassword = async (email, newPasswordContent) => {
     throw error;
   }
 };
-// export const resetPassword = async (email, newPasswordContent) => {
-//   try {
-//     const response = await axios.post(`${BASE_URL}/resetPassword`, {
-//       email: email,
-//       newPasswordContent: newPasswordContent,
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error resetting password:", error);
-//     throw error;
-//   }
-// };

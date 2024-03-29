@@ -23,19 +23,19 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import EnterNewPassword from "./pages/ForgotPassword/EnterNewPassword";
 
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
-import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
-import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
-
-import UserList from "./pages/AdminDashboard/UserList";
-import ManagerUserList from "./pages/ManagerDashboard/ManagerUserList";
-import ExpiredPasswords from "./pages/AdminDashboard/ExpiredPasswords";
-
+import UsersDashboard from "./pages/AdminDashboard/Users/UsersDashboard";
+import UserList from "./pages/AdminDashboard/Users/UserList";
+import ExpiredPasswords from "./pages/AdminDashboard/Users/ExpiredPasswords";
+import UpdateUser from "./pages/AdminDashboard/Users/UpdateUser";
 import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
 import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
 
+import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
+import ManagerUserList from "./pages/ManagerDashboard/ManagerUserList";
 import ManagerAccountsManagement from "./pages/ManagerAccounts/AccountsManagement";
 import ManagerViewLedger from "./pages/ManagerAccounts/Forms/ViewLedger";
 
+import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import AccountantAccountsManagement from "./pages/AccountantAccounts/AccountsManagement";
 import AccountantViewLedger from "./pages/AccountantAccounts/Forms/ViewLedger";
 
@@ -85,7 +85,11 @@ function App() {
                 path="/admin-dashboard"
                 element={<AdminDashboard username={state.username} />}
               />
-              <Route path="/navbar" element={<NavBar />}></Route>
+
+              <Route
+                path="/admin-user-management"
+                element={<UsersDashboard />}
+              ></Route>
 
               {/* ===================
                   Accounts Management
@@ -123,6 +127,7 @@ function App() {
               <Route path="/user-list" element={<UserList />} />
               <Route path="/manager-user-list" element={<ManagerUserList />} />
               <Route path="/expired-passwords" element={<ExpiredPasswords />} />
+              <Route path="/update-user" element={<UpdateUser />} />
 
               {/* =========
                      Help
@@ -133,6 +138,8 @@ function App() {
                   Not Found
                   =========*/}
               <Route path="*" element={<NotFound />} />
+
+              <Route path="/navbar" element={<NavBar />}></Route>
             </Routes>
           </div>
           <Footer />
