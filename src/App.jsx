@@ -32,8 +32,8 @@ import ViewLedger from "./pages/AdminDashboard/Accounts/Forms/ViewLedger";
 
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import ManagerUserList from "./pages/ManagerDashboard/Users/ManagerUserList";
-import ManagerAccountsManagement from "./pages/ManagerAccounts/AccountsManagement";
-import ManagerViewLedger from "./pages/ManagerAccounts/Forms/ViewLedger";
+import ManagerAccountsManagement from "./pages/ManagerDashboard/Accounts/AccountsManagement";
+import ManagerViewLedger from "./pages/ManagerDashboard/Accounts/Forms/ViewLedger";
 
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";

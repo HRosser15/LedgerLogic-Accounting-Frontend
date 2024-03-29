@@ -4,7 +4,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
 import SearchAccounts from "./SearchAccounts";
 import styles from "./AccountForm.module.css";
-import previous from "../../../assets/previous.png";
+import previous from "../../../../assets/previous.png";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
