@@ -1,14 +1,14 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import { fetchAccounts } from "../../../services/AccountService";
+import { fetchAccounts } from "../../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
-import AppContext from "../../../../context/AppContext";
+import AppContext from "../../../../../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const AccountantViewAccountsForm = ({ selectedDate }) => {
+const ViewAccountsForm = ({ selectedDate }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [accounts, setAccounts] = useState([]);
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
@@ -331,7 +331,7 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
               <tr key={account.accountNumber}>
                 <td>{account.accountNumber}</td>
                 <td>
-                  <Link to={`/accountant/account/${account.accountNumber}`}>
+                  <Link to={`/account/${account.accountNumber}`}>
                     {account.accountName}
                   </Link>
                 </td>
@@ -418,4 +418,4 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
   );
 };
 
-export default AccountantViewAccountsForm;
+export default ViewAccountsForm;

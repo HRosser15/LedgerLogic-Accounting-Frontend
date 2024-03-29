@@ -33,9 +33,6 @@ const NavBar = () => {
             <>
               <Link to="/admin-dashboard">Admin Dashboard</Link>
               <Link to="/admin-user-management">Users</Link>
-              {/* <Link to="/user-list">User List</Link> */}
-              {/* <Link to="/expired-passwords">View Expired Passwords</Link>
-              <Link to="/create-new-user">Add User</Link> */}
               <Link to="/admin-accounts-management">Accounts</Link>
               {/* Add other ADMIN links here */}
             </>
@@ -44,7 +41,7 @@ const NavBar = () => {
           return (
             <>
               <Link to="/manager-dashboard">Manager Dashboard</Link>
-              <Link to="/manager-user-list">View User List</Link>
+              <Link to="/manager-user-list">Users</Link>
               <Link to="/manager-accounts-management">Accounts</Link>
               {/* Add other MANAGER links here */}
             </>

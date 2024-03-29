@@ -3,8 +3,8 @@ import { Form, Button, Container, Row, Col, Modal } from "react-bootstrap";
 import {
   deactivateAccount,
   fetchAccounts,
-} from "../../../services/AccountService";
-import AppContext from "../../../../context/AppContext";
+} from "../../../../services/AccountService";
+import AppContext from "../../../../../context/AppContext";
 import styles from "./AccountForm.module.css";
 
 const DeactivateAccountsForm = () => {

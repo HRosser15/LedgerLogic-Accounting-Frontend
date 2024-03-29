@@ -9,8 +9,8 @@ import {
   OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
-import AppContext from "../../../../context/AppContext";
-import { addAccount } from "../../../services/AccountService";
+import AppContext from "../../../../../context/AppContext";
+import { addAccount } from "../../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 
 const AddAccountsForm = ({ onCancel }) => {

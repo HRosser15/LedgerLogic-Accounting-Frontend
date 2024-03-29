@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
-import { fetchUsers } from "../../services/UserService";
+import { fetchUsers } from "../../../services/UserService";
 import { useNavigate } from "react-router-dom";
-import styles from "./ManagerDashboard.module.css";
-import AppContext from "../../../context/AppContext";
+import styles from "../ManagerDashboard.module.css";
+import AppContext from "../../../../context/AppContext";
 import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
 
 const ManagerUserList = () => {

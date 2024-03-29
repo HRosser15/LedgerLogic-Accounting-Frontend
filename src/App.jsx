@@ -27,17 +27,17 @@ import UsersDashboard from "./pages/AdminDashboard/Users/UsersDashboard";
 import UserList from "./pages/AdminDashboard/Users/UserList";
 import ExpiredPasswords from "./pages/AdminDashboard/Users/ExpiredPasswords";
 import UpdateUser from "./pages/AdminDashboard/Users/UpdateUser";
-import AdminAccountsManagement from "./pages/AdminAccounts/AdminAccountsManagement";
-import ViewLedger from "./pages/AdminAccounts/Forms/ViewLedger";
+import AdminAccountsManagement from "./pages/AdminDashboard/Accounts/AdminAccountsManagement";
+import ViewLedger from "./pages/AdminDashboard/Accounts/Forms/ViewLedger";
 
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
-import ManagerUserList from "./pages/ManagerDashboard/ManagerUserList";
+import ManagerUserList from "./pages/ManagerDashboard/Users/ManagerUserList";
 import ManagerAccountsManagement from "./pages/ManagerAccounts/AccountsManagement";
 import ManagerViewLedger from "./pages/ManagerAccounts/Forms/ViewLedger";
 
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
-import AccountantAccountsManagement from "./pages/AccountantAccounts/AccountsManagement";
-import AccountantViewLedger from "./pages/AccountantAccounts/Forms/ViewLedger";
+import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";
+import AccountantViewLedger from "./pages/AccountantDashboard/Accounts/Forms/ViewLedger";
 
 import Help from "./pages/Help/Help";
 
