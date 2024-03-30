@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "./AddNewUser.module.css";
+import { updateUserInfo } from "../../../services/UserService";
 
 const UpdateUser = () => {
   const [formData, setFormData] = useState({
@@ -12,31 +13,9 @@ const UpdateUser = () => {
     firstName: "",
     lastName: "",
     email: "",
-    passwordContent: "",
-    role: "",
     birthDay: null,
     streetAddress: "",
     status: "false",
-    passwordSecurityQuestions: [
-      {
-        answer: "",
-        question: {
-          content: "",
-        },
-      },
-      {
-        answer: "",
-        question: {
-          content: "",
-        },
-      },
-      {
-        answer: "",
-        question: {
-          content: "",
-        },
-      },
-    ],
   });
 
   const [requestSent, setRequestSent] = useState(false);
@@ -50,27 +29,20 @@ const UpdateUser = () => {
     }));
   };
 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  // NEEDS TO BE UPDATED WITH UPDATE API
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  const registerUserHandler = async () => {
+  const updateUserHandler = async () => {
     try {
-      const response = await registerUser(formData);
+      const response = await updateUserInfo(formData);
 
-      if (response.status === 201) {
-        console.log("Registration successful");
+      if (response.status === 200) {
+        console.log("User updated successfully");
         setRequestSent(true);
       } else {
-        console.error("Registration failed");
-        setErrorMessage(
-          "Request failed. Please check that you don't already have an account and verify that your password meets the requirements"
-        );
+        console.error("User update failed");
+        setErrorMessage("Failed to update user. Please try again later.");
       }
     } catch (error) {
       console.error("Error:", error);
-      setErrorMessage(
-        "Request failed. Please check that you don't already have an account and verify that your password meets the minimum requirements"
-      );
+      setErrorMessage("Failed to update user. Please try again later.");
     }
   };
 
@@ -86,7 +58,7 @@ const UpdateUser = () => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          registerUserHandler();
+          updateUserHandler();
         }}
         className="row g-3"
       >
@@ -98,9 +70,11 @@ const UpdateUser = () => {
             type="text"
             className="form-control"
             id="userId"
+            name="userId"
             value={formData.userId}
             onChange={handleChange}
             placeholder="User ID"
+            autoComplete="off"
           />
         </div>
         <div className="col-md-10"></div>
@@ -116,6 +90,7 @@ const UpdateUser = () => {
             value={formData.firstName}
             onChange={handleChange}
             placeholder="First name"
+            autoComplete="off"
           />
         </div>
         <div className="col-md-6">
@@ -130,6 +105,7 @@ const UpdateUser = () => {
             value={formData.lastName}
             onChange={handleChange}
             placeholder="Last name"
+            autoComplete="off"
           />
         </div>
 
@@ -144,10 +120,11 @@ const UpdateUser = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
+            autoComplete="off"
           />
         </div>
 
-        <div className="col-md-6">
+        {/* <div className="col-md-6">
           <label htmlFor="password" className="form-label">
             Password
           </label>
@@ -159,14 +136,15 @@ const UpdateUser = () => {
             value={formData.passwordContent}
             onChange={handleChange}
             placeholder="Password"
+            autoComplete="off"
           />
           <p className="password-requirements">
             Password must be 8 or more characters and contain at least one of
             each: uppercase, number, special character{" "}
           </p>
-        </div>
+        </div> */}
 
-        <div className="col-md-3">
+        {/* <div className="col-md-3">
           <label htmlFor="role" className="form-label">
             Role
           </label>
@@ -181,7 +159,7 @@ const UpdateUser = () => {
             <option value="manager">Manager</option>
             <option value="admin">Admin</option>
           </select>
-        </div>
+        </div> */}
 
         <div className="col-md-3">
           <label htmlFor="birthDay" className={`${styles.datePickerContainer}`}>
@@ -190,10 +168,19 @@ const UpdateUser = () => {
           <div>
             <DatePicker
               id="birthDay"
+              name="birthDay"
               className="form-control"
               selected={formData.birthDay}
-              onChange={(date) => handleChange({ target: { value: date } })}
+              onChange={(date) =>
+                setFormData((prevFormData) => ({
+                  ...prevFormData,
+                  birthDay: date,
+                }))
+              }
               dateFormat="MM/dd/yyyy" // We can customize the date format as needed
+              isClearable
+              showPopperArrow
+              autoComplete="off"
               style={{
                 border: "2px solid #cccccc",
                 height: "50px",
@@ -214,6 +201,7 @@ const UpdateUser = () => {
             value={formData.streetAddress}
             onChange={handleChange}
             placeholder="1234 Main Street"
+            autoComplete="off"
           />
         </div>
 
@@ -227,6 +215,7 @@ const UpdateUser = () => {
             id="city"
             name="city"
             placeholder="Atlanta"
+            autoComplete="off"
           />
         </div>
 
@@ -300,6 +289,7 @@ const UpdateUser = () => {
             className="form-control"
             id="zipCode"
             name="zipCode"
+            autoComplete="off"
           />
         </div>
 

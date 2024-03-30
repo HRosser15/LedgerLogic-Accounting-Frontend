@@ -44,18 +44,6 @@ export const fetchExpiredPasswords = () => {
   }
 };
 
-export const loginUser = async (username, password) => {
-  try {
-    const response = await axios.post("http://localhost:8080/auth/login", {
-      username,
-      password,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const activateUser = (userId) => {
   return axios.put(`${BASE_URL}/activate/${userId}`);
 };
@@ -69,4 +57,13 @@ export const suspendUser = (userId, suspensionStartDate, suspensionEndDate) => {
     suspensionStartDate: suspensionStartDate,
     suspensionEndDate: suspensionEndDate,
   });
+};
+export const updateUserInfo = async (formData) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/update/${formData.userId}`, formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
 };
