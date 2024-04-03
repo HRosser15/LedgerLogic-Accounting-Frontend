@@ -1,31 +1,14 @@
 import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
-import { registerUser } from "../../services/AuthService";
+import { registerUser } from "../../../services/AuthService";
 import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
 import "react-datepicker/dist/react-datepicker.css";
-import styles from "./CreateNewUser.module.css";
+import styles from "./AddNewUser.module.css";
 
-const CreateNewUser = () => {
-  const securityQuestionOptions = [
-    [
-      "What was the name of your favorite childhood pet?",
-      "What was the name of your best friend growing up?",
-      "What year was your grandmother born?",
-    ],
-    [
-      "What is your mother's maiden name?",
-      "What was your nickname growing up?",
-      "What year was your grandmother born?",
-    ],
-    [
-      "What was the make of your first car?",
-      "What was the name of the school you attended for first grade?",
-      "What is your favorite movie quote?",
-    ],
-  ];
-
+const UpdateUser = () => {
   const [formData, setFormData] = useState({
+    userId: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -56,31 +39,6 @@ const CreateNewUser = () => {
     ],
   });
 
-  const handleChangeSecurityQuestion = (e, index) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      passwordSecurityQuestions: prevFormData.passwordSecurityQuestions.map(
-        (question, i) =>
-          i === index
-            ? {
-                ...question,
-                question: {
-                  content:
-                    name === `securityQuestion${index + 1}`
-                      ? value
-                      : question.question.content,
-                },
-                answer:
-                  name === `securityAnswer${index + 1}`
-                    ? value
-                    : question.answer,
-              }
-            : question
-      ),
-    }));
-  };
-
   const [requestSent, setRequestSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -92,6 +50,9 @@ const CreateNewUser = () => {
     }));
   };
 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // NEEDS TO BE UPDATED WITH UPDATE API
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   const registerUserHandler = async () => {
     try {
       const response = await registerUser(formData);
@@ -120,7 +81,7 @@ const CreateNewUser = () => {
 
   return (
     <div className={`container ${styles.formContainer}`}>
-      <h2>Create an Account</h2>
+      <h2>Update a User</h2>
 
       <form
         onSubmit={(e) => {
@@ -129,6 +90,20 @@ const CreateNewUser = () => {
         }}
         className="row g-3"
       >
+        <div className="col-md-2">
+          <label htmlFor="userId" className="form-label">
+            User ID
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="userId"
+            value={formData.userId}
+            onChange={handleChange}
+            placeholder="User ID"
+          />
+        </div>
+        <div className="col-md-10"></div>
         <div className="col-md-6">
           <label htmlFor="firstName" className="form-label">
             First Name
@@ -217,9 +192,7 @@ const CreateNewUser = () => {
               id="birthDay"
               className="form-control"
               selected={formData.birthDay}
-              onChange={(date) =>
-                handleChange({ target: { name: "birthDay", value: date } })
-              }
+              onChange={(date) => handleChange({ target: { value: date } })}
               dateFormat="MM/dd/yyyy" // We can customize the date format as needed
               style={{
                 border: "2px solid #cccccc",
@@ -330,39 +303,9 @@ const CreateNewUser = () => {
           />
         </div>
 
-        {formData.passwordSecurityQuestions.map((question, index) => (
-          <div className="mb-3" key={index}>
-            <p>{`Question ${index + 1}:`}</p>
-            <div className="d-flex">
-              <select
-                className="form-select me-3"
-                id={`securityQuestion${index + 1}`}
-                name={`securityQuestion${index + 1}`}
-                value={question.selectedOption}
-                onChange={(e) => handleChangeSecurityQuestion(e, index)}
-              >
-                <option value="">Select a question</option>
-                {securityQuestionOptions[index].map((option, optionIndex) => (
-                  <option key={optionIndex} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                className="form-control"
-                id={`securityAnswer${index + 1}`}
-                name={`securityAnswer${index + 1}`}
-                value={question.answer}
-                onChange={(e) => handleChangeSecurityQuestion(e, index)}
-              />
-            </div>
-          </div>
-        ))}
-
         <div className="col-12">
           <button type="submit" className="btn btn-primary">
-            Submit Request
+            Update User
           </button>
         </div>
       </form>
@@ -388,5 +331,4 @@ const CreateNewUser = () => {
   );
 };
 
-export default CreateNewUser;
-
+export default UpdateUser;

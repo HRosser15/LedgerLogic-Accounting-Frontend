@@ -38,9 +38,9 @@ export const fetchAccounts = () => {
   }
 };
 
-const deactivateAccount = async (sccountID) => {
+export const deactivateAccount = async (accountID) => {
   try {
-    const response = await axios.post(`${BASE_URL}/deactivate/${accountID}`)
+    const response = await axios.patch(`${BASE_URL}/deactivate/${accountID}`)
     return response.data;
   } catch (error) {
     if (error.response) {

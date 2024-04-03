@@ -3,7 +3,7 @@ import logo from "../../assets/logo.png";
 import styles from "./UserLogin.module.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import * as userService from "../../services/AuthService";
+import * as AuthService from "../../services/AuthService";
 import AppContext from "../../../context/AppContext";
 import { Modal, Button } from "react-bootstrap";
 
@@ -14,11 +14,9 @@ const UserLogin = () => {
   const { setState } = useContext(AppContext);
   const navigate = useNavigate();
 
-  // UserLogin.jsx
-
   const handleLogin = async () => {
     try {
-      const user = await userService.loginUser(username, password);
+      const user = await AuthService.loginUser(username, password);
 
       if (!user) {
         console.error("Login failed: User data not found in the response");
@@ -29,8 +27,7 @@ const UserLogin = () => {
       // Upon successful login...
       console.log("Login successful:", user);
 
-      // Use sessionStorage instead of localStorage
-      sessionStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user));
 
       setState({
         ...user,
@@ -43,7 +40,7 @@ const UserLogin = () => {
       } else if (user.role === "manager") {
         navigate("/manager-dashboard");
       } else {
-        navigate("/user-dashboard");
+        navigate("/accountant-dashboard");
       }
     } catch (error) {
       console.error(

@@ -1,0 +1,17 @@
+/* DatePickerStyles.css */
+
+/* Style the outer container of the DatePicker */
+.react-datepicker-wrapper {
+    display: inline-block;
+}
+
+/* Style the input field */
+.react-datepicker__input-container input {
+    color: black;
+    background-color: white;
+    border: 2px solid #e2e2e2;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    height: 40px;
+}

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
-import { registerUser } from "../../services/AuthService";
+import { registerUser } from "../../../services/AuthService";
 import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
 import "react-datepicker/dist/react-datepicker.css";
-import styles from "./CreateNewUser.module.css";
+import styles from "./AddNewUser.module.css";
 
-const CreateNewUser = () => {
+const AddNewUser = () => {
   const securityQuestionOptions = [
     [
       "What was the name of your favorite childhood pet?",
@@ -120,7 +120,7 @@ const CreateNewUser = () => {
 
   return (
     <div className={`container ${styles.formContainer}`}>
-      <h2>Create an Account</h2>
+      <h2>Add a New User</h2>
 
       <form
         onSubmit={(e) => {
@@ -217,9 +217,7 @@ const CreateNewUser = () => {
               id="birthDay"
               className="form-control"
               selected={formData.birthDay}
-              onChange={(date) =>
-                handleChange({ target: { name: "birthDay", value: date } })
-              }
+              onChange={(date) => handleChange({ target: { value: date } })}
               dateFormat="MM/dd/yyyy" // We can customize the date format as needed
               style={{
                 border: "2px solid #cccccc",
@@ -388,5 +386,4 @@ const CreateNewUser = () => {
   );
 };
 
-export default CreateNewUser;
-
+export default AddNewUser;
