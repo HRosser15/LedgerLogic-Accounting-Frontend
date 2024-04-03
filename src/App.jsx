@@ -33,6 +33,7 @@ import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import ManagerUserList from "./pages/ManagerDashboard/Users/ManagerUserList";
 import ManagerAccountsManagement from "./pages/ManagerDashboard/Accounts/AccountsManagement";
 import ManagerViewLedger from "./pages/ManagerDashboard/Accounts/Forms/ViewLedger";
+import ManagerCreateJournal from "./pages/ManagerDashboard/Accounts/Forms/CreateJournalEntry";
 
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";
