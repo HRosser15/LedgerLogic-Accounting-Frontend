@@ -36,6 +36,26 @@ const EditAccountsForm = () => {
 
       <form onSubmit={handleSubmit} className="row g-3">
         <div className="col-md-3">
+          <label htmlFor="accountNumber" className="form-label">
+            Account Name or Number
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="accountName"
+            name="accountName"
+            value={formData.streetAddress} // not the right variable
+            onChange={handleChange}
+            placeholder="Account Name or No."
+          />
+          <p className={styles.textboxInfo}>
+            This must match the existing account you want to update
+          </p>
+        </div>
+
+        <div className="col-md-9"></div>
+
+        <div className="col-md-3">
           <label htmlFor="category" className="form-label">
             Category
           </label>

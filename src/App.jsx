@@ -34,6 +34,7 @@ import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import ManagerUserList from "./pages/ManagerDashboard/Users/ManagerUserList";
 import ManagerAccountsManagement from "./pages/ManagerDashboard/Accounts/AccountsManagement";
 import ManagerViewLedger from "./pages/ManagerDashboard/Accounts/Forms/ViewLedger";
+import ManagerJournal from "./pages/ManagerDashboard/Accounts/Forms/ManagerJournal";
 
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";
@@ -75,33 +76,30 @@ function App() {
                 element={<EnterNewPassword />}
               />
 
-              {/* Dashboard pages */}
-              <Route
-                path="/accountant-dashboard"
-                element={<AccountantDashboard />}
-              />
-              <Route path="/manager-dashboard" element={<ManagerDashboard />} />
+              {/* ===================
+                  ADMINISTRATOR PAGES
+                  ===================*/}
               <Route
                 path="/admin-dashboard"
                 element={<AdminDashboard username={state.username} />}
               />
-
               <Route
                 path="/admin-user-management"
                 element={<UsersDashboard />}
               ></Route>
-
-              {/* ===================
-                  Accounts Management
-                  ===================*/}
-              {/* Admin */}
               <Route
                 path="admin-accounts-management"
                 element={<AdminAccountsManagement />}
               />
               <Route path="/account/:accountNumber" element={<ViewLedger />} />
+              <Route path="/user-list" element={<UserList />} />
+              <Route path="/expired-passwords" element={<ExpiredPasswords />} />
+              <Route path="/update-user" element={<UpdateUser />} />
 
-              {/* Manager */}
+              {/* =============
+                  MANAGER PAGES
+                  =============*/}
+              <Route path="/manager-dashboard" element={<ManagerDashboard />} />
               <Route
                 path="manager-accounts-management"
                 element={<ManagerAccountsManagement />}
@@ -110,8 +108,16 @@ function App() {
                 path="manager/account/:accountNumber"
                 element={<ManagerViewLedger />}
               />
+              <Route path="/manager-user-list" element={<ManagerUserList />} />
+              <Route path="/manager-journal" element={<ManagerJournal />} />
 
-              {/* Accountant */}
+              {/* ================
+                  ACCOUNTANT PAGES
+                  ================*/}
+              <Route
+                path="/accountant-dashboard"
+                element={<AccountantDashboard />}
+              />
               <Route
                 path="accountant-accounts-management"
                 element={<AccountantAccountsManagement />}
@@ -120,14 +126,6 @@ function App() {
                 path="/accountant/account/:accountNumber"
                 element={<AccountantViewLedger />}
               />
-
-              {/* =========
-                  User List
-                  =========*/}
-              <Route path="/user-list" element={<UserList />} />
-              <Route path="/manager-user-list" element={<ManagerUserList />} />
-              <Route path="/expired-passwords" element={<ExpiredPasswords />} />
-              <Route path="/update-user" element={<UpdateUser />} />
 
               {/* =========
                      Help

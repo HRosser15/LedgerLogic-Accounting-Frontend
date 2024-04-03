@@ -298,6 +298,7 @@ const ManagerViewAccountsForm = ({
               <th>Normal Side</th>
               <th>Description</th>
               <th>Balance</th>
+              <th>Statement</th>
               <th>Creation Date</th>
             </tr>
           </thead>
@@ -309,8 +310,8 @@ const ManagerViewAccountsForm = ({
                   <span
                     style={{ cursor: "pointer", textDecoration: "underline" }}
                     onClick={() => {
-                      console.log("Clicked account:", account.accountName);
-                      handleAccountSelection(account.accountName);
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
                     }}
                   >
                     {account.accountName}
@@ -325,6 +326,7 @@ const ManagerViewAccountsForm = ({
                     currency: "USD",
                   })}
                 </td>
+                <td>{account.statement}</td>
                 <td>{formatDate2(account.creationDate)}</td>
               </tr>
             ))}

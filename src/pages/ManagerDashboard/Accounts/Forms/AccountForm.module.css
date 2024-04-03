@@ -144,3 +144,11 @@
 .leftAlignedDatePicker .react-datepicker__input-container input {
   text-align: left;
 }
+
+.blackText {
+  color: black;
+}
+
+.redText {
+  color: red;
+}

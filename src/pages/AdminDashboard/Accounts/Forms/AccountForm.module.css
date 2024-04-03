@@ -78,3 +78,10 @@
   align-self: start;
   background: transparent;
 }
+
+.textboxInfo {
+  font-size: 12px;
+  color: #9d9c9c;
+  max-width: 80%;
+  margin-left: 10%;
+}

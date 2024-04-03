@@ -8,30 +8,37 @@ import "./DatePickerStyles.css";
 import AppContext from "../../../../context/AppContext";
 import ManagerViewAccountsForm from "./Forms/ViewAccountsForm";
 import ManagerViewLedger from "./Forms/ViewLedger";
+import ManagerJournal from "./Forms/ManagerJournal";
 
 const ManagerAccountsManagement = ({ username }) => {
   const { state } = useContext(AppContext);
-  const [activeTab, setActiveTab] = useState("view");
+  const [activeTab, setActiveTab] = useState("Chart of Accounts");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedAccountNumber, setSelectedAccountNumber] = useState(null);
+  // const [selectedAccountNumber, setSelectedAccountNumber] = useState(null);
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
 
   const handleTabSelect = (tab) => {
     setActiveTab(tab);
-    if (tab === "view") {
+    if (tab === "Chart of Accounts") {
       setSelectedAccountNumber(null);
     }
   };
 
-  const handleAccountSelection = (accountNumber) => {
-    setSelectedAccountNumber(accountNumber);
+  // const handleAccountSelection = (accountNumber) => {
+  //   setSelectedAccountNumber(accountNumber);
+  //   handleTabSelect("ledgers");
+  // };
+  const handleAccountSelection = (account) => {
+    setSelectedAccount(account);
     handleTabSelect("ledgers");
   };
 
   const renderTabContent = () => {
-    console.log("selectedAccountNumber:", selectedAccountNumber);
+    // console.log("selectedAccountNumber:", selectedAccountNumber);
+    console.log("selectedAccount:", selectedAccount);
     switch (activeTab) {
-      case "view":
+      case "Chart of Accounts":
         return (
           <ManagerViewAccountsForm
             selectedDate={selectedDate}
@@ -40,16 +47,19 @@ const ManagerAccountsManagement = ({ username }) => {
           />
         );
       case "ledgers":
-        return selectedAccountNumber ? (
+        return (
           <ManagerViewLedger
-            accountNumber={selectedAccountNumber}
+            // accountNumber={selectedAccountNumber}
+            account={selectedAccount}
             handleBackToAccounts={handleBackToAccounts}
             accounts={accounts}
             handleAccountSelection={handleAccountSelection}
           />
-        ) : (
-          <ManagerViewLedger
-            accountNumber={selectedAccountNumber}
+        );
+      case "journal":
+        return (
+          <ManagerJournal
+            // accountNumber={selectedAccountNumber}
             handleBackToAccounts={handleBackToAccounts}
             accounts={accounts}
             handleAccountSelection={handleAccountSelection}
@@ -124,14 +134,20 @@ const ManagerAccountsManagement = ({ username }) => {
         className={styles.tabs}
       >
         <Tab
-          eventKey="view"
-          title={<span title="View existing accounts">View</span>}
+          eventKey="Chart of Accounts"
+          title={<span title="View existing accounts">Chart of Accounts</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
           eventKey="ledgers"
           title={<span title="View account ledgers">Ledgers</span>}
+        >
+          <div style={{ height: "20px" }}></div>
+        </Tab>
+        <Tab
+          eventKey="journal"
+          title={<span title="Open journal">Journal</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
