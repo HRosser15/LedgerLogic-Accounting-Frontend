@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { fetchAccounts } from "../../../services/AccountService";
 import { Container, Tab, Tabs, Tooltip, Row, Col } from "react-bootstrap";
+import { JournalContext } from "../../../../context/JournalContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "./AccountsManagement.module.css";
@@ -8,7 +9,7 @@ import "./DatePickerStyles.css";
 import AppContext from "../../../../context/AppContext";
 import ManagerViewAccountsForm from "./Forms/ViewAccountsForm";
 import ManagerViewLedger from "./Forms/ViewLedger";
-import ManagerJournal from "./Forms/ManagerJournal";
+import ManagerCreateJournal from "./Forms/CreateJournalEntry";
 
 const ManagerAccountsManagement = ({ username }) => {
   const { state } = useContext(AppContext);
@@ -102,6 +103,8 @@ const ManagerAccountsManagement = ({ username }) => {
         );
       });
   }, []);
+
+  const { journalEntries } = useContext(JournalContext);
 
   return (
     <Container>

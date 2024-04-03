@@ -16,7 +16,6 @@ import { AuthProvider } from "../context/AuthContext";
 
 import NavBar from "./components/NavBar/NavBar";
 import Footer from "./components/Footer/Footer";
-
 import CreateNewUser from "./pages/CreateNewUser/CreateNewUser";
 import UserLogin from "./pages/UserLogin/UserLogin"; // main login
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
@@ -34,7 +33,7 @@ import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import ManagerUserList from "./pages/ManagerDashboard/Users/ManagerUserList";
 import ManagerAccountsManagement from "./pages/ManagerDashboard/Accounts/AccountsManagement";
 import ManagerViewLedger from "./pages/ManagerDashboard/Accounts/Forms/ViewLedger";
-import ManagerJournal from "./pages/ManagerDashboard/Accounts/Forms/ManagerJournal";
+import ManagerCreateJournal from "./pages/ManagerDashboard/Accounts/Forms/CreateJournalEntry";
 
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";

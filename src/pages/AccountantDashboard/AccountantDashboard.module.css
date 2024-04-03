@@ -2,4 +2,13 @@
     margin: auto;
     width: 80%;
   }
+
+  .button{
+    border: 3px solid #5EC57E;
+    background: transparent;
+    border-radius: 10px;
+    width: 10%;
+    color:#5EC57E;
+    margin: 5%;
+  }
   
