@@ -108,7 +108,10 @@ function App() {
                 element={<ManagerViewLedger />}
               />
               <Route path="/manager-user-list" element={<ManagerUserList />} />
-              <Route path="/manager-journal" element={<ManagerJournal />} />
+              <Route
+                path="/manager-create-journal"
+                element={<ManagerCreateJournal />}
+              />
 
               {/* ================
                   ACCOUNTANT PAGES
