@@ -48,6 +48,12 @@ npm run dev
 ```
 You can then view the app and any changes you make at the localhost url it displays in your terminal
 
+## Start Backend Server
+Please follow the README instructions for the backend repo.
+For the frontend and postman APIs to work, you will need to run:
+- The backend server
+- The mail server
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
