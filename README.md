@@ -49,7 +49,7 @@ npm run dev
 You can then view the app and any changes you make at the localhost url it displays in your terminal
 
 ## Start Backend Server
-Please follow the README instructions for the backend repo.
+Please follow the [README instructions for the backend repo](https://github.com/Ledger-Logic/Back-End/blob/main/README.md).
 For the frontend and postman APIs to work, you will need to run:
 - The backend server
 - The mail server
