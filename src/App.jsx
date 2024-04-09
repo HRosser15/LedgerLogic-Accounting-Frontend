@@ -38,10 +38,15 @@ import ManagerCreateJournal from "./pages/ManagerDashboard/Accounts/Forms/Create
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";
 import AccountantViewLedger from "./pages/AccountantDashboard/Accounts/Forms/ViewLedger";
+import AccountantCreateJournal from "./pages/AccountantDashboard/Accounts/Forms/CreateJournalEntry";
+
+import EventLog from "./pages/ManagerDashboard/Accounts/Forms/EventLog";
+import PostReference from "./pages/ManagerDashboard/Accounts/Forms/PostReference";
 
 import Help from "./pages/Help/Help";
 
 import NotFound from "./pages/NotFound/NotFound";
+import { JournalProvider } from "../context/JournalContext";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -59,91 +64,119 @@ function App() {
   return (
     <ContextProvider>
       <AuthProvider>
-        <Router>
-          <NavBar />
-          <div className="pd-hz ht-100 pd-vt bg-light-gray">
-            <Routes>
-              {/* Login options */}
-              <Route path="/" element={<UserLogin />} />
-              <Route path="/user-login" element={<UserLogin />} />
-              <Route path="/create-new-user" element={<CreateNewUser />} />
+        <JournalProvider>
+          <Router>
+            <NavBar />
+            <div className="pd-hz ht-100 pd-vt bg-light-gray">
+              <Routes>
+                {/* Login options */}
+                <Route path="/" element={<UserLogin />} />
+                <Route path="/user-login" element={<UserLogin />} />
+                <Route path="/create-new-user" element={<CreateNewUser />} />
 
-              {/* Forgot password pages */}
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route
-                path="/enter-new-password"
-                element={<EnterNewPassword />}
-              />
+                {/* Forgot password pages */}
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                  path="/enter-new-password"
+                  element={<EnterNewPassword />}
+                />
 
-              {/* ===================
+                {/* ===================
                   ADMINISTRATOR PAGES
                   ===================*/}
-              <Route
-                path="/admin-dashboard"
-                element={<AdminDashboard username={state.username} />}
-              />
-              <Route
-                path="/admin-user-management"
-                element={<UsersDashboard />}
-              ></Route>
-              <Route
-                path="admin-accounts-management"
-                element={<AdminAccountsManagement />}
-              />
-              <Route path="/account/:accountNumber" element={<ViewLedger />} />
-              <Route path="/user-list" element={<UserList />} />
-              <Route path="/expired-passwords" element={<ExpiredPasswords />} />
-              <Route path="/update-user" element={<UpdateUser />} />
+                <Route
+                  path="/admin-dashboard"
+                  element={<AdminDashboard username={state.username} />}
+                />
+                <Route
+                  path="/admin-user-management"
+                  element={<UsersDashboard />}
+                ></Route>
+                <Route
+                  path="admin-accounts-management"
+                  element={<AdminAccountsManagement />}
+                />
+                <Route
+                  path="/account/:accountNumber"
+                  element={<ViewLedger />}
+                />
+                <Route path="/user-list" element={<UserList />} />
+                <Route
+                  path="/expired-passwords"
+                  element={<ExpiredPasswords />}
+                />
+                <Route path="/update-user" element={<UpdateUser />} />
 
-              {/* =============
+                {/* =============
                   MANAGER PAGES
                   =============*/}
-              <Route path="/manager-dashboard" element={<ManagerDashboard />} />
-              <Route
-                path="manager-accounts-management"
-                element={<ManagerAccountsManagement />}
-              />
-              <Route
-                path="manager/account/:accountNumber"
-                element={<ManagerViewLedger />}
-              />
-              <Route path="/manager-user-list" element={<ManagerUserList />} />
-              <Route
-                path="/manager-create-journal"
-                element={<ManagerCreateJournal />}
-              />
+                <Route
+                  path="/manager-dashboard"
+                  element={<ManagerDashboard />}
+                />
+                <Route
+                  path="manager-accounts-management"
+                  element={<ManagerAccountsManagement />}
+                />
+                <Route
+                  path="manager/account/:accountNumber"
+                  element={<ManagerViewLedger />}
+                />
+                <Route
+                  path="/manager-user-list"
+                  element={<ManagerUserList />}
+                />
+                <Route
+                  path="/manager-create-journal"
+                  element={<ManagerCreateJournal />}
+                />
 
-              {/* ================
+                {/* ================
                   ACCOUNTANT PAGES
                   ================*/}
-              <Route
-                path="/accountant-dashboard"
-                element={<AccountantDashboard />}
-              />
-              <Route
-                path="accountant-accounts-management"
-                element={<AccountantAccountsManagement />}
-              />
-              <Route
-                path="/accountant/account/:accountNumber"
-                element={<AccountantViewLedger />}
-              />
+                <Route
+                  path="/accountant-dashboard"
+                  element={<AccountantDashboard />}
+                />
+                <Route
+                  path="accountant-accounts-management"
+                  element={<AccountantAccountsManagement />}
+                />
+                <Route
+                  path="/accountant/account/:accountNumber"
+                  element={<AccountantViewLedger />}
+                />
+                <Route
+                  path="/accountant-create-journal"
+                  element={<AccountantCreateJournal />}
+                />
 
-              {/* =========
+                {/* =========
+                    Event Log
+                    =========  */}
+                <Route path="/event-log" element={<EventLog />} />
+
+                {/* ===============
+                    EPost Reference
+                    ===============  */}
+                <Route path="/post-reference" element={<PostReference />} />
+
+                {/* =========
                      Help
                   =========*/}
-              <Route path="/help" element={<Help />} />
+                <Route path="/help" element={<Help />} />
 
-              {/* =========
+                {/* =========
                   Not Found
                   =========*/}
-              <Route path="*" element={<NotFound />} />
+                <Route path="*" element={<NotFound />} />
 
-              <Route path="/navbar" element={<NavBar />}></Route>
-            </Routes>
-          </div>
-          <Footer />
-        </Router>
+                <Route path="/navbar" element={<NavBar />}></Route>
+              </Routes>
+            </div>
+            <Footer />
+          </Router>
+        </JournalProvider>
       </AuthProvider>
     </ContextProvider>
   );

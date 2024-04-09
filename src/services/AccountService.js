@@ -20,6 +20,26 @@ const addAccount = async (requestData) => {
   }
 };
 
+
+export const fetchEventLog = () => {
+      return axios.get("http://localhost:8080/eventLog/getAll");
+};
+
+export const fetchExpiredPasswords = () => {
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+
+  if (user) {
+    const requestOptions = {
+      withCredentials: true,
+    };
+
+    return axios.get(`${BASE_URL}/getExpiredPasswords`, requestOptions);
+  } else {
+    console.error("User information not found in local storage");
+    return Promise.reject("User information not found");
+  }
+};
+
 export { addAccount };
 
 export const fetchAccounts = () => {

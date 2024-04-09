@@ -1,17 +1,22 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Modal } from "react-bootstrap";
 import { fetchAccounts } from "../../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
+import { emailUser } from "../../../../services/EmailService";
 import AppContext from "../../../../../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const ViewAccountsForm = ({ selectedDate }) => {
+const ViewAccountsForm = ({
+  selectedDate,
+  handleAccountSelection,
+  accounts,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [accounts, setAccounts] = useState([]);
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
+  const [selectedFilterOptionText, setSelectedFilterOptionText] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([
     "Assets",
     "Liabilities",
@@ -23,31 +28,11 @@ const ViewAccountsForm = ({ selectedDate }) => {
   const [normalSideFilter, setNormalSideFilter] = useState("");
   const [balanceFilter, setBalanceFilter] = useState({ min: "", max: "" });
   const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
-
-  useEffect(() => {
-    fetchAccounts()
-      .then((response) => {
-        const sortedAccounts = response.data.sort(
-          (a, b) => a.accountNumber - b.accountNumber
-        );
-        setAccounts(sortedAccounts);
-      })
-      .catch((error) => {
-        console.error(error);
-        concole.log(
-          "Make sure you alter the column size of previous_state and current_state (in the h2 database)"
-        );
-        console.log(
-          "This can be done in the h2 console at 'http://localhost:8080/h2-console' (Password is 'password' with:"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN previous_state VARCHAR(60000);"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN current_state VARCHAR(60000);"
-        );
-      });
-  }, []);
+  const [email, setEmail] = useState("");
+  const subject = "Ledger Logic: Message from Administrator";
+  const fromEmail = "hrosser15@gmail.com";
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
 
   const filterOptions = [
     { value: "category", label: "Account Category", type: "checkbox" },
@@ -129,6 +114,47 @@ const ViewAccountsForm = ({ selectedDate }) => {
       ...prevState,
       [field]: date ? date.toISOString() : "",
     }));
+  };
+
+  const handleButtonClick = () => {
+    if (!email) {
+      // Alert the user if the email field is empty
+      alert("Please enter an email address");
+      return;
+    }
+
+    // Assuming you have access to the email content from the textarea
+    const emailContent = document.querySelector(
+      'textarea[name="emailContent"]'
+    ).value;
+
+    // Call the emailUser function with the email and emailContent
+    emailUser(email, fromEmail, subject, emailContent)
+      .then((response) => {
+        // Handle successful email sending
+        setModalTitle("Email Sent");
+        setModalMessage("Email sent successfully!");
+        setShowModal(true); // Optionally, you can display a modal to inform the user
+      })
+      .catch((error) => {
+        // Handle error if email sending fails
+        console.error("Error sending email:", error);
+        setModalTitle("Email Error");
+        setModalMessage(
+          "There was an error sending the email. Please try again later."
+        );
+        setShowModal(true); // Optionally, you can display a modal to inform the user
+      });
+  };
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   const renderFilterOptions = () => {
@@ -287,8 +313,6 @@ const ViewAccountsForm = ({ selectedDate }) => {
     }
 
     // Filter by creation date
-    // Filter by creation date
-    // Filter by creation date
     if (selectedFilterOption === "date") {
       filteredTableAccounts = tableAccounts.filter((account) => {
         const creationDate = new Date(account.creationDate);
@@ -323,6 +347,7 @@ const ViewAccountsForm = ({ selectedDate }) => {
               <th>Normal Side</th>
               <th>Description</th>
               <th>Balance</th>
+              <th>Statement</th>
               <th>Creation Date</th>
             </tr>
           </thead>
@@ -331,9 +356,15 @@ const ViewAccountsForm = ({ selectedDate }) => {
               <tr key={account.accountNumber}>
                 <td>{account.accountNumber}</td>
                 <td>
-                  <Link to={`/account/${account.accountNumber}`}>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
+                    }}
+                  >
                     {account.accountName}
-                  </Link>
+                  </span>
                 </td>
                 <td>{account.subCategory}</td>
                 <td>{account.normalSide}</td>
@@ -344,6 +375,7 @@ const ViewAccountsForm = ({ selectedDate }) => {
                     currency: "USD",
                   })}
                 </td>
+                <td>{account.statement}</td>
                 <td>{formatDate2(account.creationDate)}</td>
               </tr>
             ))}
@@ -410,9 +442,74 @@ const ViewAccountsForm = ({ selectedDate }) => {
             {renderTable("Equity", equityAccounts)}
             {renderTable("Revenue", revenueAccounts)}
             {renderTable("Expenses", expenseAccounts)}
-            <div style={{ height: "200px" }}></div>
           </div>
         </Col>
+      </Row>
+      <Row>
+        {/* ============
+                CONTACT USER
+                ============ */}
+        <form className={styles.forms}>
+          <h4>Contact User</h4>
+
+          <Row>
+            <Col className="col-md-2">
+              <Form.Group controlId="email">
+                <Form.Label>User Email Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="JohnSmith@email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="custom-textbox"
+                  style={{
+                    marginLeft: "20px",
+                  }}
+                />
+              </Form.Group>
+            </Col>
+            <Col className="col-md-8">
+              <p>Enter your email below:</p>
+              <label>
+                <textarea
+                  name="emailContent"
+                  defaultValue=""
+                  rows={4}
+                  cols={80}
+                  align="left"
+                  style={{
+                    backgroundColor: "#ffffff",
+                    color: "black",
+                    borderRadius: "5px",
+                  }}
+                />
+              </label>
+            </Col>
+          </Row>
+
+          <Row>
+            <p></p>
+          </Row>
+          <Row>
+            <Col>
+              <Button variant="primary" onClick={handleButtonClick}>
+                Send Email to User
+              </Button>
+            </Col>
+          </Row>
+          <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>{modalTitle}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{modalMessage}</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModal}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </form>
+        <div style={{ height: "200px" }}></div>
       </Row>
     </Container>
   );

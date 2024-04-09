@@ -74,14 +74,150 @@
   padding: 0 50px;
 }
 
-.prevButton {
-  align-self: start;
-  background: transparent;
+.prButton {
+  border: 3px solid #5ec57e;
+  background: #5ec57e;
+  border-radius: 10px;
+  width: 100;
+  color: #ffffff;
+  margin: 5%;
+  min-width: 100px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.textboxInfo {
-  font-size: 12px;
-  color: #9d9c9c;
-  max-width: 80%;
-  margin-left: 10%;
+.addButton {
+  background: #5ec57e;
+}
+
+.button {
+  border: 3px solid #5ec57e;
+  background: transparent;
+  border-radius: 10px;
+  width: 60%;
+  color: #5ec57e;
+  margin: 5%;
+}
+
+.tooltipContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: relative;
+}
+
+.tooltip .tooltipText {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 3px;
+  position: absolute;
+  z-index: 1;
+  bottom: 120%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: wrap;
+}
+
+.tooltip:hover .tooltipText {
+  visibility: visible;
+  opacity: 1;
+}
+
+.filterTitle {
+  margin-left: 20px;
+}
+
+.leftAlignedDatePicker {
+  display: flex;
+  align-items: left;
+  margin-top: 0px;
+}
+
+.leftAlignedDatePicker .react-datepicker__input-container input {
+  text-align: left;
+}
+
+.blackText {
+  color: black;
+}
+
+.redText {
+  color: red;
+}
+
+.redBalance {
+  color: red;
+  font-weight: bold;
+}
+
+.grayButton {
+  background: #5c5c5c;
+  color: white;
+  border-color: transparent;
+  min-width: 120px;
+}
+
+.grayButton:hover {
+  background: #3d3d3d;
+  border-color: transparent;
+}
+
+.redButton {
+  background: #ee2424;
+  color: white;
+  border-color: transparent;
+  min-width: 200px;
+}
+
+.redButton:hover {
+  background: #b31515;
+  border-color: transparent;
+}
+
+.blueButton {
+  min-width: 200px;
+}
+
+.modal-body {
+  color: red;
+}
+
+/* EventLogs.module.css */
+.loader,
+.error,
+.noLogs,
+.logsContainer,
+.heading,
+.logEntry {
+  margin: 10px;
+  padding: 10px;
+}
+
+.error {
+  color: red;
+}
+
+.noLogs {
+  color: gray;
+}
+
+.logEntry {
+  border: 1px solid #eee;
+  margin-bottom: 8px;
+}
+
+.eventLogImage {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 8px;
 }

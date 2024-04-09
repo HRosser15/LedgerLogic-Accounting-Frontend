@@ -16,7 +16,7 @@ import "./DatePickerStyles.css";
 import { JournalContext } from "../../../../../context/JournalContext";
 import AppContext from "../../../../../context/AppContext";
 
-const ManagerCreateJournal = () => {
+const AdminCreateJournal = () => {
   const { state } = useContext(AppContext);
   const navigate = useNavigate();
   const { addJournalEntry } = useContext(JournalContext);
@@ -325,4 +325,4 @@ const ManagerCreateJournal = () => {
   );
 };
 
-export default ManagerCreateJournal;
+export default AdminCreateJournal;

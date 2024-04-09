@@ -106,9 +106,10 @@ const UserLogin = () => {
             </div>
             <div>
               <Link className={styles.fixLinks} to="/forgot-password">
-                <button className={styles.button}>Forgot Password?</button>
+                Forgot Password?
               </Link>
             </div>
+            <div style={{ height: "40px" }}></div>
           </form>
         </div>
       </div>

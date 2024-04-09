@@ -10,6 +10,7 @@ import AppContext from "../../../../context/AppContext";
 import ManagerViewAccountsForm from "./Forms/ViewAccountsForm";
 import ManagerViewLedger from "./Forms/ViewLedger";
 import ManagerCreateJournal from "./Forms/CreateJournalEntry";
+import EventLog from "./Forms/EventLog";
 
 const ManagerAccountsManagement = ({ username }) => {
   const { state } = useContext(AppContext);
@@ -18,18 +19,15 @@ const ManagerAccountsManagement = ({ username }) => {
   // const [selectedAccountNumber, setSelectedAccountNumber] = useState(null);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
+  const [newEntry, setNewEntry] = useState(null);
 
   const handleTabSelect = (tab) => {
     setActiveTab(tab);
     if (tab === "Chart of Accounts") {
-      setSelectedAccountNumber(null);
+      setSelectedAccount(null);
     }
   };
 
-  // const handleAccountSelection = (accountNumber) => {
-  //   setSelectedAccountNumber(accountNumber);
-  //   handleTabSelect("ledgers");
-  // };
   const handleAccountSelection = (account) => {
     setSelectedAccount(account);
     handleTabSelect("ledgers");
@@ -45,6 +43,7 @@ const ManagerAccountsManagement = ({ username }) => {
             selectedDate={selectedDate}
             handleAccountSelection={handleAccountSelection}
             accounts={accounts}
+            newEntry={newEntry}
           />
         );
       case "ledgers":
@@ -55,24 +54,27 @@ const ManagerAccountsManagement = ({ username }) => {
             handleBackToAccounts={handleBackToAccounts}
             accounts={accounts}
             handleAccountSelection={handleAccountSelection}
+            newEntry={newEntry}
           />
         );
       case "journal":
         return (
-          <ManagerJournal
+          <ManagerCreateJournal
             // accountNumber={selectedAccountNumber}
             handleBackToAccounts={handleBackToAccounts}
             accounts={accounts}
             handleAccountSelection={handleAccountSelection}
           />
         );
+      case "event log":
+        return <EventLog />;
       default:
         return null;
     }
   };
 
   const handleBackToAccounts = () => {
-    setSelectedAccountNumber(null);
+    setSelectedAccount(null);
   };
 
   const handleCancel = () => {
@@ -151,6 +153,10 @@ const ManagerAccountsManagement = ({ username }) => {
         <Tab
           eventKey="journal"
           title={<span title="Open journal">Journal</span>}
+        ></Tab>
+        <Tab
+          eventKey="event log"
+          title={<span title="Open Event Log">Event Log</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>

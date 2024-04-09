@@ -152,3 +152,76 @@
 .redText {
   color: red;
 }
+
+.redBalance {
+  color: red;
+  font-weight: bold;
+}
+
+.grayButton {
+  background: #5c5c5c;
+  color: white;
+  border-color: transparent;
+  min-width: 120px;
+}
+
+.grayButton:hover {
+  background: #3d3d3d;
+  border-color: transparent;
+}
+
+.redButton {
+  background: #ee2424;
+  color: white;
+  border-color: transparent;
+  min-width: 200px;
+}
+
+.redButton:hover {
+  background: #b31515;
+  border-color: transparent;
+}
+
+.blueButton {
+  min-width: 200px;
+}
+
+.modal-body {
+  color: red;
+}
+
+/* EventLogs.module.css */
+.loader,
+.error,
+.noLogs,
+.logsContainer,
+.heading,
+.logEntry {
+  margin: 10px;
+  padding: 10px;
+}
+
+.error {
+  color: red;
+}
+
+.noLogs {
+  color: gray;
+}
+
+.logEntry {
+  border: 1px solid #eee;
+  margin-bottom: 8px;
+}
+
+.eventLogImage {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.customModal .modal-dialog {
+  max-width: 1200px;
+}

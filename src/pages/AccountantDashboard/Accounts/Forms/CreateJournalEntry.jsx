@@ -9,6 +9,7 @@ import {
   Modal,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { emailUser } from "../../../../services/EmailService";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -16,7 +17,7 @@ import "./DatePickerStyles.css";
 import { JournalContext } from "../../../../../context/JournalContext";
 import AppContext from "../../../../../context/AppContext";
 
-const ManagerCreateJournal = () => {
+const AccountantCreateJournal = () => {
   const { state } = useContext(AppContext);
   const navigate = useNavigate();
   const { addJournalEntry } = useContext(JournalContext);
@@ -29,8 +30,14 @@ const ManagerCreateJournal = () => {
   ]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [balance, setBalance] = useState(0);
   const [newEntry, setNewEntry] = useState(null);
+  const email = "bw@gmail.com";
+  const subject = "Journal Entry Pending Approval";
+  const fromEmail = "journal.services@ledgerlogic.com";
+  const body =
+    "A new journal entry has been created and is pending your approval. Please log in to your account to review the entry.";
 
   const handleReset = () => {
     setDate("");
@@ -41,7 +48,7 @@ const ManagerCreateJournal = () => {
     setShowResetModal(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const debitTotal = accounts.reduce(
@@ -86,10 +93,20 @@ const ManagerCreateJournal = () => {
     };
 
     setNewEntry(newJournalEntry);
-    // addJournalEntry(newEntry);
-    navigate("/manager-accounts-management");
+    try {
+      await emailUser(email, fromEmail, subject, body);
 
-    setError("");
+      // Navigate to the desired page after submitting
+      setShowSuccessModal(true);
+      // navigate("/manager-accounts-management");
+
+      setError(""); // Reset any previous errors
+    } catch (error) {
+      console.error("Error sending email:", error);
+      // Handle error if email sending fails
+      setShowErrorModal(true);
+      setError("Error sending email. Please try again later.");
+    }
   };
 
   const handleFileUpload = (e) => {
@@ -141,6 +158,10 @@ const ManagerCreateJournal = () => {
 
   const handleCloseErrorModal = () => setShowErrorModal(false);
   const handleCloseResetModal = () => setShowResetModal(false);
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    navigate("/accountant-accounts-management");
+  };
   const handleShowResetModal = () => setShowResetModal(true);
 
   return (
@@ -321,8 +342,23 @@ const ManagerCreateJournal = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <Modal show={showSuccessModal} onHide={handleCloseSuccessModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Journal Submitted</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Your journal has been submitted. A manager will review it shortly.
+          Clsoing this dialog will redirect you to the Chart of Accounts.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseSuccessModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
 
-export default ManagerCreateJournal;
+export default AccountantCreateJournal;
