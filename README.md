@@ -53,6 +53,7 @@ Please follow the [README instructions for the backend repo](https://github.com/
 For the frontend and postman APIs to work, you will need to run:
 - The backend server
 - The mail server
+(instructions for both are in the backend's README)
 
 # React + Vite
 
