@@ -1,19 +1,23 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState } from "react";
+import { addJournalEntry } from "../src/services/JournalService";
 
-const JournalContext = createContext();
+export const JournalContext = createContext();
 
-const JournalProvider = ({ children }) => {
+export const JournalProvider = ({ children }) => {
   const [journalEntries, setJournalEntries] = useState([]);
 
-  const addJournalEntry = (entry) => {
-    setJournalEntries([...journalEntries, entry]);
+  const addJournal = async (journalEntry) => {
+    try {
+      const response = await addJournalEntry(journalEntry);
+      setJournalEntries([...journalEntries, response.data]);
+    } catch (error) {
+      console.error("Failed to add journal entry:", error);
+    }
   };
 
   return (
-    <JournalContext.Provider value={{ journalEntries, addJournalEntry }}>
+    <JournalContext.Provider value={{ journalEntries, addJournal }}>
       {children}
     </JournalContext.Provider>
   );
 };
-
-export { JournalContext, JournalProvider };

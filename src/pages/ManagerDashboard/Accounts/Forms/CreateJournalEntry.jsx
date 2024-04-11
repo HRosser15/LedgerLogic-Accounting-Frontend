@@ -31,6 +31,7 @@ const ManagerCreateJournal = () => {
   const [showResetModal, setShowResetModal] = useState(false);
   const [balance, setBalance] = useState(0);
   const [newEntry, setNewEntry] = useState(null);
+  const { addJournal } = useContext(JournalContext);
 
   const handleReset = () => {
     setDate("");
@@ -41,7 +42,7 @@ const ManagerCreateJournal = () => {
     setShowResetModal(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const debitTotal = accounts.reduce(
@@ -81,9 +82,22 @@ const ManagerCreateJournal = () => {
     const newJournalEntry = {
       date,
       description,
-      accounts,
-      documents,
+      journalEntries: accounts.map((account) => ({
+        credit: parseFloat(account.credit),
+        debit: parseFloat(account.debit),
+        account: {
+          accountId: account.accountId,
+        },
+      })),
+      attachments: documents,
     };
+
+    try {
+      await addJournal(newJournalEntry);
+      navigate("/manager-accounts-management");
+    } catch (error) {
+      console.error("Failed to add journal entry:", error);
+    }
 
     setNewEntry(newJournalEntry);
     // addJournalEntry(newEntry);

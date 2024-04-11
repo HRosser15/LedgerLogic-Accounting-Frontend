@@ -25,6 +25,66 @@ export const fetchEventLog = () => {
       return axios.get("http://localhost:8080/eventLog/getAll");
 };
 
+
+// Function to parse currentState string
+const parseCurrentState = (currentStateString) => {
+  // Split the string by commas to get individual property-value pairs
+  const keyValuePairs = currentStateString.split(", ");
+  // Create an object to store parsed properties
+  const parsedState = {};
+  // Iterate through keyValuePairs array
+  keyValuePairs.forEach(pair => {
+    // Split each pair by '=' to separate property and value
+    const [key, value] = pair.split("=");
+    // Add the property-value pair to the parsedState object
+    parsedState[key.trim()] = value.trim();
+  });
+  return parsedState;
+};
+
+export const fetchAccountBalancesByDate = async (selectedDate) => {
+  try {
+    const response = await axios.get("http://localhost:8080/eventLog/getAll");
+    const eventLog = response.data;
+
+    // Convert selectedDate to ISO string without time component
+    const isoSelectedDate = new Date(selectedDate).toISOString().split('T')[0];
+
+    // Filter event log to only include events before the selected date
+    const filteredEventLog = eventLog.filter(event => {
+      const eventDate = new Date(event.modificationTime).toISOString().split('T')[0];
+      return eventDate <= isoSelectedDate;
+    });
+
+    // Collect account details for each event in the filtered event log
+    const accountDetailsList = filteredEventLog.map((event) => {
+      // Parse event's currentState to get account balance and other details
+      const currentState = parseCurrentState(event.currentState);
+      const accountDetails = {
+        accountId: currentState.accountId,
+        accountName: currentState.accountName,
+        accountNumber: currentState.accountNumber,
+        category: currentState.category,
+        balance: currentState.balance,
+        subCategory: currentState.subCategory
+        // Add other details as needed
+      };
+      return accountDetails;
+    });
+
+    console.log("Account details list:", accountDetailsList);
+
+    return { data: accountDetailsList }; // Return the list of account details
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
+
+
+
 export const fetchExpiredPasswords = () => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
 

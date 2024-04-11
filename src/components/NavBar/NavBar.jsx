@@ -43,6 +43,7 @@ const NavBar = () => {
               <Link to="/manager-dashboard">Manager Dashboard</Link>
               <Link to="/manager-user-list">Users</Link>
               <Link to="/manager-accounts-management">Accounts</Link>
+              <Link to="/manager-reports">Reports</Link>
               {/* Add other MANAGER links here */}
             </>
           );

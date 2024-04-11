@@ -8,10 +8,14 @@ import AppContext from "../../../../../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const AccountantViewAccountsForm = ({ selectedDate }) => {
+const AccountantViewAccountsForm = ({
+  selectedDate,
+  handleAccountSelection,
+  accounts,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [accounts, setAccounts] = useState([]);
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
+  const [selectedFilterOptionText, setSelectedFilterOptionText] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([
     "Assets",
     "Liabilities",
@@ -23,31 +27,6 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
   const [normalSideFilter, setNormalSideFilter] = useState("");
   const [balanceFilter, setBalanceFilter] = useState({ min: "", max: "" });
   const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
-
-  useEffect(() => {
-    fetchAccounts()
-      .then((response) => {
-        const sortedAccounts = response.data.sort(
-          (a, b) => a.accountNumber - b.accountNumber
-        );
-        setAccounts(sortedAccounts);
-      })
-      .catch((error) => {
-        console.error(error);
-        concole.log(
-          "Make sure you alter the column size of previous_state and current_state (in the h2 database)"
-        );
-        console.log(
-          "This can be done in the h2 console at 'http://localhost:8080/h2-console' (Password is 'password' with:"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN previous_state VARCHAR(60000);"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN current_state VARCHAR(60000);"
-        );
-      });
-  }, []);
 
   const filterOptions = [
     { value: "category", label: "Account Category", type: "checkbox" },
@@ -287,8 +266,6 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
     }
 
     // Filter by creation date
-    // Filter by creation date
-    // Filter by creation date
     if (selectedFilterOption === "date") {
       filteredTableAccounts = tableAccounts.filter((account) => {
         const creationDate = new Date(account.creationDate);
@@ -323,6 +300,7 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
               <th>Normal Side</th>
               <th>Description</th>
               <th>Balance</th>
+              <th>Statement</th>
               <th>Creation Date</th>
             </tr>
           </thead>
@@ -331,9 +309,15 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
               <tr key={account.accountNumber}>
                 <td>{account.accountNumber}</td>
                 <td>
-                  <Link to={`/accountant/account/${account.accountNumber}`}>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
+                    }}
+                  >
                     {account.accountName}
-                  </Link>
+                  </span>
                 </td>
                 <td>{account.subCategory}</td>
                 <td>{account.normalSide}</td>
@@ -344,6 +328,7 @@ const AccountantViewAccountsForm = ({ selectedDate }) => {
                     currency: "USD",
                   })}
                 </td>
+                <td>{account.statement}</td>
                 <td>{formatDate2(account.creationDate)}</td>
               </tr>
             ))}

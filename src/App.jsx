@@ -34,6 +34,8 @@ import ManagerUserList from "./pages/ManagerDashboard/Users/ManagerUserList";
 import ManagerAccountsManagement from "./pages/ManagerDashboard/Accounts/AccountsManagement";
 import ManagerViewLedger from "./pages/ManagerDashboard/Accounts/Forms/ViewLedger";
 import ManagerCreateJournal from "./pages/ManagerDashboard/Accounts/Forms/CreateJournalEntry";
+import ManagerReportsDashboard from "./pages/ManagerDashboard/Reports/ReportsDashboard";
+import ManagerBalanceSheet from "./pages/ManagerDashboard/Reports/BalanceSheet";
 
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";
@@ -129,6 +131,14 @@ function App() {
                 <Route
                   path="/manager-create-journal"
                   element={<ManagerCreateJournal />}
+                />
+                <Route
+                  path="/manager-reports"
+                  element={<ManagerReportsDashboard />}
+                />
+                <Route
+                  path="/manager-balance-sheet"
+                  element={<ManagerBalanceSheet />}
                 />
 
                 {/* ================

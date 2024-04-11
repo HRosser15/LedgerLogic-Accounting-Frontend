@@ -26,33 +26,46 @@ const AccountantViewLedger = ({
   const [endDate, setEndDate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("posted");
+
   const [dummyData, setDummyData] = useState([
     {
       ledgerId: 1,
-      accountName: "Cash",
-      date: "2024-04-01",
+      date: "2024-02-01",
+      account1Name: "Cash",
+      account2Name: "Owner's Equity",
+      date: "2024-02-01",
       description: "Initial Deposit",
       debit: 10000.0,
       credit: 0.0,
+      debit2: 0.0,
+      credit2: 10000.0,
       balance: 10000.0,
       status: "posted",
     },
     {
       ledgerId: 2,
-      date: "2021-10-02",
+      date: "2024-04-04",
+      account1Name: "Cash",
+      account2Name: "Materials",
       description:
         "Bought roofing materials for customer John Smith at 123 St, Atlanta GA",
       debit: 0.0,
       credit: 5000.0,
+      debit2: 5000.0,
+      credit2: 0.0,
       balance: -5000.0,
       status: "pending",
     },
     {
       ledgerId: 3,
       date: "2024-03-25",
+      account1Name: "Cash",
+      account2Name: "Materials",
       description: "Got paid for work done",
       debit: 150.0,
       credit: 0.0,
+      debit2: 5000.0,
+      credit2: 0.0,
       balance: 150.0,
       status: "rejected",
     },
@@ -100,7 +113,89 @@ const AccountantViewLedger = ({
   };
 
   const handleSearchChange = (event) => {
+    const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
+    const dollarAmountPattern = /\$?\d+(\.\d{1,2})?/;
+    const isDollarAmount = dollarAmountPattern.test(searchValue);
+
+    const filteredData =
+      account === null
+        ? filterAccountsByRange(1000, 7999).filter(
+            (account) =>
+              account.accountName.toLowerCase().includes(searchValue) ||
+              account.accountNumber.toString().includes(searchValue) ||
+              (isDollarAmount &&
+                (account.debit
+                  .toString()
+                  .includes(searchValue.replace(/\$/g, "")) ||
+                  account.credit
+                    .toString()
+                    .includes(searchValue.replace(/\$/g, ""))))
+          )
+        : dummyData.filter(
+            (entry) =>
+              entry.description.toLowerCase().includes(searchValue) ||
+              (isDollarAmount &&
+                (entry.debit
+                  .toString()
+                  .includes(searchValue.replace(/\$/g, "")) ||
+                  entry.credit
+                    .toString()
+                    .includes(searchValue.replace(/\$/g, ""))))
+          );
+    if (account === null) {
+      setAssetAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 1000 && account.accountNumber <= 1999
+        )
+      );
+      setLiabilityAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 3000 && account.accountNumber <= 3999
+        )
+      );
+      setEquityAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 5000 && account.accountNumber <= 5999
+        )
+      );
+      setRevenueAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 6000 && account.accountNumber <= 6999
+        )
+      );
+      setExpenseAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 7000 && account.accountNumber <= 7999
+        )
+      );
+    } else {
+      setDummyData(filteredData);
+    }
+  };
+
+  const filterDataByDate = (data, startDate, endDate) => {
+    if (!startDate && !endDate) {
+      return data;
+    }
+
+    const filteredData = data.filter((entry) => {
+      const entryDate = new Date(entry.date);
+      if (startDate && endDate) {
+        return entryDate >= startDate && entryDate <= endDate;
+      } else if (startDate) {
+        return entryDate >= startDate;
+      } else {
+        return entryDate <= endDate;
+      }
+    });
+
+    return filteredData;
   };
 
   const assetAccounts = filterAccountsByRange(1000, 1999);
@@ -137,15 +232,16 @@ const AccountantViewLedger = ({
   const renderTable = (tableTitle, tableAccounts) => {
     if (account !== null) {
       // Render SubLedger table
-      let filteredTableAccounts = tableAccounts;
+      let filteredTableAccounts = filterDataByDate(
+        tableAccounts,
+        startDate,
+        endDate
+      );
 
       // Filter by status
       filteredTableAccounts = filteredTableAccounts.filter(
         (entry) => statusFilter === "all" || entry.status === statusFilter
       );
-
-      // Apply other filters (date range, search term, etc.)
-      // ...
 
       if (filteredTableAccounts.length === 0) {
         return null;
@@ -278,7 +374,11 @@ const AccountantViewLedger = ({
       );
     } else {
       // Render General Ledger tables
-      let filteredTableAccounts = tableAccounts;
+      let filteredTableAccounts = filterDataByDate(
+        tableAccounts,
+        startDate,
+        endDate
+      );
       // Filter by status (not applicable for General Ledger)
 
       // Apply other filters (search term, etc.)
@@ -414,24 +514,47 @@ const AccountantViewLedger = ({
             <Row>
               <Col>
                 <div className="container">
-                  <Form.Group
-                    controlId="searchTerm"
-                    className="d-flex flex-column align-items-start"
-                  >
-                    <Form.Label className="mr-2">
-                      Search Journal Entries:
-                    </Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Account Name or Dollar Amount"
-                      value={searchTerm}
-                      onChange={handleSearchChange}
-                      style={{
-                        maxWidth: "400px",
-                        marginRight: "10px",
-                      }}
-                    />
-                  </Form.Group>
+                  <React.Fragment>
+                    {account === null ? (
+                      <Form.Group
+                        controlId="searchTerm"
+                        className="d-flex flex-column align-items-start"
+                      >
+                        <Form.Label className="mr-2">
+                          Search Ledgers:
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Name or Dollar Amount"
+                          value={searchTerm}
+                          onChange={handleSearchChange}
+                          style={{
+                            maxWidth: "400px",
+                            marginRight: "10px",
+                          }}
+                        />
+                      </Form.Group>
+                    ) : (
+                      <Form.Group
+                        controlId="searchTerm"
+                        className="d-flex flex-column align-items-start"
+                      >
+                        <Form.Label className="mr-2">
+                          Search Journal Entries:
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Dollar Amount"
+                          value={searchTerm}
+                          onChange={handleSearchChange}
+                          style={{
+                            maxWidth: "400px",
+                            marginRight: "10px",
+                          }}
+                        />
+                      </Form.Group>
+                    )}
+                  </React.Fragment>
                 </div>
               </Col>
               <Col>
