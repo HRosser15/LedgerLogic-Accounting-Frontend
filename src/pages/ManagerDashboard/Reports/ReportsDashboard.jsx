@@ -94,7 +94,7 @@ const ManagerReportsDashboard = () => {
               </p>
             </Col>
             <Col>
-              <Link to="/manager-balance-sheet">
+              <Link to="/manager-trial-balance">
                 <h2
                   style={{
                     marginTop: "20px",
@@ -120,7 +120,7 @@ const ManagerReportsDashboard = () => {
         <form className={styles.forms}>
           <Row>
             <Col>
-              <Link to="/manager-balance-sheet">
+              <Link to="/manager-income-statement">
                 <h2
                   style={{
                     marginTop: "20px",
@@ -196,7 +196,7 @@ const ManagerReportsDashboard = () => {
               <p></p>
             </Col>
             <Col>
-              <Link to="/manager-balance-sheet">
+              <Link to="/manager-retained-earnings">
                 <h2
                   style={{
                     marginTop: "20px",

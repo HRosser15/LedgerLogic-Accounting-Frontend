@@ -69,12 +69,7 @@ const ManagerAccountsManagement = ({ username }) => {
       case "event log":
         return <EventLog />;
       case "balance sheet":
-        return (
-          <BalanceSheet
-            accounts={accounts}
-            handleAccountSelection={handleAccountSelection}
-          />
-        );
+        return <BalanceSheet accounts={accounts} />;
       default:
         return null;
     }
