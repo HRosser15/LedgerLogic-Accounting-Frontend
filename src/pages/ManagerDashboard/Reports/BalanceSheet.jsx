@@ -3,7 +3,7 @@ import {
   fetchAccounts,
   fetchAccountBalancesByDate,
 } from "../../../services/AccountService";
-import { emailUserWithAttachment } from "../../../services/EmailService";
+import { emailUserBalanceSheet } from "../../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -14,7 +14,7 @@ import "./BalanceSheet.module.css";
 const ManagerBalanceSheet = () => {
   const [accounts, setAccounts] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const balanceSheetRef = useRef(null);
+  const balanceSheetRef = useRef(null); // **** Ref for the balance sheet container
 
   const [emailAddress, setEmailAddress] = useState("");
   const [emailContent, setEmailContent] = useState("");
@@ -53,6 +53,8 @@ const ManagerBalanceSheet = () => {
     });
   };
 
+  // **** Function to print the balance sheet report
+  // **** This uses html and the useRef hook to get the HTML content of the balance sheet
   const handlePrintReport = () => {
     const printWindow = window.open("", "_blank");
     printWindow.document.open();
@@ -72,7 +74,7 @@ const ManagerBalanceSheet = () => {
           </style>
         </head>
         <body>
-          ${balanceSheetRef.current.innerHTML}
+          ${balanceSheetRef.current.innerHTML}  
         </body>
       </html>
     `);
@@ -93,14 +95,14 @@ const ManagerBalanceSheet = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const fromEmail = user.email;
     const subject = `Balance Sheet Report for ${selectedDate.toLocaleDateString()}`;
-    const reportHtml = balanceSheetRef.current.innerHTML;
+    const reportHtml = balanceSheetRef.current.innerHTML; // **** Get the HTML content of the balance sheet
 
-    emailUserWithAttachment(
+    emailUserBalanceSheet(
       emailAddress,
       fromEmail,
       subject,
       emailContent,
-      reportHtml
+      reportHtml // **** Pass the HTML content of the balance sheet
     )
       .then(() => {
         alert("Email sent successfully!");
@@ -186,6 +188,8 @@ const ManagerBalanceSheet = () => {
       </div>
       <div style={{ height: "50px" }}></div>
       <Container ref={balanceSheetRef}>
+        {" "}
+        {/* **** Add the ref to the container so it wraps the contents for saving and emailing*/}
         <div id="balance-sheet-print">
           <Row>
             <Col>

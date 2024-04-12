@@ -3,18 +3,22 @@
 This branch contains the setup for the Vite React app in the Ledger Logic Frontend project.
 
 ## Prerequisites
+
 #### Node
-- Check if you have Node installed on your machine by using ```node -v```
-if this doesn't return a version, please install [Node.js](https://nodejs.org/) as VITE requires it.
+
+- Check if you have Node installed on your machine by using `node -v`
+  if this doesn't return a version, please install [Node.js](https://nodejs.org/) as VITE requires it.
 
 #### VSCode
+
 - Download and install from the [Official VSCode website](https://code.visualstudio.com/download) if you don't already have it.
 
 #### Git
+
 - Check if you have git installed by using
-          ```git --version```
+  `git --version`
 - If you don't have it or don't have the most recent version, download and install from the [Offical Git website](https://git-scm.com/downloads)
-- Open VSCode, click the extensions button on the left, search for ```Git``` and install it.
+- Open VSCode, click the extensions button on the left, search for `Git` and install it.
 
 <p>. </p>
 <p>. </p>
@@ -30,22 +34,41 @@ git clone https://github.com/Ledger-Logic/Front-End.git
 ```
 
 #### Navigate Into the Local Repository
+
 ```bash
 cd Front-End
 ```
 
 #### Create your branch for the feature you're working on
+
 ```bash
 git checkout -b your-branch-name
 ```
-#### Install Dependencies (you may be able to skip this step)
+
+#### Install Dependencies
+
 ```bash
 npm install
+npm install axios
+npm install bootstrap
+npm install html2canvas
+npm install html2pdf.js
+npm install react-bootstrap
+npm install react-cookie
+npm install react-datepicker
+npm install react-dom
+npm install react-modal
+npm install react-router-dom
+npm install react-tooltip
+npm install reactstrap
 ```
+
 #### Start the Development Server
+
 ```bash
 npm run dev
 ```
+
 You can then view the app and any changes you make at the localhost url it displays in your terminal
 
 # React + Vite
@@ -56,4 +79,3 @@ Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
