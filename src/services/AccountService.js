@@ -36,8 +36,10 @@ const parseCurrentState = (currentStateString) => {
   keyValuePairs.forEach(pair => {
     // Split each pair by '=' to separate property and value
     const [key, value] = pair.split("=");
-    // Add the property-value pair to the parsedState object
-    parsedState[key.trim()] = value.trim();
+    // Check if both key and value exist before adding to parsedState
+    if (key && value) {
+      parsedState[key.trim()] = value.trim();
+    }
   });
   return parsedState;
 };
@@ -58,23 +60,31 @@ export const fetchAccountBalancesByDate = async (selectedDate) => {
 
     // Collect account details for each event in the filtered event log
     const accountDetailsList = filteredEventLog.map((event) => {
-      // Parse event's currentState to get account balance and other details
-      const currentState = parseCurrentState(event.currentState);
-      const accountDetails = {
-        accountId: currentState.accountId,
-        accountName: currentState.accountName,
-        accountNumber: currentState.accountNumber,
-        category: currentState.category,
-        balance: currentState.balance,
-        subCategory: currentState.subCategory
-        // Add other details as needed
-      };
-      return accountDetails;
+      try {
+        // Parse event's currentState to get account balance and other details
+        const currentState = parseCurrentState(event.currentState);
+        const accountDetails = {
+          accountId: currentState.accountId,
+          accountName: currentState.accountName,
+          accountNumber: currentState.accountNumber,
+          category: currentState.category,
+          balance: currentState.balance,
+          subCategory: currentState.subCategory
+          // Add other details as needed
+        };
+        return accountDetails;
+      } catch (error) {
+        console.error(`Error parsing currentState for event ${event.id}:`, error);
+        return null;
+      }
     });
 
-    console.log("Account details list:", accountDetailsList);
+    const filteredAccountDetailsList = accountDetailsList.filter(details => details !== null);
 
-    return { data: accountDetailsList }; // Return the list of account details
+    console.log("Account details list:", accountDetailsList);
+    console.log("Account details list:", filteredAccountDetailsList);
+
+    return { data: filteredAccountDetailsList }; // Return the list of account details
   } catch (error) {
     throw error;
   }
