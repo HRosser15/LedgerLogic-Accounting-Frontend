@@ -15,6 +15,7 @@ import {
   Col,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { fetchJournalEntriesForAccount } from "../../../../services/JournalService";
 
 const ManagerViewLedger = ({
   account,
@@ -26,50 +27,23 @@ const ManagerViewLedger = ({
   const [endDate, setEndDate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("posted");
+  const [journalEntries, setJournalEntries] = useState([]);
 
-  const [dummyData, setDummyData] = useState([
-    {
-      ledgerId: 1,
-      date: "2024-02-01",
-      account1Name: "Cash",
-      account2Name: "Owner's Equity",
-      date: "2024-02-01",
-      description: "Initial Deposit",
-      debit: 10000.0,
-      credit: 0.0,
-      debit2: 0.0,
-      credit2: 10000.0,
-      balance: 10000.0,
-      status: "posted",
-    },
-    {
-      ledgerId: 2,
-      date: "2024-04-04",
-      account1Name: "Cash",
-      account2Name: "Materials",
-      description:
-        "Bought roofing materials for customer John Smith at 123 St, Atlanta GA",
-      debit: 0.0,
-      credit: 5000.0,
-      debit2: 5000.0,
-      credit2: 0.0,
-      balance: -5000.0,
-      status: "pending",
-    },
-    {
-      ledgerId: 3,
-      date: "2024-03-25",
-      account1Name: "Cash",
-      account2Name: "Materials",
-      description: "Got paid for work done",
-      debit: 150.0,
-      credit: 0.0,
-      debit2: 5000.0,
-      credit2: 0.0,
-      balance: 150.0,
-      status: "rejected",
-    },
-  ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (account && account.accountName) {
+        const entries = await fetchJournalEntriesForAccount(
+          account.accountName
+        );
+        console.log("Fetched journal entries:", entries);
+        setJournalEntries(entries);
+      } else {
+        setJournalEntries([]);
+      }
+    };
+
+    fetchData();
+  }, [account]);
 
   const StatusFilterDropdown = () => {
     const handleStatusFilterChange = (e) => {
@@ -132,7 +106,7 @@ const ManagerViewLedger = ({
                     .toString()
                     .includes(searchValue.replace(/\$/g, ""))))
           )
-        : dummyData.filter(
+        : journalEntries.filter(
             (entry) =>
               entry.description.toLowerCase().includes(searchValue) ||
               (isDollarAmount &&
@@ -174,8 +148,6 @@ const ManagerViewLedger = ({
             account.accountNumber >= 7000 && account.accountNumber <= 7999
         )
       );
-    } else {
-      setDummyData(filteredData);
     }
   };
 
@@ -231,12 +203,8 @@ const ManagerViewLedger = ({
 
   const renderTable = (tableTitle, tableAccounts) => {
     if (account !== null) {
-      // Render SubLedger table
-      let filteredTableAccounts = filterDataByDate(
-        tableAccounts,
-        startDate,
-        endDate
-      );
+      // Render Journal Entries table
+      let filteredTableAccounts = journalEntries;
 
       // Filter by status
       filteredTableAccounts = filteredTableAccounts.filter(
@@ -247,39 +215,15 @@ const ManagerViewLedger = ({
         return null;
       }
 
-      const isDebitAccount =
-        account.accountNumber !== null &&
-        (account.accountNumber.toString().startsWith("1") ||
-          account.accountNumber.toString().startsWith("5"));
-      const isCreditAccount =
-        account.accountNumber !== null &&
-        !isDebitAccount &&
-        (account.accountNumber.toString().startsWith("3") ||
-          account.accountNumber.toString().startsWith("6") ||
-          account.accountNumber.toString().startsWith("7"));
-
-      const updatedDummyData = filteredTableAccounts.map((entry) => {
-        let balance = 0;
-        if (isDebitAccount) {
-          balance = entry.debit - entry.credit;
-        } else {
-          balance = entry.credit - entry.debit;
-        }
-        return { ...entry, balance };
-      });
-
-      const debitTotal = updatedDummyData.reduce(
+      const debitTotal = filteredTableAccounts.reduce(
         (total, entry) => total + entry.debit,
         0
       );
-      const creditTotal = updatedDummyData.reduce(
+      const creditTotal = filteredTableAccounts.reduce(
         (total, entry) => total + entry.credit,
         0
       );
-      const balanceTotal = updatedDummyData.reduce(
-        (total, entry) => total + entry.balance,
-        0
-      );
+      const balanceTotal = debitTotal - creditTotal;
 
       return (
         <React.Fragment>
@@ -299,45 +243,21 @@ const ManagerViewLedger = ({
               </thead>
               <tbody>
                 {filteredTableAccounts.map((entry) => (
-                  <tr key={entry.ledgerId}>
-                    <td>{entry.date}</td>
+                  <tr key={entry.journalEntryId}>
+                    <td>
+                      {entry.journal &&
+                        new Date(
+                          entry.journal.transactionDate
+                        ).toLocaleDateString()}
+                    </td>
                     <td>{entry.description}</td>
+                    <td>${entry.debit.toFixed(2)}</td>
+                    <td>${entry.credit.toFixed(2)}</td>
+                    <td>${(entry.debit - entry.credit).toFixed(2)}</td>
+                    <td>{entry.status}</td>
                     <td>
-                      $
-                      {entry.debit.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </td>
-                    <td>
-                      $
-                      {entry.credit.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </td>
-                    <td>
-                      $
-                      {entry.balance.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </td>
-                    <td>
-                      {entry.status}{" "}
-                      {entry.status === "rejected"
-                        ? " - should be $1,500.00"
-                        : null}
-                    </td>
-                    <td>
-                      <div className={styles.tooltipContainer}>
-                        <button
-                          className={`${styles.prButton} ${styles.tooltip}`}
-                          onClick={(e) => handleViewPR(e, entry)}
-                        >
-                          View PR
-                          <span className={styles.tooltipText}>
-                            View the posting reference for this entry
-                          </span>
-                        </button>
-                      </div>
+                      {/* Render Post Reference button or link */}
+                      <button>View PR</button>
                     </td>
                   </tr>
                 ))}
@@ -345,28 +265,13 @@ const ManagerViewLedger = ({
             </table>
             <Row>
               <Col>
-                <div>
-                  Debit total: $
-                  {debitTotal.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
+                <div>Debit total: ${debitTotal.toFixed(2)}</div>
               </Col>
               <Col>
-                <div>
-                  Credit total: $
-                  {creditTotal.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
+                <div>Credit total: ${creditTotal.toFixed(2)}</div>
               </Col>
               <Col>
-                <div>
-                  Balance total: $
-                  {balanceTotal.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
+                <div>Balance total: ${balanceTotal.toFixed(2)}</div>
               </Col>
             </Row>
           </form>
@@ -607,7 +512,7 @@ const ManagerViewLedger = ({
                     </div>
                   ) : (
                     <div className="container">
-                      {renderTable("", dummyData)}
+                      {renderTable("Journal Entries", journalEntries)}
                     </div>
                   )}
                   {showPostReferenceModal && (

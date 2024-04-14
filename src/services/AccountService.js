@@ -91,10 +91,6 @@ export const fetchAccountBalancesByDate = async (selectedDate) => {
 };
 
 
-
-
-
-
 export const fetchExpiredPasswords = () => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
 

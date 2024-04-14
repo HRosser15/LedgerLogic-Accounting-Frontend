@@ -305,7 +305,17 @@ const ManagerViewAccountsForm = ({
           <tbody>
             {filteredTableAccounts.map((account) => (
               <tr key={account.accountNumber}>
-                <td>{account.accountNumber}</td>
+                <td>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
+                    }}
+                  >
+                    {account.accountNumber}
+                  </span>
+                </td>
                 <td>
                   <span
                     style={{ cursor: "pointer", textDecoration: "underline" }}

@@ -68,8 +68,6 @@ const ManagerAccountsManagement = ({ username }) => {
         );
       case "event log":
         return <EventLog />;
-      case "balance sheet":
-        return <BalanceSheet accounts={accounts} />;
       default:
         return null;
     }
@@ -159,12 +157,6 @@ const ManagerAccountsManagement = ({ username }) => {
         <Tab
           eventKey="event log"
           title={<span title="Open Event Log">Event Log</span>}
-        >
-          <div style={{ height: "20px" }}></div>
-        </Tab>
-        <Tab
-          eventKey="balance sheet"
-          title={<span title="View Balance Sheet">Balance Sheet</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
