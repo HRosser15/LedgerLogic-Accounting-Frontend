@@ -25,6 +25,7 @@ const ManagerBalanceSheet = () => {
         if (selectedDate) {
           const response = await fetchAccountBalancesByDate(selectedDate);
           setAccounts(response.data);
+          console.log("response data with selected date: ", response.data);
         } else {
           // If no date is selected, fetch accounts in their current state
           fetchAccounts().then((response) => {
@@ -125,11 +126,10 @@ const ManagerBalanceSheet = () => {
     );
   };
 
-  const calculateSubtotal = (accounts) => {
+  const calculateSubtotal = (accounts, isExpense = false) => {
     return accounts.reduce((total, account) => {
-      // Convert account balance to a number before adding
       const balance = parseFloat(account.balance);
-      return total + balance;
+      return isExpense ? total - balance : total + balance;
     }, 0);
   };
 
@@ -138,15 +138,21 @@ const ManagerBalanceSheet = () => {
   };
 
   const currentAssets = filterAccountsBySubcategory("Current Assets");
+
   const nonCurrentAssets = filterAccountsBySubcategory(
-    "Property, Plant, and Equipment"
+    "Property Plant and Equipment"
   );
+
   const currentLiabilities = filterAccountsBySubcategory("Current Liabilities");
+  console.log("currentLiabilities:", currentLiabilities);
+
   const nonCurrentLiabilities = filterAccountsBySubcategory(
     "Long-Term Liabilities"
   );
+  console.log("nonCurrentLiabilities:", nonCurrentLiabilities);
+
   const ownersEquity = filterAccountsBySubcategory("Owner's Equity");
-  const retainedEarnings = filterAccountsBySubcategory("Retained Earnings");
+  console.log("ownersEquity:", ownersEquity);
 
   const totalCurrentAssets = calculateSubtotal(currentAssets);
   const totalNonCurrentAssets = calculateSubtotal(nonCurrentAssets);
@@ -157,7 +163,20 @@ const ManagerBalanceSheet = () => {
   const totalLiabilities = totalCurrentLiabilities + totalNonCurrentLiabilities;
 
   const totalOwnersEquity = calculateSubtotal(ownersEquity);
-  const totalRetainedEarnings = calculateSubtotal(retainedEarnings);
+  const revenue = filterAccountsBySubcategory("Service Revenue");
+  const expenses = filterAccountsBySubcategory("Operating Expenses");
+  const otherExpenses = filterAccountsBySubcategory("Other Expenses");
+
+  const totalRevenue = calculateSubtotal(revenue);
+  const totalExpenses = calculateSubtotal(expenses, true);
+  const totalOtherExpenses = calculateSubtotal(otherExpenses, true);
+
+  const retainedEarnings = filterAccountsBySubcategory("Retained Earnings");
+  const totalRetainedEarnings =
+    calculateSubtotal(retainedEarnings) +
+    totalRevenue +
+    totalExpenses +
+    totalOtherExpenses;
   const totalEquity = totalOwnersEquity + totalRetainedEarnings;
 
   console.log("totalAssets:", totalAssets);
@@ -398,16 +417,64 @@ const ManagerBalanceSheet = () => {
                     <td style={{ paddingLeft: "30px" }}>Retained Earnings</td>
                     <td></td>
                   </tr>
-                  {retainedEarnings.map((account) => (
+                  {/* {retainedEarnings.map((account) => (
                     <tr key={account.accountId}>
                       <td style={{ paddingLeft: "60px" }}>
                         {account.accountName}
                       </td>
                       <td>{formatNumber(account.balance)}</td>
                     </tr>
+                  ))} */}
+                  <tr>
+                    <td style={{ paddingLeft: "60px" }}>Revenue</td>
+                    <td></td>
+                  </tr>
+                  {revenue.map((account) => (
+                    <tr key={account.accountId}>
+                      <td style={{ paddingLeft: "90px" }}>
+                        {account.accountName}
+                      </td>
+                      <td>{formatNumber(account.balance)}</td>
+                    </tr>
                   ))}
+                  <tr style={{ fontWeight: "bold", color: "darkgray" }}>
+                    <td style={{ color: "gray", paddingLeft: "120px" }}>
+                      Total Revenue
+                    </td>
+                    <td style={{ color: "gray" }}>
+                      {formatNumber(totalRevenue)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ paddingLeft: "60px" }}>Expenses</td>
+                    <td></td>
+                  </tr>
+                  {expenses.map((account) => (
+                    <tr key={account.accountId}>
+                      <td style={{ paddingLeft: "90px" }}>
+                        {account.accountName}
+                      </td>
+                      <td>-{formatNumber(account.balance)}</td>
+                    </tr>
+                  ))}
+                  {otherExpenses.map((account) => (
+                    <tr key={account.accountId}>
+                      <td style={{ paddingLeft: "90px" }}>
+                        {account.accountName}
+                      </td>
+                      <td>-{formatNumber(account.balance)}</td>
+                    </tr>
+                  ))}
+                  <tr style={{ fontWeight: "bold", color: "darkgray" }}>
+                    <td style={{ color: "gray", paddingLeft: "120px" }}>
+                      Total Expenses
+                    </td>
+                    <td style={{ color: "gray" }}>
+                      {formatNumber(totalExpenses + totalOtherExpenses)}
+                    </td>
+                  </tr>
                   <tr style={{ fontWeight: "bold", color: "green" }}>
-                    <td style={{ color: "gray", paddingLeft: "90px" }}>
+                    <td style={{ color: "gray", paddingLeft: "150px" }}>
                       Total Retained Earnings
                     </td>
                     <td style={{ color: "gray" }}>

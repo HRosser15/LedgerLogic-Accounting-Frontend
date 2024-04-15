@@ -26,17 +26,28 @@ export const fetchEventLog = () => {
 };
 
 
-// Function to parse currentState string
+export const fetchAccounts = () => {
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+  console.log("LoggedInUser Information in fetchAccounts:", user);
+
+  if (user) {
+    const requestOptions = {
+      withCredentials: true,
+    };
+
+    return axios.get(`${BASE_URL}/allAccounts`, requestOptions);
+  } else {
+    console.error("User information not found in local storage");
+    return Promise.reject("User information not found");
+  }
+};
+
+
 const parseCurrentState = (currentStateString) => {
-  // Split the string by commas to get individual property-value pairs
   const keyValuePairs = currentStateString.split(", ");
-  // Create an object to store parsed properties
   const parsedState = {};
-  // Iterate through keyValuePairs array
   keyValuePairs.forEach(pair => {
-    // Split each pair by '=' to separate property and value
     const [key, value] = pair.split("=");
-    // Check if both key and value exist before adding to parsedState
     if (key && value) {
       parsedState[key.trim()] = value.trim();
     }
@@ -49,28 +60,25 @@ export const fetchAccountBalancesByDate = async (selectedDate) => {
     const response = await axios.get("http://localhost:8080/eventLog/getAll");
     const eventLog = response.data;
 
-    // Convert selectedDate to ISO string without time component
     const isoSelectedDate = new Date(selectedDate).toISOString().split('T')[0];
 
-    // Filter event log to only include events before the selected date
     const filteredEventLog = eventLog.filter(event => {
       const eventDate = new Date(event.modificationTime).toISOString().split('T')[0];
       return eventDate <= isoSelectedDate;
     });
 
-    // Collect account details for each event in the filtered event log
     const accountDetailsList = filteredEventLog.map((event) => {
       try {
-        // Parse event's currentState to get account balance and other details
         const currentState = parseCurrentState(event.currentState);
         const accountDetails = {
-          accountId: currentState.accountId,
-          accountName: currentState.accountName,
-          accountNumber: currentState.accountNumber,
-          category: currentState.category,
-          balance: currentState.balance,
-          subCategory: currentState.subCategory
-          // Add other details as needed
+          accountId: currentState.accountId ? currentState.accountId.toString() : undefined,
+          accountName: currentState.accountName || undefined,
+          accountNumber: currentState.accountNumber || undefined,
+          category: currentState.category || undefined,
+          balance: currentState.balance || undefined,
+          subCategory: currentState.subCategory || undefined,
+          debit: currentState.debit || undefined,
+          credit: currentState.credit || undefined
         };
         return accountDetails;
       } catch (error) {
@@ -84,7 +92,7 @@ export const fetchAccountBalancesByDate = async (selectedDate) => {
     console.log("Account details list:", accountDetailsList);
     console.log("Account details list:", filteredAccountDetailsList);
 
-    return { data: filteredAccountDetailsList }; // Return the list of account details
+    return { data: filteredAccountDetailsList };
   } catch (error) {
     throw error;
   }
@@ -107,22 +115,6 @@ export const fetchExpiredPasswords = () => {
 };
 
 export { addAccount };
-
-export const fetchAccounts = () => {
-  const user = JSON.parse(localStorage.getItem("user")) || {};
-  console.log("LoggedInUser Information in fetchAccounts:", user);
-
-  if (user) {
-    const requestOptions = {
-      withCredentials: true,
-    };
-
-    return axios.get(`${BASE_URL}/allAccounts`, requestOptions);
-  } else {
-    console.error("User information not found in local storage");
-    return Promise.reject("User information not found");
-  }
-};
 
 export const deactivateAccount = async (accountID) => {
   try {
