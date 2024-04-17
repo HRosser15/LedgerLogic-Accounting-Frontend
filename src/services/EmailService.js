@@ -138,7 +138,7 @@ export const emailUserIncomeStatement = (email, fromEmail, subject, emailContent
   });
 };
 
-export const emailUserRetainedIncome = (email, fromEmail, subject, emailContent, reportHtml) => {
+export const emailUserRetainedEarnings = (email, fromEmail, subject, emailContent, reportHtml) => {
   return new Promise((resolve, reject) => {
     const options = {
       filename: 'retained_income_report.pdf',

@@ -1,0 +1,33 @@
+.retained-earnings-header {
+  margin-top: 50px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.retained-earnings-form {
+  margin-bottom: 30px;
+}
+
+.retained-earnings-section {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.retained-earnings-buttons {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.email-form {
+  margin-top: 20px;
+}
+
+.emailFormContainer {
+  max-width: 350px;
+  margin-left: 0;
+}
+
+.emailFormLabel {
+  font-weight: bold;
+}
