@@ -98,6 +98,50 @@ export const fetchAccountBalancesByDate = async (selectedDate) => {
   }
 };
 
+export const fetchAccountBalancesByDateRange = async (startDate, endDate) => {
+  try {
+    const response = await axios.get("http://localhost:8080/eventLog/getAll");
+    const eventLog = response.data;
+    // console.log("Event Log:", eventLog);
+
+    const isoStartDate = new Date(startDate).toISOString().split('T')[0];
+    const isoEndDate = new Date(endDate).toISOString().split('T')[0];
+
+    const filteredEventLog = eventLog.filter(event => {
+      const eventDate = new Date(event.modificationTime).toISOString().split('T')[0];
+      return eventDate >= isoStartDate && eventDate <= isoEndDate;
+    });
+
+    const accountDetailsList = filteredEventLog.map((event) => {
+      try {
+        const currentState = parseCurrentState(event.currentState);
+        const accountDetails = {
+          accountId: currentState.accountId,
+          accountName: currentState.accountName,
+          accountNumber: currentState.accountNumber,
+          category: currentState.category,
+          balance: currentState.balance,
+          subCategory: currentState.subCategory,
+          // Add other details as needed
+        };
+        return accountDetails;
+      } catch (error) {
+        console.error(`Error parsing currentState for event ${event.id}:`, error);
+        return null;
+      }
+    });
+
+    const filteredAccountDetailsList = accountDetailsList.filter(details => details !== null);
+
+    console.log("Date Range--Account details list:", accountDetailsList);
+    // console.log("Date Range--Account details list:", filteredAccountDetailsList);
+
+    return { data: filteredAccountDetailsList };
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export const fetchExpiredPasswords = () => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
