@@ -2,28 +2,56 @@ import React, { useState } from "react";
 import { Container, Form, Button, Modal, Table } from "react-bootstrap";
 import styles from "./AccountForm.module.css";
 import modalBodyStyles from "./ModalBody.module.css";
+import {
+  approveJournal,
+  rejectJournal,
+} from "../../../../services/JournalService";
 
-const PostReference = ({ entry, onClose, handleEntryUpdate }) => {
-  const [reference, setReference] = useState("");
+const PostReference = ({
+  entry,
+  matchedJournal,
+  onClose,
+  handleEntryUpdate,
+}) => {
+  const [rejectionReason, setRejectionReason] = useState("");
   const [showModal, setShowModal] = useState(true);
 
-  const handleApprove = () => {
-    const updatedEntry = { ...entry, status: "posted" };
-    handleEntryUpdate(updatedEntry);
-    setShowModal(false);
-    onClose();
+  const handleApprove = async () => {
+    try {
+      await approveJournal(matchedJournal.journalId, "APPROVED");
+      const updatedEntry = { ...entry, status: "approved" };
+      handleEntryUpdate(updatedEntry);
+      setShowModal(false);
+      onClose();
+    } catch (error) {
+      console.error("Failed to approve journal entry:", error);
+    }
   };
 
-  const handleReject = () => {
-    const updatedEntry = { ...entry, status: "rejected" };
-    handleEntryUpdate(updatedEntry);
-    setShowModal(false);
-    onClose();
+  const handleReject = async () => {
+    try {
+      await rejectJournal(matchedJournal.journalId, rejectionReason);
+      const updatedEntry = { ...entry, status: "rejected" };
+      handleEntryUpdate(updatedEntry);
+      setShowModal(false);
+      onClose();
+    } catch (error) {
+      console.error("Failed to reject journal entry:", error);
+    }
   };
 
   const handleCancel = () => {
     setShowModal(false);
     onClose();
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.toLocaleString("default", { month: "long" });
+    const day = date.getDate();
+
+    return `${year}, ${month} ${day}`;
   };
 
   return (
@@ -44,45 +72,38 @@ const PostReference = ({ entry, onClose, handleEntryUpdate }) => {
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Ledger ID</th>
                   <th>Account</th>
                   <th>Debit</th>
                   <th>Credit</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{entry.date}</td>
-                  <td>{entry.ledgerId}</td>
-                  <td>{entry.account1Name}</td>
-                  <td>${(entry.debit ?? 0).toFixed(2)}</td>
-                  <td>${(entry.credit ?? 0).toFixed(2)}</td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>{entry.account2Name}</td>
-                  <td>${(entry.debit2 ?? 0).toFixed(2)}</td>
-                  <td>${(entry.credit2 ?? 0).toFixed(2)}</td>
-                </tr>
+                {matchedJournal.journalEntries.map((journalEntry) => (
+                  <tr key={journalEntry.journalEntryId}>
+                    <td>{formatDate(matchedJournal.transactionDate)}</td>
+                    <td>{journalEntry.account.accountName}</td>
+                    <td>${journalEntry.debit.toFixed(2)}</td>
+                    <td>${journalEntry.credit.toFixed(2)}</td>
+                  </tr>
+                ))}
                 <tr>
                   <th>Description</th>
                   <td colSpan="4">{entry.description}</td>
                 </tr>
                 <tr>
                   <th>Status</th>
-                  <td colSpan="4">{entry.status}</td>
+                  <td colSpan="4">{matchedJournal.status}</td>
                 </tr>
               </tbody>
             </table>
             <React.Fragment>
-              {entry.status === "pending" ? (
-                <Form.Group controlId="reference">
-                  <Form.Label>Reference</Form.Label>
+              {matchedJournal.status === "PENDING" ? (
+                <Form.Group controlId="rejectionReason">
+                  <Form.Label>Rejection Reason</Form.Label>
                   <Form.Control
                     type="text"
-                    value={reference}
-                    onChange={(e) => setReference(e.target.value)}
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
                   />
                 </Form.Group>
               ) : null}
@@ -95,14 +116,14 @@ const PostReference = ({ entry, onClose, handleEntryUpdate }) => {
           Close
         </Button>
         <React.Fragment>
-          {entry.status === "pending" ? (
+          {matchedJournal.status === "PENDING" ? (
             <Button variant="primary" onClick={handleReject}>
               Reject
             </Button>
           ) : null}
         </React.Fragment>
         <React.Fragment>
-          {entry.status === "pending" ? (
+          {matchedJournal.status === "PENDING" ? (
             <Button variant="primary" onClick={handleApprove}>
               Approve
             </Button>

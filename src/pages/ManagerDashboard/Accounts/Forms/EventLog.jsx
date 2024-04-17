@@ -4,36 +4,34 @@ import {
   fetchEventLog,
   fetchAccounts,
 } from "../../../../services/AccountService";
-import { Container, Spinner } from "react-bootstrap"; // Added Spinner for loading state
+import { Container, Spinner } from "react-bootstrap";
 import styles from "./AccountForm.module.css";
 
 const EventLog = () => {
   const { state } = useContext(AppContext);
   const [eventLog, setEventLog] = useState([]);
   const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true); // Set loading state to true before fetching data
+      setIsLoading(true);
       try {
-        // Fetch event log data
         const eventLogResponse = await fetchEventLog();
         const filteredEventLog = eventLogResponse.data.filter(
           (event) => event.previousState && event.title !== "Update User"
         );
         setEventLog(filteredEventLog);
 
-        // Fetch accounts data
         const accountsResponse = await fetchAccounts();
         setAccounts(accountsResponse.data);
 
-        setIsLoading(false); // Set loading state to false after successful data fetch
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError(error); // Set error state if there's an error during data fetch
-        setIsLoading(false); // Set loading state to false after error
+        setError(error);
+        setIsLoading(false);
       }
     };
 
@@ -56,6 +54,107 @@ const EventLog = () => {
     const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     return `${year}, ${month} ${day} ${formattedHours}:${formattedMinutes} ${ampm}`;
+  };
+
+  const getUsernameFromId = (userId) => {
+    if (userId === 1) {
+      return "bwilson0424";
+    } else if (userId === 2) {
+      return "ksmith0424";
+    }
+    return "N/A";
+  };
+
+  const parseJournalState = (stateString) => {
+    const matches = stateString.match(
+      /journalId=(\d+), status=([^,]+), rejectionReason='([^']+)', balance=([^,]+), createdDate=([^}]+)/
+    );
+
+    if (!matches) return null;
+
+    return {
+      journalId: matches[1],
+      status: matches[2],
+      rejectionReason: matches[3],
+      balance: matches[4],
+      createdDate: matches[5],
+    };
+  };
+
+  const parseAccountState = (stateString) => {
+    const matches = stateString.match(
+      /accountId=(\d+), accountNumber=(\d+), accountName=([^,]+), description=([^,]+), normalSide=([^,]+), category=([^,]+), active=([^,]+), subCategory=([^,]+), initialBalance=([^,]+), debit=([^,]+), credit=([^,]+), balance=([^,]+)/
+    );
+
+    if (!matches) return null;
+
+    return {
+      accountId: matches[1],
+      accountNumber: matches[2],
+      accountName: matches[3],
+      description: matches[4],
+      normalSide: matches[5],
+      category: matches[6],
+      active: matches[7] === "true",
+      subCategory: matches[8],
+      initialBalance: matches[9],
+      debit: matches[10],
+      credit: matches[11],
+      balance: matches[12],
+    };
+  };
+
+  const renderCurrentState = (event) => {
+    if (event.title === "Update Account") {
+      const accountData = parseAccountState(event.currentState);
+      return (
+        <div>
+          Balance: {accountData.balance}
+          <br />
+          Debit: {accountData.debit}
+          <br />
+          Credit: {accountData.credit}
+        </div>
+      );
+    } else if (
+      event.title === "Approved New Journal" ||
+      event.title === "Rejected New Journal"
+    ) {
+      const journalData = parseJournalState(event.currentState);
+      if (journalData) {
+        return (
+          <div>
+            Status: {journalData.status}
+            {journalData.status === "REJECTED" && (
+              <span> - Rejection Reason: {journalData.rejectionReason}</span>
+            )}
+          </div>
+        );
+      }
+      return "Status: APPROVED";
+    }
+    return event.currentState;
+  };
+
+  const renderPreviousState = (event) => {
+    if (
+      event.title === "Approved New Journal" ||
+      event.title === "Rejected New Journal"
+    ) {
+      return "status=PENDING";
+    } else if (event.title === "Update Account") {
+      const accountData = parseAccountState(event.previousState);
+      return (
+        <div>
+          Balance: {accountData.balance}
+          <br />
+          Debit: {accountData.debit}
+          <br />
+          Credit: {accountData.credit}
+        </div>
+      );
+    }
+    return event.previousState;
   };
 
   if (isLoading) {
@@ -98,10 +197,10 @@ const EventLog = () => {
                 <td>{index + 1}</td>
                 <td>{getAccountName(event.entityId)}</td>
                 <td>{event.title}</td>
-                <td>User ID: hrosser0424</td>
+                <td>{getUsernameFromId(event.modifiedById)}</td>
                 <td>{formatModificationTime(event.modificationTime)}</td>
-                <td>{event.currentState}</td>
-                <td>{event.previousState}</td>
+                <td>{renderCurrentState(event)}</td>
+                <td>{renderPreviousState(event)}</td>
               </tr>
             ))}
           </tbody>

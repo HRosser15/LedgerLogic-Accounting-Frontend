@@ -21,20 +21,9 @@ const ManagerCreateJournal = () => {
   ]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [balance, setBalance] = useState(0);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetchAccounts();
-  //       setAccounts(response.data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch accounts:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+  const [fileData, setFileData] = useState(null);
 
   const handleReset = () => {
     setDate("");
@@ -93,6 +82,7 @@ const ManagerCreateJournal = () => {
         .map((jAccount) => ({
           credit: parseFloat(jAccount.credit),
           debit: parseFloat(jAccount.debit),
+          description: description,
           account: {
             accountId: jAccount.accountId,
           },
@@ -103,12 +93,17 @@ const ManagerCreateJournal = () => {
 
     try {
       await addJournal(newJournal);
-      navigate("/manager-accounts-management");
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Failed to add journal:", error);
     }
 
     setError("");
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    navigate("/manager-dashboard");
   };
 
   const handleFileUpload = (e) => {
@@ -359,6 +354,21 @@ const ManagerCreateJournal = () => {
           </Button>
           <Button variant="primary" onClick={handleReset}>
             Yes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showSuccessModal} onHide={handleCloseSuccessModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Journal Entry Submitted</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          A manager has been notified and will review it shortly. Closing this
+          dialog will redirect you to the Manager Dashboard.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseSuccessModal}>
+            OK
           </Button>
         </Modal.Footer>
       </Modal>

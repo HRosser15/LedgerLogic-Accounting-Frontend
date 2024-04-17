@@ -323,7 +323,7 @@ const AccountantViewAccountsForm = ({
                 <td>{account.normalSide}</td>
                 <td>{account.description}</td>
                 <td>
-                  {parseFloat(account.initialBalance).toLocaleString("en-US", {
+                  {parseFloat(account.balance).toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
