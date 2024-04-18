@@ -60,7 +60,7 @@ const PostReference = ({
       onHide={handleCancel}
       centered
       className={styles.customModal}
-      style={{ maxWidth: "800px" }}
+      dialogClassName={styles.customModalDialog}
     >
       <Modal.Header closeButton>
         <Modal.Title>Post Reference</Modal.Title>
