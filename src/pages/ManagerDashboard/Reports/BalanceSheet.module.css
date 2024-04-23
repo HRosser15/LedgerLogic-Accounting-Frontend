@@ -52,3 +52,8 @@
     border-bottom-width: 2px;
   }
 }
+
+.emailFormContainer {
+  max-width: 350px;
+  margin-left: 0;
+}

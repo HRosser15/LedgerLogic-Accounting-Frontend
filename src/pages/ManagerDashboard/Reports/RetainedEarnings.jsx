@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  fetchAccounts,
-  fetchAccountBalancesByDate,
-} from "../../../services/AccountService";
+import { fetchAggregatedAccountBalancesByDateRange } from "../../../services/AccountService";
 import { emailUserRetainedEarnings } from "../../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
@@ -13,7 +10,14 @@ import styles from "./RetainedEarnings.module.css";
 
 const ManagerRetainedEarnings = () => {
   const [accounts, setAccounts] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(
+    new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      new Date().getDate() - 365
+    )
+  );
+  const [endDate, setEndDate] = useState(new Date());
   const retainedEarningsRef = useRef(null);
 
   const [emailAddress, setEmailAddress] = useState("");
@@ -22,16 +26,31 @@ const ManagerRetainedEarnings = () => {
   useEffect(() => {
     const fetchRetainedEarnings = async () => {
       try {
-        const response = await fetchAccountBalancesByDate(selectedDate);
-        setAccounts(response.data);
-        console.log("Account Balances By date fetched:", response.data);
+        const response = await fetchAggregatedAccountBalancesByDateRange(
+          startDate,
+          endDate
+        );
+        setAccounts(response);
+        console.log("response data with date range: ", response);
       } catch (error) {
         console.error("Error fetching retained earnings:", error);
       }
     };
 
     fetchRetainedEarnings();
-  }, [selectedDate]);
+  }, [startDate, endDate]);
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+  };
+
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+  };
+
+  const formatNumber = (number) => {
+    return number.toLocaleString();
+  };
 
   const calculateBeginningPeriodRE = () => {
     const beginningPeriodREAccounts = accounts.filter(
@@ -70,7 +89,7 @@ const ManagerRetainedEarnings = () => {
       (account) => account.accountName === "Cash Dividends"
     );
     const cashDividends = cashDividendsAccounts.reduce(
-      (total, account) => total + parseFloat(account.balance),
+      (total, account) => total - parseFloat(account.balance),
       0
     );
     return cashDividends;
@@ -81,7 +100,7 @@ const ManagerRetainedEarnings = () => {
       (account) => account.accountName === "Stock Dividends"
     );
     const stockDividends = stockDividendsAccounts.reduce(
-      (total, account) => total + parseFloat(account.balance),
+      (total, account) => total - parseFloat(account.balance),
       0
     );
     return stockDividends;
@@ -96,29 +115,6 @@ const ManagerRetainedEarnings = () => {
     const endingRetainedEarnings =
       beginningRE + netIncomeLoss - cashDividends - stockDividends;
     return endingRetainedEarnings;
-  };
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-
-  const formatNumber = (number) => {
-    return number.toLocaleString();
-  };
-
-  const calculateRetainedEarnings = () => {
-    let retainedEarnings = 0;
-    accounts.forEach((account) => {
-      if (account.type === "Retained Earnings") {
-        retainedEarnings += parseFloat(account.balance);
-      } else if (account.type === "Net Income") {
-        retainedEarnings += parseFloat(account.balance);
-      } else if (account.type === "Cash Dividends") {
-        retainedEarnings -= parseFloat(account.balance);
-      } else if (account.type === "Stock Dividends") {
-        retainedEarnings -= parseFloat(account.balance);
-      }
-    });
-    return retainedEarnings;
   };
 
   const handleSaveReport = () => {
@@ -192,24 +188,35 @@ const ManagerRetainedEarnings = () => {
 
   return (
     <Container>
+      <div style={{ height: "50px" }}></div>
       <div className="retained-earnings-header">
         <h1>Retained Earnings</h1>
       </div>
 
-      <Form className="retained-earnings-form">
+      <Form>
         <Row>
           <Col>
-            <Form.Label>Select Date</Form.Label>
+            <Form.Label>Select Start Date</Form.Label>
             <DatePicker
-              selected={selectedDate}
-              onChange={handleDateChange}
+              selected={startDate}
+              onChange={handleStartDateChange}
               dateFormat="yyyy-MM-dd"
-              placeholderText="Select date"
+              placeholderText="Select start date"
+            />
+          </Col>
+          <Col>
+            <Form.Label>Select End Date</Form.Label>
+            <DatePicker
+              selected={endDate}
+              onChange={handleEndDateChange}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="Select end date"
             />
           </Col>
         </Row>
       </Form>
 
+      <div style={{ height: "50px" }}></div>
       <Container ref={retainedEarningsRef}>
         <div className="retained-earnings-section">
           <Row>
@@ -248,9 +255,10 @@ const ManagerRetainedEarnings = () => {
           </Row>
         </div>
       </Container>
-      <div style={{ height: "50px" }}></div>
 
       <div className="income-statement-buttons">
+        <div style={{ height: "30px" }}></div>
+        {/* Buttons */}
         <Row>
           <Col>
             <Button style={{ minWidth: "100px" }} onClick={handleSaveReport}>
@@ -264,6 +272,7 @@ const ManagerRetainedEarnings = () => {
           </Col>
         </Row>
         <div style={{ height: "50px" }}></div>
+        <h3>Email Balance Sheet Report</h3>
         <Form>
           <div className={styles.emailFormContainer}>
             <Form.Group controlId="emailAddress">
@@ -278,11 +287,11 @@ const ManagerRetainedEarnings = () => {
           </div>
           <div style={{ height: "20px" }}></div>
           <Form.Group controlId="emailContent">
-            <Form.Label>Email Content</Form.Label>
+            <Form.Label>Email Body</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
-              placeholder="Enter email content"
+              placeholder="Enter email body content"
               value={emailContent}
               onChange={handleEmailContentChange}
             />

@@ -1,6 +1,11 @@
 import axios from "axios";
 
 const BASE_URL = "http://localhost:8080/account";
+const API_BASE_URL = "http://localhost:8080";
+
+export const fetchParsedEventLogs = () => {
+  return axios.get("http://localhost:8080/eventLog/getAllParsed");
+};
 
 const addAccount = async (requestData) => {
   try {
@@ -98,45 +103,29 @@ export const fetchAccountBalancesByDate = async (selectedDate) => {
   }
 };
 
-export const fetchAccountBalancesByDateRange = async (startDate, endDate) => {
+export const fetchAggregatedAccountBalancesByDateRange = async (startDate, endDate) => {
   try {
-    const response = await axios.get("http://localhost:8080/eventLog/getAll");
-    const eventLog = response.data;
-    // console.log("Event Log:", eventLog);
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
 
-    const isoStartDate = new Date(startDate).toISOString().split('T')[0];
-    const isoEndDate = new Date(endDate).toISOString().split('T')[0];
-
-    const filteredEventLog = eventLog.filter(event => {
-      const eventDate = new Date(event.modificationTime).toISOString().split('T')[0];
-      return eventDate >= isoStartDate && eventDate <= isoEndDate;
-    });
-
-    const accountDetailsList = filteredEventLog.map((event) => {
-      try {
-        const currentState = parseCurrentState(event.currentState);
-        const accountDetails = {
-          accountId: currentState.accountId,
-          accountName: currentState.accountName,
-          accountNumber: currentState.accountNumber,
-          category: currentState.category,
-          balance: currentState.balance,
-          subCategory: currentState.subCategory,
-          // Add other details as needed
-        };
-        return accountDetails;
-      } catch (error) {
-        console.error(`Error parsing currentState for event ${event.id}:`, error);
-        return null;
+    const response = await axios.get(`${API_BASE_URL}/eventLog/getAggregatedAccountBalancesByDateRange`, {
+      params: {
+        startDate: formattedStartDate,
+        endDate: formattedEndDate
       }
     });
+    console.log("Aggregated Account Balances:", response.data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
-    const filteredAccountDetailsList = accountDetailsList.filter(details => details !== null);
-
-    console.log("Date Range--Account details list:", accountDetailsList);
-    // console.log("Date Range--Account details list:", filteredAccountDetailsList);
-
-    return { data: filteredAccountDetailsList };
+export const fetchAccountBalancesByDateRange = async (startDate, endDate) => {
+  try {
+    const response = await fetchAggregatedAccountBalancesByDateRange(startDate, endDate);
+    console.log("Aggregated Account Balances:", response);
+    return { data: response };
   } catch (error) {
     throw error;
   }

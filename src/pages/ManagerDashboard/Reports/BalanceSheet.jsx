@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   fetchAccounts,
-  fetchAccountBalancesByDate,
+  fetchAggregatedAccountBalancesByDateRange,
 } from "../../../services/AccountService";
 import { emailUserBalanceSheet } from "../../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
@@ -9,11 +9,18 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import html2canvas from "html2canvas";
 import "./DatePickerStyles.css";
-import "./BalanceSheet.module.css";
+import styles from "./BalanceSheet.module.css";
 
 const ManagerBalanceSheet = () => {
   const [accounts, setAccounts] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(
+    new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      new Date().getDate() - 365
+    )
+  );
+  const [endDate, setEndDate] = useState(new Date());
   const balanceSheetRef = useRef(null); // **** Ref for the balance sheet container
 
   const [emailAddress, setEmailAddress] = useState("");
@@ -22,28 +29,27 @@ const ManagerBalanceSheet = () => {
   useEffect(() => {
     const fetchBalances = async () => {
       try {
-        if (selectedDate) {
-          const response = await fetchAccountBalancesByDate(selectedDate);
-          setAccounts(response.data);
-          console.log("response data with selected date: ", response.data);
-        } else {
-          // If no date is selected, fetch accounts in their current state
-          fetchAccounts().then((response) => {
-            console.log(response.data);
-            const sortedAccounts = response.data.sort(
-              (a, b) => a.accountNumber - b.accountNumber
-            );
-            console.log("Sorted accounts:", sortedAccounts);
-            setAccounts(sortedAccounts);
-          });
-        }
+        const response = await fetchAggregatedAccountBalancesByDateRange(
+          startDate,
+          endDate
+        );
+        setAccounts(response);
+        console.log("response data with date range: ", response);
       } catch (error) {
         console.error("Error fetching account balances:", error);
       }
     };
 
     fetchBalances();
-  }, [selectedDate]);
+  }, [startDate, endDate]);
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+  };
+
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+  };
 
   const handleSaveReport = () => {
     html2canvas(balanceSheetRef.current).then((canvas) => {
@@ -134,7 +140,7 @@ const ManagerBalanceSheet = () => {
   };
 
   const formatNumber = (number) => {
-    return number.toLocaleString();
+    return number ? number.toLocaleString() : "0";
   };
 
   const currentAssets = filterAccountsBySubcategory("Current Assets");
@@ -192,16 +198,23 @@ const ManagerBalanceSheet = () => {
         <Form>
           <Row>
             <Col>
-              <Form.Label>Select a Date</Form.Label>
+              <Form.Label>Select Start Date</Form.Label>
               <DatePicker
-                selected={selectedDate}
-                onChange={handleDateChange}
+                selected={startDate}
+                onChange={handleStartDateChange}
                 dateFormat="yyyy-MM-dd"
-                placeholderText="Select a date"
+                placeholderText="Select start date"
               />
             </Col>
-            <Col></Col>
-            <Col></Col>
+            <Col>
+              <Form.Label>Select End Date</Form.Label>
+              <DatePicker
+                selected={endDate}
+                onChange={handleEndDateChange}
+                dateFormat="yyyy-MM-dd"
+                placeholderText="Select end date"
+              />
+            </Col>
           </Row>
         </Form>
       </div>
@@ -212,7 +225,10 @@ const ManagerBalanceSheet = () => {
         <div id="balance-sheet-print">
           <Row>
             <Col>
-              <h3>Balance Sheet for {selectedDate.toLocaleDateString()}</h3>
+              <h3>
+                Balance Sheet for {startDate.toLocaleDateString()} to{" "}
+                {endDate.toLocaleDateString()}
+              </h3>
             </Col>
           </Row>
           <div style={{ height: "30px" }}></div>
@@ -491,43 +507,50 @@ const ManagerBalanceSheet = () => {
           </Row>
         </div>
       </Container>
-      <div style={{ height: "50px" }}></div>
+      <div style={{ height: "30px" }}></div>
       {/* Buttons */}
       <Row>
         <Col>
-          <Button onClick={handleSaveReport}>Save</Button>
+          <Button style={{ minWidth: "100px" }} onClick={handleSaveReport}>
+            Save
+          </Button>
         </Col>
         <Col>
-          <Button onClick={handlePrintReport}>Print</Button>
+          <Button style={{ minWidth: "100px" }} onClick={handlePrintReport}>
+            Print
+          </Button>
         </Col>
       </Row>
-
       <div style={{ height: "50px" }}></div>
+      <h3>Email Balance Sheet Report</h3>
       <Form>
-        <Form.Group controlId="emailAddress">
-          <Form.Label>Email Address</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email address"
-            value={emailAddress}
-            onChange={handleEmailChange}
-          />
-        </Form.Group>
+        <div className={styles.emailFormContainer}>
+          <Form.Group controlId="emailAddress">
+            <Form.Label>Email Address</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="Enter email address"
+              value={emailAddress}
+              onChange={handleEmailChange}
+            />
+          </Form.Group>
+        </div>
+        <div style={{ height: "20px" }}></div>
         <Form.Group controlId="emailContent">
-          <Form.Label>Email Content</Form.Label>
+          <Form.Label>Email Body</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
-            placeholder="Enter email content"
+            placeholder="Enter email body content"
             value={emailContent}
             onChange={handleEmailContentChange}
           />
         </Form.Group>
+        <div style={{ height: "20px" }}></div>
         <Button variant="primary" onClick={handleSendEmail}>
           Send Email
         </Button>
       </Form>
-
       <div style={{ height: "200px" }}></div>
     </Container>
   );

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   fetchAccounts,
   fetchAccountBalancesByDateRange,
+  fetchAggregatedAccountBalancesByDateRange,
 } from "../../../services/AccountService";
 import { emailUserIncomeStatement } from "../../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
@@ -23,11 +24,11 @@ const ManagerIncomeStatement = () => {
   useEffect(() => {
     const fetchIncomeStatement = async () => {
       try {
-        const response = await fetchAccountBalancesByDateRange(
+        const response = await fetchAggregatedAccountBalancesByDateRange(
           startDate,
           endDate
         );
-        setAccounts(response.data);
+        setAccounts(response);
       } catch (error) {
         console.error("Error fetching income statement:", error);
       }
@@ -148,6 +149,7 @@ const ManagerIncomeStatement = () => {
 
   return (
     <Container>
+      <div style={{ height: "50px" }}></div>
       <div className="income-statement-header">
         <h1>Income Statement</h1>
       </div>
@@ -175,6 +177,7 @@ const ManagerIncomeStatement = () => {
         </Row>
       </Form>
 
+      <div style={{ height: "50px" }}></div>
       <Container ref={incomeStatementRef}>
         <div className="income-statement-print">
           <Row>
@@ -219,6 +222,8 @@ const ManagerIncomeStatement = () => {
       <div style={{ height: "20px" }}></div>
 
       <div className="income-statement-buttons">
+        <div style={{ height: "30px" }}></div>
+        {/* Buttons */}
         <Row>
           <Col>
             <Button style={{ minWidth: "100px" }} onClick={handleSaveReport}>
@@ -232,6 +237,7 @@ const ManagerIncomeStatement = () => {
           </Col>
         </Row>
         <div style={{ height: "50px" }}></div>
+        <h3>Email Income Statement Report</h3>
         <Form>
           <div className={styles.emailFormContainer}>
             <Form.Group controlId="emailAddress">
@@ -246,11 +252,11 @@ const ManagerIncomeStatement = () => {
           </div>
           <div style={{ height: "20px" }}></div>
           <Form.Group controlId="emailContent">
-            <Form.Label>Email Content</Form.Label>
+            <Form.Label>Email Body</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
-              placeholder="Enter email content"
+              placeholder="Enter email body content"
               value={emailContent}
               onChange={handleEmailContentChange}
             />
