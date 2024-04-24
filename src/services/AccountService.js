@@ -33,7 +33,7 @@ export const fetchEventLog = () => {
 
 export const fetchAccounts = () => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
-  console.log("LoggedInUser Information in fetchAccounts:", user);
+  // console.log("LoggedInUser Information in fetchAccounts:", user);
 
   if (user) {
     const requestOptions = {
@@ -87,15 +87,15 @@ export const fetchAccountBalancesByDate = async (selectedDate) => {
         };
         return accountDetails;
       } catch (error) {
-        console.error(`Error parsing currentState for event ${event.id}:`, error);
+        // console.error(`Error parsing currentState for event ${event.id}:`, error);
         return null;
       }
     });
 
     const filteredAccountDetailsList = accountDetailsList.filter(details => details !== null);
 
-    console.log("Account details list:", accountDetailsList);
-    console.log("Account details list:", filteredAccountDetailsList);
+    // console.log("Account details list:", accountDetailsList);
+    // console.log("Account details list:", filteredAccountDetailsList);
 
     return { data: filteredAccountDetailsList };
   } catch (error) {
@@ -114,7 +114,7 @@ export const fetchAggregatedAccountBalancesByDateRange = async (startDate, endDa
         endDate: formattedEndDate
       }
     });
-    console.log("Aggregated Account Balances:", response.data);
+    // console.log("Aggregated Account Balances:", response.data);
     return response.data;
   } catch (error) {
     throw error;
@@ -124,7 +124,7 @@ export const fetchAggregatedAccountBalancesByDateRange = async (startDate, endDa
 export const fetchAccountBalancesByDateRange = async (startDate, endDate) => {
   try {
     const response = await fetchAggregatedAccountBalancesByDateRange(startDate, endDate);
-    console.log("Aggregated Account Balances:", response);
+    // console.log("Aggregated Account Balances:", response);
     return { data: response };
   } catch (error) {
     throw error;

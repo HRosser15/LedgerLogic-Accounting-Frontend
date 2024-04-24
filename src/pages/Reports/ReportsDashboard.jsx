@@ -1,13 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
-import balanceSheet from "../../../assets/balance-sheet.png";
-import trialBalance from "../../../assets/trial-balance.png";
-import incomeStatement from "../../../assets/income-statement.png";
-import retainedEarnings from "../../../assets/retained-earnings.png";
+import balanceSheet from "../../assets/balance-sheet.png";
+import trialBalance from "../../assets/trial-balance.png";
+import incomeStatement from "../../assets/income-statement.png";
+import retainedEarnings from "../../assets/retained-earnings.png";
 import styles from "./ReportsDashboard.module.css";
 
-const ManagerReportsDashboard = () => {
+const ReportsDashboard = () => {
   return (
     <Container>
       <div>
@@ -17,7 +17,7 @@ const ManagerReportsDashboard = () => {
         <form className={styles.forms}>
           <Row>
             <Col>
-              <Link to="/manager-balance-sheet">
+              <Link to="/balance-sheet">
                 <h2
                   style={{
                     marginTop: "20px",
@@ -94,7 +94,7 @@ const ManagerReportsDashboard = () => {
               </p>
             </Col>
             <Col>
-              <Link to="/manager-trial-balance">
+              <Link to="/trial-balance">
                 <h2
                   style={{
                     marginTop: "20px",
@@ -120,7 +120,7 @@ const ManagerReportsDashboard = () => {
         <form className={styles.forms}>
           <Row>
             <Col>
-              <Link to="/manager-income-statement">
+              <Link to="/income-statement">
                 <h2
                   style={{
                     marginTop: "20px",
@@ -196,7 +196,7 @@ const ManagerReportsDashboard = () => {
               <p></p>
             </Col>
             <Col>
-              <Link to="/manager-retained-earnings">
+              <Link to="/retained-earnings">
                 <h2
                   style={{
                     marginTop: "20px",
@@ -216,4 +216,4 @@ const ManagerReportsDashboard = () => {
   );
 };
 
-export default ManagerReportsDashboard;
+export default ReportsDashboard;

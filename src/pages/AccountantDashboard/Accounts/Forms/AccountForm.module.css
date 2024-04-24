@@ -170,6 +170,22 @@
   border-color: transparent;
 }
 
+.transparentButton {
+  background: transparent;
+  color: black;
+  border-color: #6f95ff;
+  border-width: 3px;
+  min-width: 120px;
+  max-width: 220px;
+}
+
+.transparentButton:hover {
+  background: #eeeeee;
+  color: black;
+  border-color: #2e64f8;
+  border-width: 3px;
+}
+
 .redButton {
   background: #ee2424;
   color: white;
@@ -220,4 +236,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   margin-top: 8px;
+}
+
+.customModal .modal-dialog {
+  max-width: 1200px;
 }

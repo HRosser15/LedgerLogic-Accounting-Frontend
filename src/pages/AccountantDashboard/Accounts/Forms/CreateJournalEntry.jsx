@@ -270,8 +270,8 @@ const AccountantCreateJournal = () => {
             </Row>
 
             <Row>
-              <Button variant="primary" onClick={addAccount}>
-                Add Account
+              <Button className={styles.transparentButton} onClick={addAccount}>
+                Add Another Account
               </Button>
               <div style={{ height: "50px" }}></div>
             </Row>

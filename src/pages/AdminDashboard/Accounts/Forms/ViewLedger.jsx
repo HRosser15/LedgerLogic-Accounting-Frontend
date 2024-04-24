@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useParams } from "react-router-dom";
-import SearchAccounts from "./SearchAccounts";
 import styles from "./AccountForm.module.css";
 import previous from "../../../../assets/previous.png";
 import PostReference from "./PostReference";
@@ -15,8 +14,9 @@ import {
   Col,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { fetchJournalEntriesForAccount } from "../../../../services/JournalService";
 
-const AccountantViewLedger = ({
+const AdminViewLedger = ({
   account,
   handleBackToAccounts,
   accounts,
@@ -25,38 +25,25 @@ const AccountantViewLedger = ({
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("posted");
-  const [dummyData, setDummyData] = useState([
-    {
-      ledgerId: 1,
-      accountName: "Cash",
-      date: "2024-04-01",
-      description: "Initial Deposit",
-      debit: 10000.0,
-      credit: 0.0,
-      balance: 10000.0,
-      status: "posted",
-    },
-    {
-      ledgerId: 2,
-      date: "2021-10-02",
-      description:
-        "Bought roofing materials for customer John Smith at 123 St, Atlanta GA",
-      debit: 0.0,
-      credit: 5000.0,
-      balance: -5000.0,
-      status: "pending",
-    },
-    {
-      ledgerId: 3,
-      date: "2024-03-25",
-      description: "Got paid for work done",
-      debit: 150.0,
-      credit: 0.0,
-      balance: 150.0,
-      status: "rejected",
-    },
-  ]);
+  const [statusFilter, setStatusFilter] = useState("approved");
+  const [journalEntries, setJournalEntries] = useState([]);
+  const [matchedJournal, setMatchedJournal] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (account && account.accountName) {
+        const entries = await fetchJournalEntriesForAccount(
+          account.accountName
+        );
+        console.log("Fetched journal entries from useEffect:", entries);
+        setJournalEntries(entries);
+      } else {
+        setJournalEntries([]);
+      }
+    };
+
+    fetchData();
+  }, [account]);
 
   const StatusFilterDropdown = () => {
     const handleStatusFilterChange = (e) => {
@@ -71,7 +58,7 @@ const AccountantViewLedger = ({
           value={statusFilter}
           onChange={handleStatusFilterChange}
         >
-          <option value="posted">Posted</option>
+          <option value="approved">Posted</option>
           <option value="rejected">Rejected</option>
           <option value="pending">Pending</option>
           <option value="all">All</option>
@@ -100,7 +87,88 @@ const AccountantViewLedger = ({
   };
 
   const handleSearchChange = (event) => {
+    const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
+
+    const dollarAmountPattern = /\$?(\d+(\.\d{1,2})?)$/;
+    const isDollarAmount = dollarAmountPattern.test(searchValue);
+
+    let filteredData;
+    if (account === null) {
+      filteredData = filterAccountsByRange(1000, 7999).filter(
+        (account) =>
+          account.accountName.toLowerCase().includes(searchValue) ||
+          account.accountNumber.toString().includes(searchValue) ||
+          (isDollarAmount &&
+            (account.debit
+              .toString()
+              .includes(searchValue.replace(/\$/g, "")) ||
+              account.credit
+                .toString()
+                .includes(searchValue.replace(/\$/g, ""))))
+      );
+      // Update state with filtered data
+      setAssetAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 1000 && account.accountNumber <= 1999
+        )
+      );
+      setLiabilityAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 3000 && account.accountNumber <= 3999
+        )
+      );
+      setEquityAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 5000 && account.accountNumber <= 5999
+        )
+      );
+      setRevenueAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 6000 && account.accountNumber <= 6999
+        )
+      );
+      setExpenseAccounts(
+        filteredData.filter(
+          (account) =>
+            account.accountNumber >= 7000 && account.accountNumber <= 7999
+        )
+      );
+    } else {
+      filteredData = journalEntries.filter(
+        (entry) =>
+          entry.description.toLowerCase().includes(searchValue.toLowerCase()) ||
+          (isDollarAmount &&
+            (entry.debit.toString().includes(searchValue.replace(/\$/g, "")) ||
+              entry.credit.toString().includes(searchValue.replace(/\$/g, ""))))
+      );
+    }
+  };
+
+  const filterDataByDate = (data, startDate, endDate) => {
+    if (!startDate && !endDate) {
+      return data;
+    }
+
+    const filteredData = data.filter((item) => {
+      const itemDate = item.transactionDate
+        ? new Date(item.transactionDate)
+        : new Date(item.creationDate);
+
+      if (startDate && endDate) {
+        return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
+      } else if (startDate) {
+        return itemDate >= new Date(startDate);
+      } else {
+        return itemDate <= new Date(endDate);
+      }
+    });
+
+    return filteredData;
   };
 
   const assetAccounts = filterAccountsByRange(1000, 1999);
@@ -116,10 +184,29 @@ const AccountantViewLedger = ({
   const [showPostReferenceModal, setShowPostReferenceModal] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
 
-  const handleViewPR = (e, entry) => {
+  const handleViewPR = async (e, entry) => {
     e.preventDefault();
-    setSelectedEntry(entry);
-    setShowPostReferenceModal(true);
+
+    try {
+      const response = await axios.get(`http://localhost:8080/journal/getAll`);
+      const journals = response.data;
+
+      const matchedJournal = journals.find((journal) =>
+        journal.journalEntries.some(
+          (journalEntry) => journalEntry.journalEntryId === entry.journalEntryId
+        )
+      );
+
+      if (matchedJournal) {
+        setSelectedEntry({ ...entry, journalId: matchedJournal.journalId });
+        setMatchedJournal(matchedJournal); // Add this line to set the matched journal
+        setShowPostReferenceModal(true);
+      } else {
+        console.error("No matching journal found for the selected entry.");
+      }
+    } catch (error) {
+      console.error("Failed to fetch journals:", error);
+    }
   };
 
   const handleClosePostReferenceModal = () => {
@@ -128,62 +215,67 @@ const AccountantViewLedger = ({
   };
 
   const handleEntryUpdate = (updatedEntry) => {
-    const updatedDummyData = dummyData.map((entry) =>
-      entry.ledgerId === updatedEntry.ledgerId ? updatedEntry : entry
+    const updatedJournalEntries = journalEntries.map((entry) =>
+      entry.journalEntryId === updatedEntry.journalEntryId
+        ? updatedEntry
+        : entry
     );
-    setDummyData(updatedDummyData);
+    setJournalEntries(updatedJournalEntries);
   };
 
   const renderTable = (tableTitle, tableAccounts) => {
     if (account !== null) {
-      // Render SubLedger table
-      let filteredTableAccounts = tableAccounts;
+      // ============================
+      // Render Subledger tables
+      // ============================
+      console.log("Subledger--Non-Filtered Journal Entries:", journalEntries);
+      let filteredTableAccounts = filterDataByDate(
+        journalEntries,
+        startDate,
+        endDate
+      );
+      console.log(
+        "1 Subledger Filtered table accounts:",
+        filteredTableAccounts
+      );
 
       // Filter by status
       filteredTableAccounts = filteredTableAccounts.filter(
         (entry) => statusFilter === "all" || entry.status === statusFilter
       );
+      console.log(
+        "2 Subledger Filtered table accounts:",
+        filteredTableAccounts
+      );
 
-      // Apply other filters (date range, search term, etc.)
-      // ...
+      // Filter by search term
+      filteredTableAccounts = filteredTableAccounts.filter(
+        (entry) =>
+          (entry.description &&
+            entry.description
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())) ||
+          entry.debit.toString().includes(searchTerm.replace(/\$/g, "")) ||
+          entry.credit.toString().includes(searchTerm.replace(/\$/g, ""))
+      );
+      console.log(
+        "3 Subledger Filtered table accounts:",
+        filteredTableAccounts
+      );
 
       if (filteredTableAccounts.length === 0) {
         return null;
       }
 
-      const isDebitAccount =
-        account.accountNumber !== null &&
-        (account.accountNumber.toString().startsWith("1") ||
-          account.accountNumber.toString().startsWith("5"));
-      const isCreditAccount =
-        account.accountNumber !== null &&
-        !isDebitAccount &&
-        (account.accountNumber.toString().startsWith("3") ||
-          account.accountNumber.toString().startsWith("6") ||
-          account.accountNumber.toString().startsWith("7"));
-
-      const updatedDummyData = filteredTableAccounts.map((entry) => {
-        let balance = 0;
-        if (isDebitAccount) {
-          balance = entry.debit - entry.credit;
-        } else {
-          balance = entry.credit - entry.debit;
-        }
-        return { ...entry, balance };
-      });
-
-      const debitTotal = updatedDummyData.reduce(
+      const debitTotal = filteredTableAccounts.reduce(
         (total, entry) => total + entry.debit,
         0
       );
-      const creditTotal = updatedDummyData.reduce(
+      const creditTotal = filteredTableAccounts.reduce(
         (total, entry) => total + entry.credit,
         0
       );
-      const balanceTotal = updatedDummyData.reduce(
-        (total, entry) => total + entry.balance,
-        0
-      );
+      const balanceTotal = debitTotal - creditTotal;
 
       return (
         <React.Fragment>
@@ -201,47 +293,27 @@ const AccountantViewLedger = ({
                   <th>Post Reference</th>
                 </tr>
               </thead>
+              {console.log("filteredTableAccounts:", filteredTableAccounts)}
               <tbody>
                 {filteredTableAccounts.map((entry) => (
-                  <tr key={entry.ledgerId}>
-                    <td>{entry.date}</td>
-                    <td>{entry.description}</td>
+                  <tr key={entry.journalEntryId}>
                     <td>
-                      $
-                      {entry.debit.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                      })}
+                      {new Date(entry.transactionDate).toLocaleDateString()}
+                    </td>
+                    <td>{entry.description || ""}</td>
+                    <td>${entry.debit.toFixed(2)}</td>
+                    <td>${entry.credit.toFixed(2)}</td>
+                    <td>${(entry.debit - entry.credit).toFixed(2)}</td>
+                    <td>
+                      {entry.status}
+                      {entry.status === "rejected" && entry.rejectionReason ? (
+                        <span> - {entry.rejectionReason}</span>
+                      ) : null}
                     </td>
                     <td>
-                      $
-                      {entry.credit.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </td>
-                    <td>
-                      $
-                      {entry.balance.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </td>
-                    <td>
-                      {entry.status}{" "}
-                      {entry.status === "rejected"
-                        ? " - should be $1,500.00"
-                        : null}
-                    </td>
-                    <td>
-                      <div className={styles.tooltipContainer}>
-                        <button
-                          className={`${styles.prButton} ${styles.tooltip}`}
-                          onClick={(e) => handleViewPR(e, entry)}
-                        >
-                          View PR
-                          <span className={styles.tooltipText}>
-                            View the posting reference for this entry
-                          </span>
-                        </button>
-                      </div>
+                      <button onClick={(e) => handleViewPR(e, entry)}>
+                        View PR
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -249,45 +321,37 @@ const AccountantViewLedger = ({
             </table>
             <Row>
               <Col>
-                <div>
-                  Debit total: $
-                  {debitTotal.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
+                <div>Debit total: ${debitTotal.toFixed(2)}</div>
               </Col>
               <Col>
-                <div>
-                  Credit total: $
-                  {creditTotal.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
+                <div>Credit total: ${creditTotal.toFixed(2)}</div>
               </Col>
               <Col>
-                <div>
-                  Balance total: $
-                  {balanceTotal.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
+                <div>Balance total: ${balanceTotal.toFixed(2)}</div>
               </Col>
             </Row>
           </form>
         </React.Fragment>
       );
     } else {
+      // ============================
       // Render General Ledger tables
-      let filteredTableAccounts = tableAccounts;
-      // Filter by status (not applicable for General Ledger)
+      // ============================
+      let filteredTableAccounts = filterDataByDate(
+        tableAccounts,
+        startDate,
+        endDate
+      );
 
-      // Apply other filters (search term, etc.)
+      // Filter by search term
       filteredTableAccounts = filteredTableAccounts.filter(
         (account) =>
           account.accountName
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          account.accountNumber.toString().includes(searchTerm.toLowerCase())
+          account.accountNumber.toString().includes(searchTerm.toLowerCase()) ||
+          account.debit.toString().includes(searchTerm.replace(/\$/g, "")) ||
+          account.credit.toString().includes(searchTerm.replace(/\$/g, ""))
       );
 
       if (filteredTableAccounts.length === 0) {
@@ -350,13 +414,10 @@ const AccountantViewLedger = ({
                       })}
                     </td>
                     <td>
-                      {parseFloat(account.initialBalance).toLocaleString(
-                        "en-US",
-                        {
-                          style: "currency",
-                          currency: "USD",
-                        }
-                      )}
+                      {parseFloat(account.balance).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      })}
                     </td>
                   </tr>
                 ))}
@@ -414,24 +475,47 @@ const AccountantViewLedger = ({
             <Row>
               <Col>
                 <div className="container">
-                  <Form.Group
-                    controlId="searchTerm"
-                    className="d-flex flex-column align-items-start"
-                  >
-                    <Form.Label className="mr-2">
-                      Search Journal Entries:
-                    </Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Account Name or Dollar Amount"
-                      value={searchTerm}
-                      onChange={handleSearchChange}
-                      style={{
-                        maxWidth: "400px",
-                        marginRight: "10px",
-                      }}
-                    />
-                  </Form.Group>
+                  <React.Fragment>
+                    {account === null ? (
+                      <Form.Group
+                        controlId="searchTerm"
+                        className="d-flex flex-column align-items-start"
+                      >
+                        <Form.Label className="mr-2">
+                          Search Ledgers:
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Name or Dollar Amount"
+                          value={searchTerm}
+                          onChange={handleSearchChange}
+                          style={{
+                            maxWidth: "400px",
+                            marginRight: "10px",
+                          }}
+                        />
+                      </Form.Group>
+                    ) : (
+                      <Form.Group
+                        controlId="searchTerm"
+                        className="d-flex flex-column align-items-start"
+                      >
+                        <Form.Label className="mr-2">
+                          Search Journal Entries:
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Dollar Amount"
+                          value={searchTerm}
+                          onChange={handleSearchChange}
+                          style={{
+                            maxWidth: "400px",
+                            marginRight: "10px",
+                          }}
+                        />
+                      </Form.Group>
+                    )}
+                  </React.Fragment>
                 </div>
               </Col>
               <Col>
@@ -484,12 +568,13 @@ const AccountantViewLedger = ({
                     </div>
                   ) : (
                     <div className="container">
-                      {renderTable("", dummyData)}
+                      {renderTable("Journal Entries", journalEntries)}
                     </div>
                   )}
                   {showPostReferenceModal && (
                     <PostReference
                       entry={selectedEntry}
+                      matchedJournal={matchedJournal}
                       onClose={handleClosePostReferenceModal}
                       handleEntryUpdate={handleEntryUpdate}
                     />
@@ -520,7 +605,7 @@ const AccountantViewLedger = ({
               </React.Fragment>
               <Col>
                 <div className={styles.tooltipContainer}>
-                  <Link to="/manager-create-journal">
+                  <Link to="/admin-create-journal">
                     <button className={`${styles.addButton} ${styles.tooltip}`}>
                       Add Journal Entry
                       <span className={styles.tooltipText}>
@@ -540,4 +625,4 @@ const AccountantViewLedger = ({
   );
 };
 
-export default AccountantViewLedger;
+export default AdminViewLedger;

@@ -1,40 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  fetchAccounts,
-  fetchAccountBalancesByDateRange,
-  fetchAggregatedAccountBalancesByDateRange,
-} from "../../../services/AccountService";
-import { emailUserIncomeStatement } from "../../../services/EmailService";
+import { fetchAggregatedAccountBalancesByDateRange } from "../../services/AccountService";
+import { emailUserRetainedEarnings } from "../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import html2canvas from "html2canvas";
 import "./DatePickerStyles.css";
-import styles from "./IncomeStatement.module.css";
+import styles from "./RetainedEarnings.module.css";
 
-const ManagerIncomeStatement = () => {
+const RetainedEarnings = () => {
   const [accounts, setAccounts] = useState([]);
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(
+    new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      new Date().getDate() - 365
+    )
+  );
   const [endDate, setEndDate] = useState(new Date());
-  const incomeStatementRef = useRef(null);
+  const retainedEarningsRef = useRef(null);
 
   const [emailAddress, setEmailAddress] = useState("");
   const [emailContent, setEmailContent] = useState("");
 
   useEffect(() => {
-    const fetchIncomeStatement = async () => {
+    const fetchRetainedEarnings = async () => {
       try {
         const response = await fetchAggregatedAccountBalancesByDateRange(
           startDate,
           endDate
         );
         setAccounts(response);
+        console.log("response data with date range: ", response);
       } catch (error) {
-        console.error("Error fetching income statement:", error);
+        console.error("Error fetching retained earnings:", error);
       }
     };
 
-    fetchIncomeStatement();
+    fetchRetainedEarnings();
   }, [startDate, endDate]);
 
   const handleStartDateChange = (date) => {
@@ -49,40 +52,76 @@ const ManagerIncomeStatement = () => {
     return number.toLocaleString();
   };
 
-  const calculateTotalRevenue = () => {
-    let totalRevenue = 0;
-    accounts.forEach((account) => {
-      if (account.category === "Revenue") {
-        totalRevenue += parseFloat(account.balance);
-      }
-    });
-    return totalRevenue;
+  const calculateBeginningPeriodRE = () => {
+    const beginningPeriodREAccounts = accounts.filter(
+      (account) => account.accountName === "Owner's Capital"
+    );
+    const beginningPeriodRE = beginningPeriodREAccounts.reduce(
+      (total, account) => total + parseFloat(account.balance),
+      0
+    );
+    return beginningPeriodRE;
   };
 
-  const calculateTotalExpenses = () => {
-    let totalExpenses = 0;
-    accounts.forEach((account) => {
-      if (account.category === "Expenses") {
-        totalExpenses += parseFloat(account.balance);
-      }
-    });
-    return totalExpenses;
+  const calculateNetIncomeLoss = () => {
+    const revenueAccounts = accounts.filter(
+      (account) => account.category === "Revenue"
+    );
+    const expenseAccounts = accounts.filter(
+      (account) => account.category === "Expenses"
+    );
+
+    const totalRevenue = revenueAccounts.reduce(
+      (total, account) => total + parseFloat(account.balance),
+      0
+    );
+    const totalExpenses = expenseAccounts.reduce(
+      (total, account) => total + parseFloat(account.balance),
+      0
+    );
+
+    const netIncomeLoss = totalRevenue - totalExpenses;
+    return netIncomeLoss;
   };
 
-  const calculateNetIncome = () => {
-    return calculateTotalRevenue() - calculateTotalExpenses();
+  const calculateCashDividends = () => {
+    const cashDividendsAccounts = accounts.filter(
+      (account) => account.accountName === "Cash Dividends"
+    );
+    const cashDividends = cashDividendsAccounts.reduce(
+      (total, account) => total - parseFloat(account.balance),
+      0
+    );
+    return cashDividends;
   };
 
-  const isWithinDateRange = (account) => {
-    const accountDate = new Date(account.date);
-    return accountDate >= startDate && accountDate <= endDate;
+  const calculateStockDividends = () => {
+    const stockDividendsAccounts = accounts.filter(
+      (account) => account.accountName === "Stock Dividends"
+    );
+    const stockDividends = stockDividendsAccounts.reduce(
+      (total, account) => total - parseFloat(account.balance),
+      0
+    );
+    return stockDividends;
+  };
+
+  const calculateEndingRetainedEarnings = () => {
+    const beginningRE = calculateBeginningPeriodRE();
+    const netIncomeLoss = calculateNetIncomeLoss();
+    const cashDividends = calculateCashDividends();
+    const stockDividends = calculateStockDividends();
+
+    const endingRetainedEarnings =
+      beginningRE + netIncomeLoss - cashDividends - stockDividends;
+    return endingRetainedEarnings;
   };
 
   const handleSaveReport = () => {
-    html2canvas(incomeStatementRef.current).then((canvas) => {
+    html2canvas(retainedEarningsRef.current).then((canvas) => {
       const link = document.createElement("a");
       link.href = canvas.toDataURL("image/png");
-      link.download = "income_statement.png";
+      link.download = "retained_earnings.png";
       link.click();
     });
   };
@@ -93,7 +132,7 @@ const ManagerIncomeStatement = () => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Income Statement Report</title>
+          <title>Retained Earnings Report</title>
           <style>
             table {
               width: 100%;
@@ -106,7 +145,7 @@ const ManagerIncomeStatement = () => {
           </style>
         </head>
         <body>
-          ${incomeStatementRef.current.innerHTML}  
+          ${retainedEarningsRef.current.innerHTML}
         </body>
       </html>
     `);
@@ -126,10 +165,10 @@ const ManagerIncomeStatement = () => {
   const handleSendEmail = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const fromEmail = user.email;
-    const subject = `Income Statement Report for ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`;
-    const reportHtml = incomeStatementRef.current.innerHTML;
+    const subject = `Retained Earnings Report for ${selectedDate.toLocaleDateString()}`;
+    const reportHtml = retainedEarningsRef.current.innerHTML;
 
-    emailUserIncomeStatement(
+    emailUserRetainedEarnings(
       emailAddress,
       fromEmail,
       subject,
@@ -150,11 +189,11 @@ const ManagerIncomeStatement = () => {
   return (
     <Container>
       <div style={{ height: "50px" }}></div>
-      <div className="income-statement-header">
-        <h1>Income Statement</h1>
+      <div className="retained-earnings-header">
+        <h1>Retained Earnings</h1>
       </div>
 
-      <Form className="income-statement-form">
+      <Form>
         <Row>
           <Col>
             <Form.Label>Select Start Date</Form.Label>
@@ -178,48 +217,44 @@ const ManagerIncomeStatement = () => {
       </Form>
 
       <div style={{ height: "50px" }}></div>
-      <Container ref={incomeStatementRef}>
-        <div className="income-statement-print">
+      <Container ref={retainedEarningsRef}>
+        <div className="retained-earnings-section">
           <Row>
             <Col>
-              <h3>
-                Income Statement for {startDate.toLocaleDateString()} to{" "}
-                {endDate.toLocaleDateString()}
-              </h3>
+              <Table striped bordered>
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Amount ($)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Beginning Period Retained Earnings</td>
+                    <td>{formatNumber(calculateBeginningPeriodRE())}</td>
+                  </tr>
+                  <tr>
+                    <td>Net Income/Loss</td>
+                    <td>{formatNumber(calculateNetIncomeLoss())}</td>
+                  </tr>
+                  <tr>
+                    <td>Cash Dividends</td>
+                    <td>{formatNumber(calculateCashDividends())}</td>
+                  </tr>
+                  <tr>
+                    <td>Stock Dividends</td>
+                    <td>{formatNumber(calculateStockDividends())}</td>
+                  </tr>
+                  <tr>
+                    <td>Ending Retained Earnings</td>
+                    <td>{formatNumber(calculateEndingRetainedEarnings())}</td>
+                  </tr>
+                </tbody>
+              </Table>
             </Col>
           </Row>
-          <div className="income-statement-section">
-            <Row>
-              <Col>
-                <Table striped bordered>
-                  <thead>
-                    <tr>
-                      <th>Category</th>
-                      <th>Amount ($)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Total Revenue</td>
-                      <td>{formatNumber(calculateTotalRevenue())}</td>
-                    </tr>
-                    <tr>
-                      <td>Total Expenses</td>
-                      <td>{formatNumber(calculateTotalExpenses())}</td>
-                    </tr>
-                    <tr>
-                      <td>Net Income</td>
-                      <td>{formatNumber(calculateNetIncome())}</td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </Col>
-            </Row>
-          </div>
         </div>
       </Container>
-
-      <div style={{ height: "20px" }}></div>
 
       <div className="income-statement-buttons">
         <div style={{ height: "30px" }}></div>
@@ -237,7 +272,7 @@ const ManagerIncomeStatement = () => {
           </Col>
         </Row>
         <div style={{ height: "50px" }}></div>
-        <h3>Email Income Statement Report</h3>
+        <h3>Email Balance Sheet Report</h3>
         <Form>
           <div className={styles.emailFormContainer}>
             <Form.Group controlId="emailAddress">
@@ -272,4 +307,4 @@ const ManagerIncomeStatement = () => {
   );
 };
 
-export default ManagerIncomeStatement;
+export default RetainedEarnings;

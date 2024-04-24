@@ -34,6 +34,7 @@ const NavBar = () => {
               <Link to="/admin-dashboard">Admin Dashboard</Link>
               <Link to="/admin-user-management">Users</Link>
               <Link to="/admin-accounts-management">Accounts</Link>
+              <Link to="/reports">Reports</Link>
               {/* Add other ADMIN links here */}
             </>
           );
@@ -43,7 +44,7 @@ const NavBar = () => {
               <Link to="/manager-dashboard">Manager Dashboard</Link>
               <Link to="/manager-user-list">Users</Link>
               <Link to="/manager-accounts-management">Accounts</Link>
-              <Link to="/manager-reports">Reports</Link>
+              <Link to="/reports">Reports</Link>
               {/* Add other MANAGER links here */}
             </>
           );
@@ -52,7 +53,7 @@ const NavBar = () => {
             <>
               <Link to="/accountant-dashboard">Accountant Dashboard</Link>
               <Link to="/accountant-accounts-management">Accounts</Link>
-              <Link to="/accountant-reports">Reports</Link>
+              <Link to="/reports">Reports</Link>
               {/* Add other ACCOUNTANT links here */}
             </>
           );

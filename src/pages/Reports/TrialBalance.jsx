@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { fetchAggregatedAccountBalancesByDateRange } from "../../../services/AccountService";
-import { emailUserTrialBalance } from "../../../services/EmailService";
+import { fetchAggregatedAccountBalancesByDateRange } from "../../services/AccountService";
+import { emailUserTrialBalance } from "../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -8,7 +8,7 @@ import html2canvas from "html2canvas";
 import "./DatePickerStyles.css";
 import styles from "./TrialBalance.module.css";
 
-const ManagerTrialBalance = () => {
+const TrialBalance = () => {
   const [accounts, setAccounts] = useState([]);
   const [startDate, setStartDate] = useState(
     new Date(
@@ -252,4 +252,4 @@ const ManagerTrialBalance = () => {
   );
 };
 
-export default ManagerTrialBalance;
+export default TrialBalance;
