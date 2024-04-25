@@ -25,6 +25,26 @@ const addAccount = async (requestData) => {
   }
 };
 
+export const updateAccount = async (accountId, updatedData) => {
+  try {
+    console.log("Updated Data:", updatedData);
+    console.log("updating Account ID:", accountId);
+    const url = `${BASE_URL}/updateAccount/${accountId}`;
+    console.log("Request URL:", url);
+
+    const response = await axios.put(url, updatedData);
+    console.log("Response Data:", response.data);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(`Error updating account: ${error.response.data}`);
+    } else if (error.request) {
+      throw new Error("No response received from the server.");
+    } else {
+      throw new Error(`Error setting up the request: ${error.message}`);
+    }
+  }
+};
 
 export const fetchEventLog = () => {
       return axios.get("http://localhost:8080/eventLog/getAll");

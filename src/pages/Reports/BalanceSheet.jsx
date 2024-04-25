@@ -101,7 +101,7 @@ const BalanceSheet = () => {
   const handleSendEmail = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const fromEmail = user.email;
-    const subject = `Balance Sheet Report for ${selectedDate.toLocaleDateString()}`;
+    const subject = `Balance Sheet Report for ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`;
     const reportHtml = balanceSheetRef.current.innerHTML; // **** Get the HTML content of the balance sheet
 
     emailUserBalanceSheet(

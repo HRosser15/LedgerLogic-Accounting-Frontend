@@ -38,7 +38,10 @@ const ManagerCreateJournal = () => {
     setDescription("");
     setDocuments(null);
     setError("");
-    setJAccounts([{ accountId: "", debit: "", credit: "" }]);
+    setJAccounts([
+      { accountId: "", debit: "", credit: "" },
+      { accountId: "", debit: "", credit: "" },
+    ]);
     setShowResetModal(false);
   };
 

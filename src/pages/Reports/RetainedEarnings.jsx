@@ -165,7 +165,7 @@ const RetainedEarnings = () => {
   const handleSendEmail = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const fromEmail = user.email;
-    const subject = `Retained Earnings Report for ${selectedDate.toLocaleDateString()}`;
+    const subject = `Retained Earnings Report for ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`;
     const reportHtml = retainedEarningsRef.current.innerHTML;
 
     emailUserRetainedEarnings(
@@ -221,6 +221,14 @@ const RetainedEarnings = () => {
         <div className="retained-earnings-section">
           <Row>
             <Col>
+              <h3>
+                Retained Earnings for {startDate.toLocaleDateString()} to{" "}
+                {endDate.toLocaleDateString()}
+              </h3>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
               <Table striped bordered>
                 <thead>
                   <tr>
@@ -272,7 +280,7 @@ const RetainedEarnings = () => {
           </Col>
         </Row>
         <div style={{ height: "50px" }}></div>
-        <h3>Email Balance Sheet Report</h3>
+        <h3>Email Retained Earnings Report</h3>
         <Form>
           <div className={styles.emailFormContainer}>
             <Form.Group controlId="emailAddress">

@@ -85,7 +85,7 @@ const TrialBalance = () => {
   const handleSendEmail = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const fromEmail = user.email;
-    const subject = `Trial Balance Report for ${selectedDate.toLocaleDateString()}`;
+    const subject = `Trial Balance Report for ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`;
     const reportHtml = trialBalanceRef.current.innerHTML;
 
     emailUserTrialBalance(
@@ -155,12 +155,11 @@ const TrialBalance = () => {
         <Row>
           <Col>
             <h3>
-              Balance Sheet for {startDate.toLocaleDateString()} to{" "}
+              Trial Balance for {startDate.toLocaleDateString()} to{" "}
               {endDate.toLocaleDateString()}
             </h3>
           </Col>
         </Row>
-        <div style={{ height: "30px" }}></div>
         <Table striped bordered hover>
           <thead>
             <tr>

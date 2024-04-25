@@ -11,7 +11,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import ContextProvider from "../context/ContextProvider";
-import AppContext from "../context/AppContext";
 import { AuthProvider } from "../context/AuthContext";
 
 import NavBar from "./components/NavBar/NavBar";
@@ -27,7 +26,12 @@ import UserList from "./pages/AdminDashboard/Users/UserList";
 import ExpiredPasswords from "./pages/AdminDashboard/Users/ExpiredPasswords";
 import UpdateUser from "./pages/AdminDashboard/Users/UpdateUser";
 import AdminAccountsManagement from "./pages/AdminDashboard/Accounts/AdminAccountsManagement";
-import ViewLedger from "./pages/AdminDashboard/Accounts/Forms/ViewLedger";
+import AdminViewAccountsForm from "./pages/AdminDashboard/Accounts/Forms/ViewAccountsForm";
+import AddAccountsForm from "./pages/AdminDashboard/Accounts/Forms/AddAccountsForm";
+import EditAccountsForm from "./pages/AdminDashboard/Accounts/Forms/EditAccountsForm";
+import DeactivateAccountsForm from "./pages/AdminDashboard/Accounts/Forms/DeactivateAccountsForm";
+import AdminViewLedger from "./pages/AdminDashboard/Accounts/Forms/ViewLedger";
+import AdminCreateJournal from "./pages/AdminDashboard/Accounts/Forms/CreateJournalEntry";
 
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import ManagerUserList from "./pages/ManagerDashboard/Users/ManagerUserList";
@@ -40,6 +44,7 @@ import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";
 import AccountantViewLedger from "./pages/AccountantDashboard/Accounts/Forms/ViewLedger";
 import AccountantCreateJournal from "./pages/AccountantDashboard/Accounts/Forms/CreateJournalEntry";
+import AccountantViewAccountsForm from "./pages/AccountantDashboard/Accounts/Forms/ViewAccountsForm";
 
 import ReportsDashboard from "./pages/Reports/ReportsDashboard";
 import BalanceSheet from "./pages/Reports/BalanceSheet";
@@ -103,20 +108,17 @@ function App() {
                   path="/admin-accounts-management"
                   element={<AdminAccountsManagement />}
                 >
-                  <Route
-                    path="/admin-accounts-management/ledgers"
-                    element={<AdminViewLedger />}
-                  />
                   <Route index element={<AdminViewAccountsForm />} />
-                  <Route
-                    path="ledgers/:accountId"
-                    element={<AdminViewLedger />}
-                  />
                   <Route path="add" element={<AddAccountsForm />} />
                   <Route path="edit" element={<EditAccountsForm />} />
                   <Route
                     path="deactivate"
                     element={<DeactivateAccountsForm />}
+                  />
+                  <Route path="ledgers" element={<AdminViewLedger />} />
+                  <Route
+                    path="ledgers/:accountId"
+                    element={<AdminViewLedger />}
                   />
                   <Route path="journal" element={<AdminCreateJournal />} />
                   <Route path="event-log" element={<EventLog />} />
@@ -164,17 +166,21 @@ function App() {
                   element={<AccountantDashboard />}
                 />
                 <Route
-                  path="accountant-accounts-management"
+                  path="/accountant-accounts-management"
                   element={<AccountantAccountsManagement />}
-                />
-                <Route
-                  path="/accountant/account/:accountNumber"
-                  element={<AccountantViewLedger />}
-                />
-                <Route
-                  path="/accountant-create-journal"
-                  element={<AccountantCreateJournal />}
-                />
+                >
+                  <Route
+                    path="/accountant-accounts-management/ledgers"
+                    element={<AccountantViewLedger />}
+                  />
+                  <Route index element={<AccountantViewAccountsForm />} />
+                  <Route
+                    path="ledgers/:accountId"
+                    element={<AccountantViewLedger />}
+                  />
+                  <Route path="journal" element={<AccountantCreateJournal />} />
+                  <Route path="event-log" element={<EventLog />} />
+                </Route>
 
                 {/* =========
                     Reports

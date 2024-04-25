@@ -1,22 +1,19 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col, Modal } from "react-bootstrap";
 import { fetchAccounts } from "../../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
+import { Link, useNavigate } from "react-router-dom";
 import { emailUser } from "../../../../services/EmailService";
-import AppContext from "../../../../../context/AppContext";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 
-const ViewAccountsForm = ({
-  selectedDate,
-  handleAccountSelection,
-  accounts,
-}) => {
+const AdminViewAccountsForm = ({ isGeneralLedger }) => {
+  const [accounts, setAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
+  const [activeTab, setActiveTab] = useState("Chart of Accounts");
   const [selectedFilterOptionText, setSelectedFilterOptionText] = useState("");
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([
     "Assets",
     "Liabilities",
@@ -33,6 +30,72 @@ const ViewAccountsForm = ({
   const fromEmail = "hrosser15@gmail.com";
   const [modalMessage, setModalMessage] = useState("");
   const [modalTitle, setModalTitle] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchAccounts();
+        setAccounts(response.data);
+      } catch (error) {
+        console.error("Failed to fetch accounts:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleAccountSelection = (account) => {
+    navigate(`/admin-accounts-management/ledgers/${account.accountId}`);
+  };
+
+  const handleButtonClick = () => {
+    if (!email) {
+      // Alert the user if the email field is empty
+      alert("Please enter an email address");
+      return;
+    }
+
+    // Assuming you have access to the email content from the textarea
+    const emailContent = document.querySelector(
+      'textarea[name="emailContent"]'
+    ).value;
+
+    // Call the emailUser function with the email and emailContent
+    emailUser(email, fromEmail, subject, emailContent)
+      .then((response) => {
+        // Handle successful email sending
+        setModalTitle("Email Sent");
+        setModalMessage("Email sent successfully!");
+        setShowModal(true); // Optionally, you can display a modal to inform the user
+      })
+      .catch((error) => {
+        // Handle error if email sending fails
+        console.error("Error sending email:", error);
+        setModalTitle("Email Error");
+        setModalMessage(
+          "There was an error sending the email. Please try again later."
+        );
+        setShowModal(true); // Optionally, you can display a modal to inform the user
+      });
+  };
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleTabSelect = (tab) => {
+    setActiveTab(tab);
+    if (tab === "Chart of Accounts") {
+      setSelectedAccount(null);
+    }
+  };
 
   const filterOptions = [
     { value: "category", label: "Account Category", type: "checkbox" },
@@ -54,6 +117,10 @@ const ViewAccountsForm = ({
   };
 
   const filterAccountsByRange = (start, end) => {
+    if (!accounts) {
+      return []; // Return an empty array if accounts is undefined or not provided
+    }
+
     return accounts.filter(
       (account) =>
         parseInt(account.accountNumber) >= start &&
@@ -114,47 +181,6 @@ const ViewAccountsForm = ({
       ...prevState,
       [field]: date ? date.toISOString() : "",
     }));
-  };
-
-  const handleButtonClick = () => {
-    if (!email) {
-      // Alert the user if the email field is empty
-      alert("Please enter an email address");
-      return;
-    }
-
-    // Assuming you have access to the email content from the textarea
-    const emailContent = document.querySelector(
-      'textarea[name="emailContent"]'
-    ).value;
-
-    // Call the emailUser function with the email and emailContent
-    emailUser(email, fromEmail, subject, emailContent)
-      .then((response) => {
-        // Handle successful email sending
-        setModalTitle("Email Sent");
-        setModalMessage("Email sent successfully!");
-        setShowModal(true); // Optionally, you can display a modal to inform the user
-      })
-      .catch((error) => {
-        // Handle error if email sending fails
-        console.error("Error sending email:", error);
-        setModalTitle("Email Error");
-        setModalMessage(
-          "There was an error sending the email. Please try again later."
-        );
-        setShowModal(true); // Optionally, you can display a modal to inform the user
-      });
-  };
-
-  const [showModal, setShowModal] = useState(false);
-
-  const handleShowModal = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
   };
 
   const renderFilterOptions = () => {
@@ -354,7 +380,17 @@ const ViewAccountsForm = ({
           <tbody>
             {filteredTableAccounts.map((account) => (
               <tr key={account.accountNumber}>
-                <td>{account.accountNumber}</td>
+                <td>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
+                    }}
+                  >
+                    {account.accountNumber}
+                  </span>
+                </td>
                 <td>
                   <span
                     style={{ cursor: "pointer", textDecoration: "underline" }}
@@ -437,11 +473,12 @@ const ViewAccountsForm = ({
       <Row className="mb-4">
         <Col>
           <div className="container">
-            {renderTable("Assets", assetAccounts)}
-            {renderTable("Liabilities", liabilityAccounts)}
-            {renderTable("Equity", equityAccounts)}
-            {renderTable("Revenue", revenueAccounts)}
-            {renderTable("Expenses", expenseAccounts)}
+            {renderTable("Assets", assetAccounts, isGeneralLedger)}
+            {renderTable("Liabilities", liabilityAccounts, isGeneralLedger)}
+            {renderTable("Equity", equityAccounts, isGeneralLedger)}
+            {renderTable("Revenue", revenueAccounts, isGeneralLedger)}
+            {renderTable("Expenses", expenseAccounts, isGeneralLedger)}
+            <div style={{ height: "80px" }}></div>
           </div>
         </Col>
       </Row>
@@ -515,4 +552,4 @@ const ViewAccountsForm = ({
   );
 };
 
-export default ViewAccountsForm;
+export default AdminViewAccountsForm;

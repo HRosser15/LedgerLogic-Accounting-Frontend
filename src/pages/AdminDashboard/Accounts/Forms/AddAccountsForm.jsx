@@ -157,6 +157,7 @@ const AddAccountsForm = ({ onCancel }) => {
       debit: enteredInitialDebit,
       credit: enteredInitialCredit,
       initialBalance: enteredBalance,
+      balance: enteredBalance,
       normalSide: enteredNormalSide,
       category: enteredCategory,
       subCategory: enteredAccountSubcategory,

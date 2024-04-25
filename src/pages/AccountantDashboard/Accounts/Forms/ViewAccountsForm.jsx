@@ -1,21 +1,18 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { fetchAccounts } from "../../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
-import AppContext from "../../../../../context/AppContext";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const AccountantViewAccountsForm = ({
-  selectedDate,
-  handleAccountSelection,
-  accounts,
-}) => {
+const AccountantViewAccountsForm = ({ isGeneralLedger }) => {
+  const [accounts, setAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
+  const [activeTab, setActiveTab] = useState("Chart of Accounts");
   const [selectedFilterOptionText, setSelectedFilterOptionText] = useState("");
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([
     "Assets",
     "Liabilities",
@@ -27,6 +24,31 @@ const AccountantViewAccountsForm = ({
   const [normalSideFilter, setNormalSideFilter] = useState("");
   const [balanceFilter, setBalanceFilter] = useState({ min: "", max: "" });
   const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchAccounts();
+        setAccounts(response.data);
+      } catch (error) {
+        console.error("Failed to fetch accounts:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleAccountSelection = (account) => {
+    navigate(`/accountant-accounts-management/ledgers/${account.accountId}`);
+  };
+
+  const handleTabSelect = (tab) => {
+    setActiveTab(tab);
+    if (tab === "Chart of Accounts") {
+      setSelectedAccount(null);
+    }
+  };
 
   const filterOptions = [
     { value: "category", label: "Account Category", type: "checkbox" },
@@ -48,6 +70,10 @@ const AccountantViewAccountsForm = ({
   };
 
   const filterAccountsByRange = (start, end) => {
+    if (!accounts) {
+      return []; // Return an empty array if accounts is undefined or not provided
+    }
+
     return accounts.filter(
       (account) =>
         parseInt(account.accountNumber) >= start &&
@@ -307,7 +333,17 @@ const AccountantViewAccountsForm = ({
           <tbody>
             {filteredTableAccounts.map((account) => (
               <tr key={account.accountNumber}>
-                <td>{account.accountNumber}</td>
+                <td>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
+                    }}
+                  >
+                    {account.accountNumber}
+                  </span>
+                </td>
                 <td>
                   <span
                     style={{ cursor: "pointer", textDecoration: "underline" }}
@@ -390,11 +426,11 @@ const AccountantViewAccountsForm = ({
       <Row className="mb-4">
         <Col>
           <div className="container">
-            {renderTable("Assets", assetAccounts)}
-            {renderTable("Liabilities", liabilityAccounts)}
-            {renderTable("Equity", equityAccounts)}
-            {renderTable("Revenue", revenueAccounts)}
-            {renderTable("Expenses", expenseAccounts)}
+            {renderTable("Assets", assetAccounts, isGeneralLedger)}
+            {renderTable("Liabilities", liabilityAccounts, isGeneralLedger)}
+            {renderTable("Equity", equityAccounts, isGeneralLedger)}
+            {renderTable("Revenue", revenueAccounts, isGeneralLedger)}
+            {renderTable("Expenses", expenseAccounts, isGeneralLedger)}
             <div style={{ height: "200px" }}></div>
           </div>
         </Col>
