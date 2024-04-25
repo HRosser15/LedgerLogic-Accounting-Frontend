@@ -285,10 +285,10 @@ const AccountantDashboard = ({ username }) => {
   };
 
   //Determining Health of Inventory Turnover Ratio
-  const determineInventoryTurnoverHealth = (ratio) => {
-    if (ratio >= 4 && ratio <= 6) {
+  const determineInventoryTurnoverHealth = (ITR) => {
+    if (ITR >= 4 && ITR <= 6) {
       return 'green'; // Healthy
-    } else if (ratio >= 2 && ratio < 4 || ratio > 6 && ratio <= 8) {
+    } else if (ITR >= 2 && ITR < 4 || ITR > 6 && ITR <= 8) {
       return 'yellow'; // Slightly outside of normal
     } else {
       return 'red'; // Significantly outside of normal
@@ -304,10 +304,10 @@ const AccountantDashboard = ({ username }) => {
   };
 
   //Determining Health of Accounts Receivable Turnover Ratio
-  const determineAccountsReceivableTurnoverHealth = (ratio) => {
-    if (ratio >= 6 && ratio <= 10) {
+  const determineAccountsReceivableTurnoverHealth = (ART) => {
+    if (ART >= 6 && ART <= 10) {
       return 'green'; // Healthy
-    } else if (ratio >= 4 && ratio < 6 || ratio > 10 && ratio <= 12) {
+    } else if (ART >= 4 && ART < 6 || ART > 10 && ART <= 12) {
       return 'yellow'; // Slightly outside of normal
     } else {
       return 'red'; // Significantly outside of normal
@@ -323,10 +323,10 @@ const AccountantDashboard = ({ username }) => {
   };
 
   //Determining Health of Total Asset Turnover Ratio
-  const determineTotalAssetTurnoverHealth = (ratio) => {
-    if (ratio >= 1.5 && ratio <= 2.5) {
+  const determineTotalAssetTurnoverHealth = (TAT) => {
+    if (TAT >= 1.5 && TAT <= 2.5) {
       return 'green'; // Healthy
-    } else if (ratio >= 1.0 && ratio < 1.5 || ratio > 2.5 && ratio <= 3.0) {
+    } else if (TAT >= 1.0 && TAT < 1.5 || TAT > 2.5 && TAT <= 3.0) {
       return 'yellow'; // Slightly outside of normal
     } else {
       return 'red'; // Significantly outside of normal
@@ -338,6 +338,44 @@ const AccountantDashboard = ({ username }) => {
       Leverage Ratios
       ================ */
   }
+
+  //Debt to Equity Ratio
+  const calculateDebtToEquity = (totalCurrentLiabilities, totalshareholdersEquity) => {
+    if (totalshareholdersEquity === 0) {
+      return null;
+    }
+    return totalCurrentLiabilities / totalshareholdersEquity;
+  };
+
+  //Determining Health of Debt to Equity Ratio
+  const determineDebtToEquityHealth = (debtEquity) => {
+    if (debtEquity >= 1 && debtEquity <= 1.5) {
+      return 'green'; // Healthy
+    } else if (debtEquity >= .5 && debtEquity < 1 || debtEquity > 1.5 && debtEquity <= 2.0) {
+      return 'yellow'; // Slightly outside of normal
+    } else {
+      return 'red'; // Significantly outside of normal
+    }
+  };
+
+  //Debt Ratio
+  const calculateDebt = (totalCurrentLiabilities, totalCurrentAssets) => {
+    if (totalCurrentAssets === 0) {
+      return null;
+    }
+    return totalCurrentLiabilities / totalCurrentAssets;
+  };
+
+  //Determining Health of Debt Ratio
+  const determineDebtHealth = (debt) => {
+    if (debt <= 0.3) {
+      return 'green'; // Healthy
+    } else if (debt <= .06) {
+      return 'yellow'; // Slightly outside of normal
+    } else {
+      return 'red'; // Significantly outside of normal
+    }
+  };
 
   // Current Ratios
   const currentRatio = calculateCurrentRatio(
@@ -369,8 +407,27 @@ const AccountantDashboard = ({ username }) => {
 
   // Return on Equity
   const ROE = calculateROE(netIncome, shareholdersEquity);
-  const ROEHealth = determineROAHealth(ROE);
+  const ROEHealth = determineROEHealth(ROE);
 
+  // Inventory Turnover Ratio
+  const ITR = calculateInventoryTurnover(netIncome, shareholdersEquity);
+  const ITRHealth = determineInventoryTurnoverHealth(ITR);
+
+   // Accounts Receiveable Turnover Ratio
+   const ART = calculateAccountsReceivableTurnover(netIncome, shareholdersEquity);
+   const ARTHealth = determineAccountsReceivableTurnoverHealth(ART);
+
+   // Total Asset Turnover Ratio
+   const TAT = calculateTotalAssetTurnover(netIncome, shareholdersEquity);
+   const TATHealth = determineTotalAssetTurnoverHealth(TAT);
+
+   // Debt to Equity Ratio
+   const debtEquity = calculateDebtToEquity(netIncome, shareholdersEquity);
+   const debtEquityHealth = determineDebtToEquityHealth(debtEquity);
+
+   // Debt Ratio
+   const debt = calculateDebt(netIncome, shareholdersEquity);
+   const debtHealth = determineDebtHealth(debt);
   
   const CircleDisplay = ({ health, ratio }) => {
     const circleStyle = {
@@ -491,7 +548,7 @@ const AccountantDashboard = ({ username }) => {
                     <span>Inventory Turnover Ratio</span>
                   </Col>
                   <Col xs={6}>
-                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  <CircleDisplay health={ITRHealth} ratio={ITR} />
                   </Col>
                 </Row>
                 <hr class="rounded"></hr>
@@ -500,7 +557,7 @@ const AccountantDashboard = ({ username }) => {
                     <span>Accounts Receivable Turnover Ratio</span>
                   </Col>
                   <Col xs={6}>
-                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  <CircleDisplay health={ARTHealth} ratio={ART} />
                   </Col>
                 </Row>
                 <hr class="rounded"></hr>
@@ -509,7 +566,7 @@ const AccountantDashboard = ({ username }) => {
                     <span>Total Asset Turnover Ratio</span>
                   </Col>
                   <Col xs={6}>
-                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  <CircleDisplay health={TATHealth} ratio={TAT} />
                   </Col>
                 </Row>
               </Card.Text>
@@ -531,7 +588,7 @@ const AccountantDashboard = ({ username }) => {
                     <span>Debt-to-Equity Ratio</span>
                   </Col>
                   <Col xs={6}>
-                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  <CircleDisplay health={debtEquityHealth} ratio={debtEquity} />
                   </Col>
                 </Row>
                 <hr class="rounded"></hr>
@@ -540,7 +597,7 @@ const AccountantDashboard = ({ username }) => {
                     <span>Debt Ratio</span>
                   </Col>
                   <Col xs={6}>
-                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  <CircleDisplay health={debtHealth} ratio={debt} />
                   </Col>
                 </Row>
               </Card.Text>
