@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { fetchAccounts } from "../../../services/AccountService";
 import { Container, Tab, Tabs, Tooltip, Row, Col } from "react-bootstrap";
 import { JournalContext } from "../../../../context/JournalContext";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "./AccountsManagement.module.css";
@@ -20,6 +21,7 @@ const ManagerAccountsManagement = ({ username }) => {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [newEntry, setNewEntry] = useState(null);
+  const navigate = useNavigate();
 
   const handleTabSelect = (tab) => {
     setActiveTab(tab);
@@ -30,12 +32,10 @@ const ManagerAccountsManagement = ({ username }) => {
 
   const handleAccountSelection = (account) => {
     setSelectedAccount(account);
-    handleTabSelect("ledgers");
+    navigate(`/manager-accounts-management/ledgers/${account.accountId}`);
   };
 
   const renderTabContent = () => {
-    // console.log("selectedAccountNumber:", selectedAccountNumber);
-    console.log("selectedAccount:", selectedAccount);
     switch (activeTab) {
       case "Chart of Accounts":
         return (
@@ -44,17 +44,17 @@ const ManagerAccountsManagement = ({ username }) => {
             handleAccountSelection={handleAccountSelection}
             accounts={accounts}
             newEntry={newEntry}
+            isGeneralLedger={false}
           />
         );
       case "ledgers":
         return (
-          <ManagerViewLedger
-            // accountNumber={selectedAccountNumber}
-            account={selectedAccount}
-            handleBackToAccounts={handleBackToAccounts}
-            accounts={accounts}
+          <ManagerViewAccountsForm
+            selectedDate={selectedDate}
             handleAccountSelection={handleAccountSelection}
+            accounts={accounts}
             newEntry={newEntry}
+            isGeneralLedger={true}
           />
         );
       case "journal":
@@ -91,25 +91,13 @@ const ManagerAccountsManagement = ({ username }) => {
       })
       .catch((error) => {
         console.error(error);
-        console.log(
-          "Make sure you alter the column size of previous_state and current_state (in the h2 database)"
-        );
-        console.log(
-          "This can be done in the h2 console at 'http://localhost:8080/h2-console' (Password is 'password' with:"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN previous_state VARCHAR(60000);"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN current_state VARCHAR(60000);"
-        );
       });
   }, []);
 
   const { journalEntries } = useContext(JournalContext);
 
   return (
-    <Container>
+    <Container className={styles.dashboardContainer}>
       <div style={{ height: "50px" }}></div>
       <Row>
         <Col>
@@ -134,35 +122,40 @@ const ManagerAccountsManagement = ({ username }) => {
       {/* Tabbed Interface */}
       <Tabs
         id="manager-tabs"
-        activeKey={activeTab}
-        onSelect={handleTabSelect}
+        activeKey={location.pathname}
+        onSelect={(key) => {
+          if (key === "/manager-accounts-management/ledgers") {
+            setSelectedAccount(null);
+          }
+          navigate(key);
+        }}
         className={styles.tabs}
       >
         <Tab
-          eventKey="Chart of Accounts"
+          eventKey="/manager-accounts-management"
           title={<span title="View existing accounts">Chart of Accounts</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
-          eventKey="ledgers"
+          eventKey="/manager-accounts-management/ledgers"
           title={<span title="View account ledgers">Ledgers</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
-          eventKey="journal"
+          eventKey="/manager-accounts-management/journal"
           title={<span title="Open journal">Journal</span>}
         ></Tab>
         <Tab
-          eventKey="event log"
+          eventKey="/manager-accounts-management/event-log"
           title={<span title="Open Event Log">Event Log</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
       </Tabs>
 
-      {renderTabContent(selectedDate)}
+      <Outlet />
     </Container>
   );
 };

@@ -5,51 +5,55 @@ import {
   Button,
   Row,
   Col,
-  Alert,
   Modal,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DatePickerStyles.css";
 import { JournalContext } from "../../../../../context/JournalContext";
-import AppContext from "../../../../../context/AppContext";
+import { fetchAccounts } from "../../../../services/AccountService";
 
 const AdminCreateJournal = () => {
-  const { state } = useContext(AppContext);
   const navigate = useNavigate();
-  const { addJournalEntry } = useContext(JournalContext);
-  const [date, setDate] = useState("");
+  const { addJournal } = useContext(JournalContext);
+  const [date, setDate] = useState(null);
   const [description, setDescription] = useState("");
   const [documents, setDocuments] = useState(null);
   const [error, setError] = useState("");
-  const [accounts, setAccounts] = useState([
-    { name: "", debit: "", credit: "" },
+  const [jAccounts, setJAccounts] = useState([
+    { accountId: "", debit: "", credit: "" },
+    { accountId: "", debit: "", credit: "" },
   ]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [balance, setBalance] = useState(0);
-  const [newEntry, setNewEntry] = useState(null);
 
   const handleReset = () => {
     setDate("");
     setDescription("");
     setDocuments(null);
     setError("");
-    setAccounts([{ name: "", debit: "", credit: "" }]);
+    setJAccounts([
+      { accountId: "", debit: "", credit: "" },
+      { accountId: "", debit: "", credit: "" },
+    ]);
     setShowResetModal(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const debitTotal = accounts.reduce(
+    const debitTotal = jAccounts.reduce(
       (total, account) => total + parseFloat(account.debit || 0),
       0
     );
-    const creditTotal = accounts.reduce(
-      (total, account) => total + parseFloat(account.credit || 0),
+    const creditTotal = jAccounts.reduce(
+      (total, jAccount) => total + parseFloat(jAccount.credit || 0),
       0
     );
 
@@ -65,31 +69,45 @@ const AdminCreateJournal = () => {
       return;
     }
 
-    if (!documents) {
-      setError("Please upload supporting documents.");
+    if (date) {
+      // formattedDate = date.toISOString().split("T")[0];
+    } else {
+      setError("A date must be selected.");
       setShowErrorModal(true);
       return;
     }
 
-    const newEntry = {
-      date,
-      description,
-      accounts,
-      documents,
+    const newJournal = {
+      transactionDate: date,
+      rejectionReason: "",
+      attachments: documents,
+      journalEntries: jAccounts
+        .filter((jAccount) => jAccount.accountId)
+        .map((jAccount) => ({
+          credit: parseFloat(jAccount.credit),
+          debit: parseFloat(jAccount.debit),
+          description: description,
+          account: {
+            accountId: jAccount.accountId,
+          },
+        })),
     };
 
-    const newJournalEntry = {
-      date,
-      description,
-      accounts,
-      documents,
-    };
+    console.log("NewJournal:", newJournal);
 
-    setNewEntry(newJournalEntry);
-    // addJournalEntry(newEntry);
-    navigate("/manager-accounts-management");
+    try {
+      await addJournal(newJournal);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Failed to add journal:", error);
+    }
 
     setError("");
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    navigate("/admin-accounts-management");
   };
 
   const handleFileUpload = (e) => {
@@ -116,19 +134,40 @@ const AdminCreateJournal = () => {
   };
 
   const handleCancel = () => {
-    return navigate("/manager-accounts-management");
+    navigate("/admin-accounts-management");
   };
 
-  const handleAccountChange = (index, field, value) => {
-    const updatedAccounts = [...accounts];
-    updatedAccounts[index][field] = value;
-    setAccounts(updatedAccounts);
+  const handleAccountChange = async (index, field, value) => {
+    const updatedJAccounts = [...jAccounts];
+    updatedJAccounts[index][field] = value;
+
+    if (field === "name") {
+      try {
+        const response = await fetchAccounts();
+        const matchedAccount = response.data.find(
+          (account) => account.accountName === value
+        );
+        if (matchedAccount) {
+          updatedJAccounts[index].accountId = matchedAccount.accountId;
+        } else {
+          updatedJAccounts[index].accountId = "";
+        }
+        console.log(
+          "AccountId for entered account name:",
+          updatedJAccounts[index].accountId
+        );
+      } catch (error) {
+        console.error("Failed to fetch accounts:", error);
+      }
+    }
+
+    setJAccounts(updatedJAccounts);
 
     let totalDebit = 0;
     let totalCredit = 0;
-    updatedAccounts.forEach((account) => {
-      totalDebit += parseFloat(account.debit || 0);
-      totalCredit += parseFloat(account.credit || 0);
+    updatedJAccounts.forEach((jAccount) => {
+      totalDebit += parseFloat(jAccount.debit || 0);
+      totalCredit += parseFloat(jAccount.credit || 0);
     });
 
     const balance = totalDebit - totalCredit;
@@ -136,7 +175,11 @@ const AdminCreateJournal = () => {
   };
 
   const addAccount = () => {
-    setAccounts([...accounts, { name: "", debit: "", credit: "" }]);
+    setJAccounts([...jAccounts, { accountId: "", debit: "", credit: "" }]);
+  };
+
+  const handleDateChange = (selectedDate) => {
+    setDate(new Date(selectedDate));
   };
 
   const handleCloseErrorModal = () => setShowErrorModal(false);
@@ -159,10 +202,7 @@ const AdminCreateJournal = () => {
                   <div
                     className={`${styles.datePickerContainer} ${styles.leftAlignedDatePicker}`}
                   >
-                    <DatePicker
-                      selected={date}
-                      onChange={(date) => setDate(date)}
-                    />
+                    <DatePicker selected={date} onChange={handleDateChange} />
                   </div>
                 </Form.Group>
               </Col>
@@ -180,7 +220,7 @@ const AdminCreateJournal = () => {
               <Col></Col>
             </Row>
 
-            {accounts.map((account, index) => (
+            {jAccounts.map((jAccount, index) => (
               <Row key={index} className="mb-4">
                 <Col className="mr-4">
                   <Form.Group controlId={`accountName-${index}`}>
@@ -188,7 +228,7 @@ const AdminCreateJournal = () => {
                     <Form.Control
                       type="text"
                       placeholder="Enter Account Name"
-                      value={account.name}
+                      value={jAccount.name}
                       onChange={(e) =>
                         handleAccountChange(index, "name", e.target.value)
                       }
@@ -201,7 +241,7 @@ const AdminCreateJournal = () => {
                     <Form.Control
                       type="text"
                       placeholder="Amount"
-                      value={account.debit}
+                      value={jAccount.debit}
                       onChange={(e) =>
                         handleAccountChange(index, "debit", e.target.value)
                       }
@@ -214,7 +254,7 @@ const AdminCreateJournal = () => {
                     <Form.Control
                       type="text"
                       placeholder="Amount"
-                      value={account.credit}
+                      value={jAccount.credit}
                       onChange={(e) =>
                         handleAccountChange(index, "credit", e.target.value)
                       }
@@ -234,9 +274,21 @@ const AdminCreateJournal = () => {
             </Row>
 
             <Row>
-              <Button variant="primary" onClick={addAccount}>
-                Add Account
-              </Button>
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="add-account-tooltip">
+                    Add another account to this Journal Entry
+                  </Tooltip>
+                }
+              >
+                <Button
+                  className={styles.transparentButton}
+                  onClick={addAccount}
+                >
+                  Add Another Account
+                </Button>
+              </OverlayTrigger>
               <div style={{ height: "50px" }}></div>
             </Row>
 
@@ -264,26 +316,45 @@ const AdminCreateJournal = () => {
               <Col></Col>
               <Col></Col>
               <Col className="mb-4">
-                <Button
-                  className={styles.grayButton}
-                  onClick={handleShowResetModal}
+                <OverlayTrigger
+                  placement="top"
+                  overlay={<Tooltip id="reset-tooltip">Reset Form</Tooltip>}
                 >
-                  Reset
-                </Button>
+                  <Button
+                    className={styles.grayButton}
+                    onClick={handleShowResetModal}
+                  >
+                    Reset
+                  </Button>
+                </OverlayTrigger>
               </Col>
             </Row>
 
             <Row>
               <Col></Col>
               <Col>
-                <Button className={styles.redButton} onClick={handleCancel}>
-                  Cancel
-                </Button>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id="cancel-tooltip">Cancel and Go Back</Tooltip>
+                  }
+                >
+                  <Button className={styles.redButton} onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                </OverlayTrigger>
               </Col>
               <Col>
-                <Button className={styles.blueButton} type="submit">
-                  Submit
-                </Button>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id="submit-tooltip">Submit Journal Entry</Tooltip>
+                  }
+                >
+                  <Button className={styles.blueButton} type="submit">
+                    Submit
+                  </Button>
+                </OverlayTrigger>
               </Col>
               <Col></Col>
               <div style={{ height: "200px" }}></div>
@@ -318,6 +389,21 @@ const AdminCreateJournal = () => {
           </Button>
           <Button variant="primary" onClick={handleReset}>
             Yes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showSuccessModal} onHide={handleCloseSuccessModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Journal Entry Submitted</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          A manager has been notified and will review it shortly. Closing this
+          dialog will redirect you to the Chart of Accounts.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseSuccessModal}>
+            OK
           </Button>
         </Modal.Footer>
       </Modal>

@@ -1,23 +1,43 @@
 import React, { useState } from "react";
-import { Container, Form, Button, Modal, Table } from "react-bootstrap";
+import { Container, Form, Button, Modal } from "react-bootstrap";
 import styles from "./AccountForm.module.css";
+import modalBodyStyles from "./ModalBody.module.css";
+import {
+  approveJournal,
+  rejectJournal,
+} from "../../../../services/JournalService";
 
-const PostReference = ({ entry, onClose, handleEntryUpdate }) => {
-  const [reference, setReference] = useState("");
+const PostReference = ({
+  entry,
+  matchedJournal,
+  onClose,
+  handleEntryUpdate,
+}) => {
+  const [rejectionReason, setRejectionReason] = useState("");
   const [showModal, setShowModal] = useState(true);
 
-  const handleApprove = () => {
-    const updatedEntry = { ...entry, status: "posted" };
-    handleEntryUpdate(updatedEntry);
-    setShowModal(false);
-    onClose();
+  const handleApprove = async () => {
+    try {
+      await approveJournal(matchedJournal.journalId, "APPROVED");
+      const updatedEntry = { ...entry, status: "approved" };
+      handleEntryUpdate(updatedEntry);
+      setShowModal(false);
+      onClose();
+    } catch (error) {
+      console.error("Failed to approve journal entry:", error);
+    }
   };
 
-  const handleReject = () => {
-    const updatedEntry = { ...entry, status: "rejected" };
-    handleEntryUpdate(updatedEntry);
-    setShowModal(false);
-    onClose();
+  const handleReject = async () => {
+    try {
+      await rejectJournal(matchedJournal.journalId, rejectionReason);
+      const updatedEntry = { ...entry, status: "rejected" };
+      handleEntryUpdate(updatedEntry);
+      setShowModal(false);
+      onClose();
+    } catch (error) {
+      console.error("Failed to reject journal entry:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -25,74 +45,85 @@ const PostReference = ({ entry, onClose, handleEntryUpdate }) => {
     onClose();
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.toLocaleString("default", { month: "long" });
+    const day = date.getDate();
+
+    return `${year}, ${month} ${day}`;
+  };
+
   return (
-    <Modal show={showModal} onHide={handleCancel} centered>
+    <Modal
+      show={showModal}
+      onHide={handleCancel}
+      centered
+      className={styles.customModal}
+      dialogClassName={styles.customModalDialog}
+    >
       <Modal.Header closeButton>
         <Modal.Title>Post Reference</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Container>
-          <Form>
-            <Table striped bordered>
-              <tbody>
-                <tr>
-                  <th>Ledger ID</th>
-                  <td>{entry.ledgerId}</td>
-                </tr>
+        <div className={modalBodyStyles.wideModalBody}>
+          <Container>
+            <table className="table table-striped table-bordered">
+              <thead>
                 <tr>
                   <th>Date</th>
-                  <td>{entry.date}</td>
+                  <th>Account</th>
+                  <th>Debit</th>
+                  <th>Credit</th>
                 </tr>
+              </thead>
+              <tbody>
+                {matchedJournal.journalEntries.map((journalEntry) => (
+                  <tr key={journalEntry.journalEntryId}>
+                    <td>{formatDate(matchedJournal.transactionDate)}</td>
+                    <td>{journalEntry.account.accountName}</td>
+                    <td>${journalEntry.debit.toFixed(2)}</td>
+                    <td>${journalEntry.credit.toFixed(2)}</td>
+                  </tr>
+                ))}
                 <tr>
                   <th>Description</th>
-                  <td>{entry.description}</td>
-                </tr>
-                <tr>
-                  <th>Debit</th>
-                  <td>${entry.debit.toFixed(2)}</td>
-                </tr>
-                <tr>
-                  <th>Credit</th>
-                  <td>${entry.credit.toFixed(2)}</td>
-                </tr>
-                <tr>
-                  <th>Balance</th>
-                  <td>${entry.balance.toFixed(2)}</td>
+                  <td colSpan="4">{entry.description}</td>
                 </tr>
                 <tr>
                   <th>Status</th>
-                  <td>{entry.status}</td>
+                  <td colSpan="4">{matchedJournal.status}</td>
                 </tr>
               </tbody>
-            </Table>
+            </table>
             <React.Fragment>
-              {entry.status === "pending" ? (
-                <Form.Group controlId="reference">
-                  <Form.Label>Reference</Form.Label>
+              {matchedJournal.status === "PENDING" ? (
+                <Form.Group controlId="rejectionReason">
+                  <Form.Label>Rejection Reason</Form.Label>
                   <Form.Control
                     type="text"
-                    value={reference}
-                    onChange={(e) => setReference(e.target.value)}
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
                   />
                 </Form.Group>
               ) : null}
             </React.Fragment>
-          </Form>
-        </Container>
+          </Container>
+        </div>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleCancel}>
           Close
         </Button>
         <React.Fragment>
-          {entry.status === "pending" ? (
+          {matchedJournal.status === "PENDING" ? (
             <Button variant="primary" onClick={handleReject}>
               Reject
             </Button>
           ) : null}
         </React.Fragment>
         <React.Fragment>
-          {entry.status === "pending" ? (
+          {matchedJournal.status === "PENDING" ? (
             <Button variant="primary" onClick={handleApprove}>
               Approve
             </Button>

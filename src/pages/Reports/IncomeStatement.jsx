@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  fetchAccounts,
-  fetchAccountBalancesByDateRange,
-  fetchAggregatedAccountBalancesByDateRange,
-} from "../../../services/AccountService";
-import { emailUserIncomeStatement } from "../../../services/EmailService";
+import { fetchAggregatedAccountBalancesByDateRange } from "../../services/AccountService";
+import { emailUserIncomeStatement } from "../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,7 +8,7 @@ import html2canvas from "html2canvas";
 import "./DatePickerStyles.css";
 import styles from "./IncomeStatement.module.css";
 
-const ManagerIncomeStatement = () => {
+const IncomeStatement = () => {
   const [accounts, setAccounts] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -272,5 +268,4 @@ const ManagerIncomeStatement = () => {
   );
 };
 
-export default ManagerIncomeStatement;
-
+export default IncomeStatement;

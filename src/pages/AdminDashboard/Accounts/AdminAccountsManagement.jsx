@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { fetchAccounts } from "../../../services/AccountService";
 import { Container, Tab, Tabs, Tooltip, Row, Col } from "react-bootstrap";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "./AdminAccountsManagement.module.css";
@@ -21,6 +22,7 @@ const AdminAccountsManagement = ({ username }) => {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [newEntry, setNewEntry] = useState(null);
+  const navigate = useNavigate();
 
   const handleTabSelect = (tab) => {
     setActiveTab(tab);
@@ -40,30 +42,30 @@ const AdminAccountsManagement = ({ username }) => {
         return <AddAccountsForm onCancel={() => handleCancel()} />;
       case "edit":
         return <EditAccountsForm />;
-      case "view":
+      case "Chart of Accounts":
         return (
-          <ViewAccountsForm
+          <AdminViewAccountsForm
             selectedDate={selectedDate}
             handleAccountSelection={handleAccountSelection}
             accounts={accounts}
             newEntry={newEntry}
+            isGeneralLedger={false}
           />
         );
-      case "deactivate":
-        return <DeactivateAccountsForm />;
       case "ledgers":
         return (
-          <AdminViewLedger
-            account={selectedAccount}
-            handleBackToAccounts={handleBackToAccounts}
-            accounts={accounts}
+          <AdminViewAccountsForm
+            selectedDate={selectedDate}
             handleAccountSelection={handleAccountSelection}
+            accounts={accounts}
             newEntry={newEntry}
+            isGeneralLedger={true}
           />
         );
       case "journal":
         return (
           <AdminCreateJournal
+            // accountNumber={selectedAccountNumber}
             handleBackToAccounts={handleBackToAccounts}
             accounts={accounts}
             handleAccountSelection={handleAccountSelection}
@@ -135,59 +137,62 @@ const AdminAccountsManagement = ({ username }) => {
       {/* Tabbed Interface */}
       <Tabs
         id="admin-tabs"
-        activeKey={activeTab}
-        onSelect={handleTabSelect}
+        activeKey={location.pathname}
+        onSelect={(key) => {
+          if (key === "/admin-accounts-management/ledgers") {
+            setSelectedAccount(null);
+          }
+          navigate(key);
+        }}
         className={styles.tabs}
       >
         <Tab
-          eventKey="view"
+          eventKey="/admin-accounts-management"
           title={<span title="View existing accounts">Chart of Accounts</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
-          eventKey="add"
+          eventKey="/admin-accounts-management/add"
           title={<span title="Add a new account">Add Account</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
-          eventKey="edit"
+          eventKey="/admin-accounts-management/edit"
           title={<span title="Edit an existing account">Update Account</span>}
         >
-          {/* Edit Account Form Component Goes Here */}
           <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
-          eventKey="deactivate"
+          eventKey="/admin-accounts-management/deactivate"
           title={
             <span title="Deactivate an existing account">
               Deactivate Account
             </span>
           }
         >
-          {/* Deactivate Account Form Component Goes Here */}
-          <h2>Deactivate Account</h2>
+          <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
-          eventKey="ledgers"
+          eventKey="/admin-accounts-management/ledgers"
           title={<span title="View account ledgers">Ledgers</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
         <Tab
-          eventKey="journal"
+          eventKey="/admin-accounts-management/journal"
           title={<span title="Open journal">Journal</span>}
         ></Tab>
         <Tab
-          eventKey="event log"
+          eventKey="/admin-accounts-management/event-log"
           title={<span title="Open Event Log">Event Log</span>}
         >
           <div style={{ height: "20px" }}></div>
         </Tab>
       </Tabs>
 
-      {renderTabContent(selectedDate)}
+      <Outlet />
     </Container>
   );
 };

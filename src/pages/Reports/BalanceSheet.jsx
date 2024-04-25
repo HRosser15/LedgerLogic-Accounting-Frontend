@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   fetchAccounts,
   fetchAggregatedAccountBalancesByDateRange,
-} from "../../../services/AccountService";
-import { emailUserBalanceSheet } from "../../../services/EmailService";
+} from "../../services/AccountService";
+import { emailUserBalanceSheet } from "../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,7 +11,7 @@ import html2canvas from "html2canvas";
 import "./DatePickerStyles.css";
 import styles from "./BalanceSheet.module.css";
 
-const ManagerBalanceSheet = () => {
+const BalanceSheet = () => {
   const [accounts, setAccounts] = useState([]);
   const [startDate, setStartDate] = useState(
     new Date(
@@ -101,7 +101,7 @@ const ManagerBalanceSheet = () => {
   const handleSendEmail = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const fromEmail = user.email;
-    const subject = `Balance Sheet Report for ${selectedDate.toLocaleDateString()}`;
+    const subject = `Balance Sheet Report for ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`;
     const reportHtml = balanceSheetRef.current.innerHTML; // **** Get the HTML content of the balance sheet
 
     emailUserBalanceSheet(
@@ -556,4 +556,4 @@ const ManagerBalanceSheet = () => {
   );
 };
 
-export default ManagerBalanceSheet;
+export default BalanceSheet;

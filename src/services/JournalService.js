@@ -6,8 +6,8 @@ export const addJournal = (journal) => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const userId = user.userId;
 
-  console.log("LoggedInUser Information in addJournal:", user);
-  console.log("User ID: ", userId);
+  // console.log("LoggedInUser Information in addJournal:", user);
+  // console.log("User ID: ", userId);
 
   const requestData = {
     ...journal,
@@ -16,7 +16,7 @@ export const addJournal = (journal) => {
     },
   };
 
-  console.log("Request Data: ", requestData);
+  // console.log("Request Data: ", requestData);
 
   return axios.post(`${API_BASE_URL}/journal/addJournal?userId=${userId}`, requestData, {
     headers: {

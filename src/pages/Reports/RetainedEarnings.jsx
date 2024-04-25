@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  fetchAccounts,
-  fetchAccountBalancesByDate,
-} from "../../../services/AccountService";
-import { emailUserRetainedEarnings } from "../../../services/EmailService";
+import { fetchAggregatedAccountBalancesByDateRange } from "../../services/AccountService";
+import { emailUserRetainedEarnings } from "../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,9 +8,16 @@ import html2canvas from "html2canvas";
 import "./DatePickerStyles.css";
 import styles from "./RetainedEarnings.module.css";
 
-const AccountantRetainedEarnings = () => {
+const RetainedEarnings = () => {
   const [accounts, setAccounts] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(
+    new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      new Date().getDate() - 365
+    )
+  );
+  const [endDate, setEndDate] = useState(new Date());
   const retainedEarningsRef = useRef(null);
 
   const [emailAddress, setEmailAddress] = useState("");
@@ -22,16 +26,31 @@ const AccountantRetainedEarnings = () => {
   useEffect(() => {
     const fetchRetainedEarnings = async () => {
       try {
-        const response = await fetchAccountBalancesByDate(selectedDate);
-        setAccounts(response.data);
-        console.log("Account Balances By date fetched:", response.data);
+        const response = await fetchAggregatedAccountBalancesByDateRange(
+          startDate,
+          endDate
+        );
+        setAccounts(response);
+        console.log("response data with date range: ", response);
       } catch (error) {
         console.error("Error fetching retained earnings:", error);
       }
     };
 
     fetchRetainedEarnings();
-  }, [selectedDate]);
+  }, [startDate, endDate]);
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+  };
+
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+  };
+
+  const formatNumber = (number) => {
+    return number.toLocaleString();
+  };
 
   const calculateBeginningPeriodRE = () => {
     const beginningPeriodREAccounts = accounts.filter(
@@ -70,7 +89,7 @@ const AccountantRetainedEarnings = () => {
       (account) => account.accountName === "Cash Dividends"
     );
     const cashDividends = cashDividendsAccounts.reduce(
-      (total, account) => total + parseFloat(account.balance),
+      (total, account) => total - parseFloat(account.balance),
       0
     );
     return cashDividends;
@@ -81,7 +100,7 @@ const AccountantRetainedEarnings = () => {
       (account) => account.accountName === "Stock Dividends"
     );
     const stockDividends = stockDividendsAccounts.reduce(
-      (total, account) => total + parseFloat(account.balance),
+      (total, account) => total - parseFloat(account.balance),
       0
     );
     return stockDividends;
@@ -96,29 +115,6 @@ const AccountantRetainedEarnings = () => {
     const endingRetainedEarnings =
       beginningRE + netIncomeLoss - cashDividends - stockDividends;
     return endingRetainedEarnings;
-  };
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-
-  const formatNumber = (number) => {
-    return number.toLocaleString();
-  };
-
-  const calculateRetainedEarnings = () => {
-    let retainedEarnings = 0;
-    accounts.forEach((account) => {
-      if (account.type === "Retained Earnings") {
-        retainedEarnings += parseFloat(account.balance);
-      } else if (account.type === "Net Income") {
-        retainedEarnings += parseFloat(account.balance);
-      } else if (account.type === "Cash Dividends") {
-        retainedEarnings -= parseFloat(account.balance);
-      } else if (account.type === "Stock Dividends") {
-        retainedEarnings -= parseFloat(account.balance);
-      }
-    });
-    return retainedEarnings;
   };
 
   const handleSaveReport = () => {
@@ -169,7 +165,7 @@ const AccountantRetainedEarnings = () => {
   const handleSendEmail = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const fromEmail = user.email;
-    const subject = `Retained Earnings Report for ${selectedDate.toLocaleDateString()}`;
+    const subject = `Retained Earnings Report for ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`;
     const reportHtml = retainedEarningsRef.current.innerHTML;
 
     emailUserRetainedEarnings(
@@ -192,26 +188,45 @@ const AccountantRetainedEarnings = () => {
 
   return (
     <Container>
+      <div style={{ height: "50px" }}></div>
       <div className="retained-earnings-header">
         <h1>Retained Earnings</h1>
       </div>
 
-      <Form className="retained-earnings-form">
+      <Form>
         <Row>
           <Col>
-            <Form.Label>Select Date</Form.Label>
+            <Form.Label>Select Start Date</Form.Label>
             <DatePicker
-              selected={selectedDate}
-              onChange={handleDateChange}
+              selected={startDate}
+              onChange={handleStartDateChange}
               dateFormat="yyyy-MM-dd"
-              placeholderText="Select date"
+              placeholderText="Select start date"
+            />
+          </Col>
+          <Col>
+            <Form.Label>Select End Date</Form.Label>
+            <DatePicker
+              selected={endDate}
+              onChange={handleEndDateChange}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="Select end date"
             />
           </Col>
         </Row>
       </Form>
 
+      <div style={{ height: "50px" }}></div>
       <Container ref={retainedEarningsRef}>
         <div className="retained-earnings-section">
+          <Row>
+            <Col>
+              <h3>
+                Retained Earnings for {startDate.toLocaleDateString()} to{" "}
+                {endDate.toLocaleDateString()}
+              </h3>
+            </Col>
+          </Row>
           <Row>
             <Col>
               <Table striped bordered>
@@ -248,9 +263,10 @@ const AccountantRetainedEarnings = () => {
           </Row>
         </div>
       </Container>
-      <div style={{ height: "50px" }}></div>
 
       <div className="income-statement-buttons">
+        <div style={{ height: "30px" }}></div>
+        {/* Buttons */}
         <Row>
           <Col>
             <Button style={{ minWidth: "100px" }} onClick={handleSaveReport}>
@@ -264,6 +280,7 @@ const AccountantRetainedEarnings = () => {
           </Col>
         </Row>
         <div style={{ height: "50px" }}></div>
+        <h3>Email Retained Earnings Report</h3>
         <Form>
           <div className={styles.emailFormContainer}>
             <Form.Group controlId="emailAddress">
@@ -278,11 +295,11 @@ const AccountantRetainedEarnings = () => {
           </div>
           <div style={{ height: "20px" }}></div>
           <Form.Group controlId="emailContent">
-            <Form.Label>Email Content</Form.Label>
+            <Form.Label>Email Body</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
-              placeholder="Enter email content"
+              placeholder="Enter email body content"
               value={emailContent}
               onChange={handleEmailContentChange}
             />
@@ -298,4 +315,4 @@ const AccountantRetainedEarnings = () => {
   );
 };
 
-export default AccountantRetainedEarnings;
+export default RetainedEarnings;

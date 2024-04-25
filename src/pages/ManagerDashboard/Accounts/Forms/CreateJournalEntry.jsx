@@ -1,5 +1,14 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Container, Form, Button, Row, Col, Modal } from "react-bootstrap";
+import React, { useState, useContext } from "react";
+import {
+  Container,
+  Form,
+  Button,
+  Row,
+  Col,
+  Modal,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
@@ -23,14 +32,16 @@ const ManagerCreateJournal = () => {
   const [showResetModal, setShowResetModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [balance, setBalance] = useState(0);
-  const [fileData, setFileData] = useState(null);
 
   const handleReset = () => {
     setDate("");
     setDescription("");
     setDocuments(null);
     setError("");
-    setJAccounts([{ accountId: "", debit: "", credit: "" }]);
+    setJAccounts([
+      { accountId: "", debit: "", credit: "" },
+      { accountId: "", debit: "", credit: "" },
+    ]);
     setShowResetModal(false);
   };
 
@@ -58,13 +69,6 @@ const ManagerCreateJournal = () => {
       return;
     }
 
-    // if (!documents) {
-    //   setError("Please upload supporting documents.");
-    //   setShowErrorModal(true);
-    //   return;
-    // }
-
-    // let formattedDate;
     if (date) {
       // formattedDate = date.toISOString().split("T")[0];
     } else {
@@ -103,7 +107,7 @@ const ManagerCreateJournal = () => {
 
   const handleCloseSuccessModal = () => {
     setShowSuccessModal(false);
-    navigate("/manager-dashboard");
+    navigate("/manager-accounts-management");
   };
 
   const handleFileUpload = (e) => {
@@ -130,7 +134,7 @@ const ManagerCreateJournal = () => {
   };
 
   const handleCancel = () => {
-    return navigate("/manager-accounts-management");
+    navigate("/manager-accounts-management");
   };
 
   const handleAccountChange = async (index, field, value) => {
@@ -270,9 +274,21 @@ const ManagerCreateJournal = () => {
             </Row>
 
             <Row>
-              <Button variant="primary" onClick={addAccount}>
-                Add Account
-              </Button>
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip id="add-account-tooltip">
+                    Add another account to this Journal Entry
+                  </Tooltip>
+                }
+              >
+                <Button
+                  className={styles.transparentButton}
+                  onClick={addAccount}
+                >
+                  Add Another Account
+                </Button>
+              </OverlayTrigger>
               <div style={{ height: "50px" }}></div>
             </Row>
 
@@ -300,26 +316,45 @@ const ManagerCreateJournal = () => {
               <Col></Col>
               <Col></Col>
               <Col className="mb-4">
-                <Button
-                  className={styles.grayButton}
-                  onClick={handleShowResetModal}
+                <OverlayTrigger
+                  placement="top"
+                  overlay={<Tooltip id="reset-tooltip">Reset Form</Tooltip>}
                 >
-                  Reset
-                </Button>
+                  <Button
+                    className={styles.grayButton}
+                    onClick={handleShowResetModal}
+                  >
+                    Reset
+                  </Button>
+                </OverlayTrigger>
               </Col>
             </Row>
 
             <Row>
               <Col></Col>
               <Col>
-                <Button className={styles.redButton} onClick={handleCancel}>
-                  Cancel
-                </Button>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id="cancel-tooltip">Cancel and Go Back</Tooltip>
+                  }
+                >
+                  <Button className={styles.redButton} onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                </OverlayTrigger>
               </Col>
               <Col>
-                <Button className={styles.blueButton} type="submit">
-                  Submit
-                </Button>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id="submit-tooltip">Submit Journal Entry</Tooltip>
+                  }
+                >
+                  <Button className={styles.blueButton} type="submit">
+                    Submit
+                  </Button>
+                </OverlayTrigger>
               </Col>
               <Col></Col>
               <div style={{ height: "200px" }}></div>
@@ -364,7 +399,7 @@ const ManagerCreateJournal = () => {
         </Modal.Header>
         <Modal.Body>
           A manager has been notified and will review it shortly. Closing this
-          dialog will redirect you to the Manager Dashboard.
+          dialog will redirect you to the Chart of Accounts.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleCloseSuccessModal}>

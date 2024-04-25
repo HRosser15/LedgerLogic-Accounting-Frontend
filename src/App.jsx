@@ -1,17 +1,10 @@
 import { useState, useContext, useEffect } from "react";
-import { createRoot } from "react-dom/client";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  NavLink,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import ContextProvider from "../context/ContextProvider";
-import AppContext from "../context/AppContext";
 import { AuthProvider } from "../context/AuthContext";
 
 import NavBar from "./components/NavBar/NavBar";
@@ -27,28 +20,31 @@ import UserList from "./pages/AdminDashboard/Users/UserList";
 import ExpiredPasswords from "./pages/AdminDashboard/Users/ExpiredPasswords";
 import UpdateUser from "./pages/AdminDashboard/Users/UpdateUser";
 import AdminAccountsManagement from "./pages/AdminDashboard/Accounts/AdminAccountsManagement";
-import ViewLedger from "./pages/AdminDashboard/Accounts/Forms/ViewLedger";
+import AdminViewAccountsForm from "./pages/AdminDashboard/Accounts/Forms/ViewAccountsForm";
+import AddAccountsForm from "./pages/AdminDashboard/Accounts/Forms/AddAccountsForm";
+import EditAccountsForm from "./pages/AdminDashboard/Accounts/Forms/EditAccountsForm";
+import DeactivateAccountsForm from "./pages/AdminDashboard/Accounts/Forms/DeactivateAccountsForm";
+import AdminViewLedger from "./pages/AdminDashboard/Accounts/Forms/ViewLedger";
+import AdminCreateJournal from "./pages/AdminDashboard/Accounts/Forms/CreateJournalEntry";
 
 import ManagerDashboard from "./pages/ManagerDashboard/ManagerDashboard";
 import ManagerUserList from "./pages/ManagerDashboard/Users/ManagerUserList";
+import ManagerViewAccountsForm from "./pages/ManagerDashboard/Accounts/Forms/ViewAccountsForm";
 import ManagerAccountsManagement from "./pages/ManagerDashboard/Accounts/AccountsManagement";
 import ManagerViewLedger from "./pages/ManagerDashboard/Accounts/Forms/ViewLedger";
 import ManagerCreateJournal from "./pages/ManagerDashboard/Accounts/Forms/CreateJournalEntry";
-import ManagerReportsDashboard from "./pages/ManagerDashboard/Reports/ReportsDashboard";
-import ManagerBalanceSheet from "./pages/ManagerDashboard/Reports/BalanceSheet";
-import ManagerIncomeStatement from "./pages/ManagerDashboard/Reports/IncomeStatement";
-import ManagerRetainedEarnings from "./pages/ManagerDashboard/Reports/RetainedEarnings";
-import ManagerTrialBalance from "./pages/ManagerDashboard/Reports/TrialBalance";
 
 import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard";
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";
 import AccountantViewLedger from "./pages/AccountantDashboard/Accounts/Forms/ViewLedger";
 import AccountantCreateJournal from "./pages/AccountantDashboard/Accounts/Forms/CreateJournalEntry";
-import AccountantReportsDashboard from "./pages/AccountantDashboard/Reports/ReportsDashboard";
-import AccountantBalanceSheet from "./pages/AccountantDashboard/Reports/BalanceSheet";
-import AccountantIncomeStatement from "./pages/AccountantDashboard/Reports/IncomeStatement";
-import AccountantRetainedEarnings from "./pages/AccountantDashboard/Reports/RetainedEarnings";
-import AccountantTrialBalance from "./pages/AccountantDashboard/Reports/TrialBalance";
+import AccountantViewAccountsForm from "./pages/AccountantDashboard/Accounts/Forms/ViewAccountsForm";
+
+import ReportsDashboard from "./pages/Reports/ReportsDashboard";
+import BalanceSheet from "./pages/Reports/BalanceSheet";
+import IncomeStatement from "./pages/Reports/IncomeStatement";
+import RetainedEarnings from "./pages/Reports/RetainedEarnings";
+import TrialBalance from "./pages/Reports/TrialBalance";
 
 import EventLog from "./pages/ManagerDashboard/Accounts/Forms/EventLog";
 import PostReference from "./pages/ManagerDashboard/Accounts/Forms/PostReference";
@@ -103,13 +99,24 @@ function App() {
                   element={<UsersDashboard />}
                 ></Route>
                 <Route
-                  path="admin-accounts-management"
+                  path="/admin-accounts-management"
                   element={<AdminAccountsManagement />}
-                />
-                <Route
-                  path="/account/:accountNumber"
-                  element={<ViewLedger />}
-                />
+                >
+                  <Route index element={<AdminViewAccountsForm />} />
+                  <Route path="add" element={<AddAccountsForm />} />
+                  <Route path="edit" element={<EditAccountsForm />} />
+                  <Route
+                    path="deactivate"
+                    element={<DeactivateAccountsForm />}
+                  />
+                  <Route path="ledgers" element={<AdminViewLedger />} />
+                  <Route
+                    path="ledgers/:accountId"
+                    element={<AdminViewLedger />}
+                  />
+                  <Route path="journal" element={<AdminCreateJournal />} />
+                  <Route path="event-log" element={<EventLog />} />
+                </Route>
                 <Route path="/user-list" element={<UserList />} />
                 <Route
                   path="/expired-passwords"
@@ -125,40 +132,24 @@ function App() {
                   element={<ManagerDashboard />}
                 />
                 <Route
-                  path="manager-accounts-management"
+                  path="/manager-accounts-management"
                   element={<ManagerAccountsManagement />}
-                />
-                <Route
-                  path="manager/account/:accountNumber"
-                  element={<ManagerViewLedger />}
-                />
+                >
+                  <Route
+                    path="/manager-accounts-management/ledgers"
+                    element={<ManagerViewLedger />}
+                  />
+                  <Route index element={<ManagerViewAccountsForm />} />
+                  <Route
+                    path="ledgers/:accountId"
+                    element={<ManagerViewLedger />}
+                  />
+                  <Route path="journal" element={<ManagerCreateJournal />} />
+                  <Route path="event-log" element={<EventLog />} />
+                </Route>
                 <Route
                   path="/manager-user-list"
                   element={<ManagerUserList />}
-                />
-                <Route
-                  path="/manager-create-journal"
-                  element={<ManagerCreateJournal />}
-                />
-                <Route
-                  path="/manager-reports"
-                  element={<ManagerReportsDashboard />}
-                />
-                <Route
-                  path="/manager-balance-sheet"
-                  element={<ManagerBalanceSheet />}
-                />
-                <Route
-                  path="/manager-income-statement"
-                  element={<ManagerIncomeStatement />}
-                />
-                <Route
-                  path="/manager-retained-earnings"
-                  element={<ManagerRetainedEarnings />}
-                />
-                <Route
-                  path="/manager-trial-balance"
-                  element={<ManagerTrialBalance />}
                 />
 
                 {/* ================
@@ -169,42 +160,34 @@ function App() {
                   element={<AccountantDashboard />}
                 />
                 <Route
-                  path="accountant-accounts-management"
+                  path="/accountant-accounts-management"
                   element={<AccountantAccountsManagement />}
-                />
-                <Route
-                  path="/accountant/account/:accountNumber"
-                  element={<AccountantViewLedger />}
-                />
-                <Route
-                  path="/accountant-create-journal"
-                  element={<AccountantCreateJournal />}
-                />
-                <Route
-                  path="/accountant-reports"
-                  element={<AccountantReportsDashboard />}
-                />
-                <Route
-                  path="/accountant-balance-sheet"
-                  element={<AccountantBalanceSheet />}
-                />
-                <Route
-                  path="/accountant-income-statement"
-                  element={<AccountantIncomeStatement />}
-                />
-                <Route
-                  path="/accountant-retained-earnings"
-                  element={<AccountantRetainedEarnings />}
-                />
-                <Route
-                  path="/accountant-trial-balance"
-                  element={<AccountantTrialBalance />}
-                />
+                >
+                  <Route
+                    path="/accountant-accounts-management/ledgers"
+                    element={<AccountantViewLedger />}
+                  />
+                  <Route index element={<AccountantViewAccountsForm />} />
+                  <Route
+                    path="ledgers/:accountId"
+                    element={<AccountantViewLedger />}
+                  />
+                  <Route path="journal" element={<AccountantCreateJournal />} />
+                  <Route path="event-log" element={<EventLog />} />
+                </Route>
 
                 {/* =========
-                    Event Log
+                    Reports
                     =========  */}
                 <Route path="/event-log" element={<EventLog />} />
+                <Route path="/reports" element={<ReportsDashboard />} />
+                <Route path="/balance-sheet" element={<BalanceSheet />} />
+                <Route path="/income-statement" element={<IncomeStatement />} />
+                <Route
+                  path="/retained-earnings"
+                  element={<RetainedEarnings />}
+                />
+                <Route path="/trial-balance" element={<TrialBalance />} />
 
                 {/* ===============
                     EPost Reference
