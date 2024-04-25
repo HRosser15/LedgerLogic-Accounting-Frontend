@@ -346,14 +346,13 @@ const HelpPage = () => {
               </p>
               <ul>
                 <li>Balance Sheet</li>
-                <li>more to come...</li>
-                {/* <li>Income Statement</li>
+                <li>Income Statement</li>
                 <li>Cash Flow Statement</li>
-                <li>Trial Balance</li> */}
+                <li>Trial Balance</li>
               </ul>
               <p> We can potentially add something about the event logs here</p>
 
-              {/* <h5>Generating Reports</h5>
+              <h5>Generating Reports</h5>
               <p>To generate a financial report, follow these steps:</p>
               <ol>
                 <li>Navigate to the "Reports" section.</li>
@@ -370,7 +369,7 @@ const HelpPage = () => {
               <p>
                 Once generated, you can view, print, or export the report in
                 various formats (e.g., PDF, Excel).
-              </p> */}
+              </p> 
             </div>
           </div>
         </div>
