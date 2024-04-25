@@ -9,8 +9,8 @@ import {
   Card,
 } from "react-bootstrap";
 import { emailUser } from "../../services/EmailService";
-
-import styles from "./Accounts/Forms/AccountForm.module.css";
+import { fetchAccounts } from "../../services/AccountService";
+import styles from "./AccountantDashboard.module.css";
 import AppContext from "../../../context/AppContext";
 import logo from "../../assets/logoNoWords.png";
 
@@ -64,6 +64,274 @@ const AccountantDashboard = ({ username }) => {
     setShowModal(false);
   };
 
+  {
+    /* =====================
+      Fetching Account Data
+      ===================== */
+  }
+
+  useEffect(() => {
+    const fetchBalances = async () => {
+      try {
+        const response = await fetchAccounts();
+        setAccounts(response.data);
+        console.log("response data: ", response);
+      } catch (error) {
+        console.error("Error fetching account balances:", error);
+      }
+    };
+
+    fetchBalances();
+  }, []);
+
+  const filterAccountsBySubcategory = (subcategory) => {
+    if (accounts.length === 0) {
+      return [];
+    }
+    return accounts.filter((account) => account.subCategory === subcategory);
+  };
+
+  const calculateSubtotal = (accounts, isExpense = false) => {
+    return accounts.reduce((total, account) => {
+      const balance = parseFloat(account.balance);
+      return isExpense ? total - balance : total + balance;
+    }, 0);
+  };
+
+  // Data Necessary for Financial Ratios
+
+  const currentAssets = filterAccountsBySubcategory("Current Assets");
+  const totalCurrentAssets = calculateSubtotal(currentAssets);
+
+  const nonCurrentAssets = filterAccountsBySubcategory(
+    "Property Plant and Equipment"
+  );
+  const totalNonCurrentAssets = calculateSubtotal(nonCurrentAssets);
+
+  const inventory = totalCurrentAssets + totalNonCurrentAssets;
+
+  const currentLiabilities = filterAccountsBySubcategory("Current Liabilities");
+  const totalCurrentLiabilities = calculateSubtotal(currentLiabilities);
+
+  const revenue = filterAccountsBySubcategory("Service Revenue");
+  const totalRevenue = calculateSubtotal(revenue);
+
+  const expenses = filterAccountsBySubcategory("Operating Expenses");
+  const otherExpenses = filterAccountsBySubcategory("Other Expenses");
+  const totalExpenses =
+    calculateSubtotal(expenses, true) + calculateSubtotal(otherExpenses, true);
+
+  const netIncome = totalRevenue - totalExpenses;
+
+  const costOfGoodsSoldAccounts =
+    filterAccountsBySubcategory("Cost of Goods Sold");
+  const totalCOGS = calculateSubtotal(costOfGoodsSoldAccounts);
+  const shareholdersEquity = filterAccountsBySubcategory("Owner's Equity");
+  const totalshareholdersEquity = calculateSubtotal(shareholdersEquity);
+
+  {
+    /* ================
+      Liquidity Ratios
+      ================ */
+  }
+
+  // Current Ratios
+  const calculateCurrentRatio = (currentAssets, currentLiabilities) => {
+    if (currentLiabilities === 0) {
+      return null;
+    }
+    return currentAssets / currentLiabilities;
+  };
+
+  const determineCurrentRatioHealth = (currentRatio) => {
+    if (currentRatio >= 1.5 && currentRatio <= 2.0) {
+      return "green"; // Healthy
+    } else if (
+      (currentRatio >= 1.0 && currentRatio < 1.5) ||
+      (currentRatio > 2.0 && currentRatio <= 3.0)
+    ) {
+      return "yellow"; // Slightly outside of normal
+    } else {
+      return "red"; //Significantly outside of normal"
+    }
+  };
+
+  // Quick Ratios
+  const calculateQuickRatio = (
+    currentAssets,
+    inventory,
+    currentLiabilities
+  ) => {
+    const quickAssets = currentAssets - inventory;
+    if (currentLiabilities === 0) {
+      return null;
+    }
+    return quickAssets / currentLiabilities;
+  };
+
+  const determineQuickRatioHealth = (quickRatio) => {
+    if (quickRatio >= 1.0 && quickRatio <= 1.5) {
+      return 'green'; //Healthy
+    } else if (
+      (quickRatio >= 0.5 && quickRatio < 1.0) ||
+      (quickRatio > 1.5 && quickRatio <= 2.0)
+    ) {
+      return 'yellow'; // Slightly outside of normal
+    } else {
+      return 'red'; //Significantly outside of normal
+    }
+  };
+
+  {
+    /* ====================
+      Profitability Ratios
+      ==================== */
+  }
+
+  // Gross Profit Margin
+  const calculateGrossProfitMargin = (revenue, costOfGoodsSold) => {
+    if (revenue === 0 || costOfGoodsSold == null || costOfGoodsSold == 0) {
+      return null;
+    }
+    return ((revenue - costOfGoodsSold) / revenue) * 100;
+  };
+
+  const determineGrossProfitMarginHealth = (grossProfitMargin) => {
+    if (grossProfitMargin == null) {
+      return "Not Available";
+    }
+
+    if (grossProfitMargin >= 35 && grossProfitMargin <= 50) {
+      return 'green'; //Healthy
+    } else if (
+      (grossProfitMargin >= 25 && grossProfitMargin < 35) ||
+      (grossProfitMargin > 50 && grossProfitMargin <= 60)
+    ) {
+      return 'yellow'; //Slightly outside of normal
+    } else {
+      return 'red'; //Significantly outside of normal
+    }
+  };
+
+  // Net Profit Margin
+  const calculateNetProfitMargin = (netIncome, revenue) => {
+    if (revenue === 0) {
+      return null;
+    }
+    return (netIncome / revenue) * 100;
+  };
+
+  const determineNetProfitMarginHealth = (netProfitMargin) => {
+    if (netProfitMargin >= 8 && netProfitMargin <= 15) {
+      return 'green'; //Healthy
+    } else if (
+      (netProfitMargin >= 5 && netProfitMargin < 8) ||
+      (netProfitMargin > 15 && netProfitMargin <= 20)
+    ) {
+      return 'yellow'; //Slightly outside of normal
+    } else {
+      return 'red'; //Significantly outside of normal
+    }
+  };
+
+  // Return on Assets
+  const calculateROA = (netIncome, totalAssets) => {
+    if (totalAssets === 0) {
+      return null;
+    }
+    return (netIncome / totalAssets) * 100;
+  };
+
+  const determineROAHealth = (ROA) => {
+    if (ROA >= 10 && ROA <= 20) {
+      return 'green'; //Healthy
+    } else if ((ROA >= 5 && ROA < 10) || (ROA > 20 && ROA <= 25)) {
+      return 'yellow'; //Slightly outside of normal
+    } else {
+      return 'red'; //Significantly outside of normal
+    }
+  };
+
+  // Return on Equity
+  const calculateROE = (netIncome, shareholdersEquity) => {
+    if (shareholdersEquity === 0) {
+      return null;
+    }
+    return (netIncome / shareholdersEquity) * 100;
+  };
+
+  const determineROEHealth = (ROE) => {
+    if (ROE >= 15 && ROE <= 25) {
+      return 'green'; //Healthy
+    } else if ((ROE >= 10 && ROE < 15) || (ROE > 25 && ROE <= 30)) {
+      return 'yellow'; //Slightly outside of normal
+    } else {
+      return 'red'; //Significantly outside of normal
+    }
+  };
+
+  {
+    /* ==================
+      Efficiency Ratios
+      ================== */
+  }
+
+  {
+    /* ================
+      Leverage Ratios
+      ================ */
+  }
+
+  // Current Ratios
+  const currentRatio = calculateCurrentRatio(
+    totalCurrentAssets,
+    totalCurrentLiabilities
+  );
+  const currentRatioHealth = determineCurrentRatioHealth(currentRatio);
+
+  // Quick Ratios
+  const quickRatio = calculateQuickRatio(
+    totalCurrentAssets,
+    inventory,
+    totalCurrentLiabilities
+  );
+  const quickRatioHealth = determineQuickRatioHealth(quickRatio);
+
+  // Gross Profit Margin
+  const grossProfitMargin = calculateGrossProfitMargin(totalRevenue, totalCOGS);
+  const grossProfitMarginHeath =
+    determineGrossProfitMarginHealth(grossProfitMargin);
+
+  // Net Profit Margin
+  const netProfitMargin = calculateNetProfitMargin(netIncome, totalRevenue);
+  const netProfitMarginHealth = determineNetProfitMarginHealth(netProfitMargin);
+
+  // Return on Assets
+  const ROA = calculateROA(netIncome, inventory);
+  const ROAHealth = determineROAHealth(ROA);
+
+  // Return on Equity
+  const ROE = calculateROE(netIncome, shareholdersEquity);
+  const ROEHealth = determineROAHealth(ROE);
+
+  
+  const CircleDisplay = ({ health, ratio }) => {
+    const circleStyle = {
+      width: "50px",
+      height: "50px",
+      borderRadius: "50%",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      fontWeight: "bold",
+      margin: "10px",
+      backgroundColor: health === "green" ? "#336b45" : health === "yellow" ? "yellow" : "#ee2424",
+      color: health === "green" ? "white" : health === "yellow" ? "black" : "white",
+    };
+  
+    return <div style={circleStyle}>{ratio}</div>;
+  };
+
   return (
     <Container className={styles.dashboardContainer}>
       <div style={{ height: "30px" }}></div>
@@ -71,6 +339,159 @@ const AccountantDashboard = ({ username }) => {
       <div style={{ height: "30px" }}></div>
       <img className={styles.image} src={logo} alt="Logo"></img>
       <h2 className={styles.welcomeMessage}> Welcome {state.username}!</h2>
+      <div style={{ height: "30px" }}></div>
+
+      <Row>
+        {/* =========
+            Liquidity
+            ========= */}
+        <Col md={3}>
+          <Card>
+            <Card.Body>
+              <Card.Title style={{fontWeight:"bold"}}>Liquidity</Card.Title>
+              <Card.Text style={{marginTop:"30px"}}>
+                <Row>
+                  <Col xs={6}>
+                    <span>Current Ratio</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={currentRatioHealth} ratio={currentRatio} />
+                  </Col>
+                </Row>
+                <hr class="rounded"></hr>
+                <Row>
+                  <Col xs={6}>
+                    <span>Quick Ratio</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={quickRatioHealth} ratio={quickRatio} />
+                  </Col>
+                </Row>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* =============
+            Profitability
+            ============= */}
+        <Col md={3}>
+          <Card>
+            <Card.Body>
+              <Card.Title style={{fontWeight:"bold"}}>Profitability</Card.Title>
+              <Card.Text style={{marginTop:"30px"}}>
+                <Row>
+                  <Col xs={6}>
+                    <span>Gross Profit Margin</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={grossProfitMarginHeath} ratio={grossProfitMargin} />
+                  </Col>
+                </Row>
+                <hr class="rounded"></hr>
+                <Row>
+                  <Col xs={6}>
+                    <span>Net Profit Margin</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={netProfitMarginHealth} ratio={netProfitMargin} />
+                  </Col>
+                </Row>
+                <hr class="rounded"></hr>
+                <Row>
+                  <Col xs={6}>
+                    <span>Return on Assets</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={ROAHealth} ratio={ROA} />
+                  </Col>
+                </Row>
+                <hr class="rounded"></hr>
+                <Row>
+                  <Col xs={6}>
+                    <span>Return on Equity</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  </Col>
+                </Row>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* ==========
+            Efficiency
+            ========== */}
+
+        <Col md={3}>
+          <Card>
+            <Card.Body>
+              <Card.Title style={{fontWeight:"bold"}}>Efficiency</Card.Title>
+              <Card.Text style={{marginTop:"30px"}}>
+                <Row>
+                  <Col xs={6} >
+                    <span>Inventory Turnover Ratio</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  </Col>
+                </Row>
+                <hr class="rounded"></hr>
+                <Row>
+                  <Col xs={6}>
+                    <span>Accounts Receivable Turnover Ratio</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  </Col>
+                </Row>
+                <hr class="rounded"></hr>
+                <Row>
+                  <Col xs={6}>
+                    <span>Total Asset Turnover Ratio</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  </Col>
+                </Row>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* ========
+            Leverage
+            ======== */}
+
+        <Col md={3}>
+          <Card>
+            <Card.Body>
+              <Card.Title style={{fontWeight:"bold"}}>Liquidity</Card.Title>
+              <Card.Text style={{marginTop:"30px"}}>
+                <Row>
+                  <Col xs={6}>
+                    <span>Debt-to-Equity Ratio</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  </Col>
+                </Row>
+                <hr class="rounded"></hr>
+                <Row>
+                  <Col xs={6}>
+                    <span>Debt Ratio</span>
+                  </Col>
+                  <Col xs={6}>
+                  <CircleDisplay health={ROEHealth} ratio={ROE} />
+                  </Col>
+                </Row>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
       <div style={{ height: "50px" }}></div>
 
       {/* ============
