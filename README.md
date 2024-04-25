@@ -49,6 +49,7 @@ git checkout -b your-branch-name
 
 ```bash
 npm install
+npm install vite
 npm install axios
 npm install bootstrap
 npm install html2canvas

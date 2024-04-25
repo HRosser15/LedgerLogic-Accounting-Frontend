@@ -44,6 +44,11 @@ import AccountantDashboard from "./pages/AccountantDashboard/AccountantDashboard
 import AccountantAccountsManagement from "./pages/AccountantDashboard/Accounts/AccountsManagement";
 import AccountantViewLedger from "./pages/AccountantDashboard/Accounts/Forms/ViewLedger";
 import AccountantCreateJournal from "./pages/AccountantDashboard/Accounts/Forms/CreateJournalEntry";
+import AccountantReportsDashboard from "./pages/AccountantDashboard/Reports/ReportsDashboard";
+import AccountantBalanceSheet from "./pages/AccountantDashboard/Reports/BalanceSheet";
+import AccountantIncomeStatement from "./pages/AccountantDashboard/Reports/IncomeStatement";
+import AccountantRetainedEarnings from "./pages/AccountantDashboard/Reports/RetainedEarnings";
+import AccountantTrialBalance from "./pages/AccountantDashboard/Reports/TrialBalance";
 
 import EventLog from "./pages/ManagerDashboard/Accounts/Forms/EventLog";
 import PostReference from "./pages/ManagerDashboard/Accounts/Forms/PostReference";
@@ -174,6 +179,26 @@ function App() {
                 <Route
                   path="/accountant-create-journal"
                   element={<AccountantCreateJournal />}
+                />
+                <Route
+                  path="/accountant-reports"
+                  element={<AccountantReportsDashboard />}
+                />
+                <Route
+                  path="/accountant-balance-sheet"
+                  element={<AccountantBalanceSheet />}
+                />
+                <Route
+                  path="/accountant-income-statement"
+                  element={<AccountantIncomeStatement />}
+                />
+                <Route
+                  path="/accountant-retained-earnings"
+                  element={<AccountantRetainedEarnings />}
+                />
+                <Route
+                  path="/accountant-trial-balance"
+                  element={<AccountantTrialBalance />}
                 />
 
                 {/* =========

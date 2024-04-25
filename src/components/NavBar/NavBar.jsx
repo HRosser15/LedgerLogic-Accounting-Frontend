@@ -52,6 +52,7 @@ const NavBar = () => {
             <>
               <Link to="/accountant-dashboard">Accountant Dashboard</Link>
               <Link to="/accountant-accounts-management">Accounts</Link>
+              <Link to="/accountant-reports">Reports</Link>
               {/* Add other ACCOUNTANT links here */}
             </>
           );

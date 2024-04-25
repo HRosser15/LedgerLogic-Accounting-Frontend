@@ -1,19 +1,19 @@
-.retained-earnings-header {
+.income-statement-header {
   margin-top: 50px;
   margin-bottom: 30px;
   text-align: center;
 }
 
-.retained-earnings-form {
+.income-statement-form {
   margin-bottom: 30px;
 }
 
-.retained-earnings-section {
+.income-statement-section {
   margin-top: 20px;
   margin-bottom: 30px;
 }
 
-.retained-earnings-buttons {
+.income-statement-buttons {
   margin-top: 30px;
   display: flex;
   justify-content: space-between;

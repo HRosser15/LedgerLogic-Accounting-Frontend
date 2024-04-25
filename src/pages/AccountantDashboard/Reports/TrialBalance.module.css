@@ -3,12 +3,12 @@
     visibility: hidden;
   }
 
-  #balance-sheet-print,
-  #balance-sheet-print * {
+  #trial-balance-print,
+  #trial-balance-print * {
     visibility: visible;
   }
 
-  #balance-sheet-print {
+  #trial-balance-print {
     position: absolute;
     left: 0;
     top: 0;
@@ -24,6 +24,14 @@
     margin-bottom: 1rem;
     color: #212529;
     border-collapse: collapse;
+  }
+
+  .table thead th {
+    border-top: none;
+  }
+
+  .table tfoot td {
+    border-bottom: none;
   }
 
   .table th,
@@ -51,9 +59,4 @@
   .table-bordered thead td {
     border-bottom-width: 2px;
   }
-}
-
-.emailFormContainer {
-  max-width: 350px;
-  margin-left: 0;
 }

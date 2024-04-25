@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
@@ -26,8 +27,9 @@ const ManagerViewLedger = ({
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("posted");
+  const [statusFilter, setStatusFilter] = useState("approved");
   const [journalEntries, setJournalEntries] = useState([]);
+  const [matchedJournal, setMatchedJournal] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +37,7 @@ const ManagerViewLedger = ({
         const entries = await fetchJournalEntriesForAccount(
           account.accountName
         );
-        console.log("Fetched journal entries:", entries);
+        console.log("Fetched journal entries from useEffect:", entries);
         setJournalEntries(entries);
       } else {
         setJournalEntries([]);
@@ -58,7 +60,7 @@ const ManagerViewLedger = ({
           value={statusFilter}
           onChange={handleStatusFilterChange}
         >
-          <option value="posted">Posted</option>
+          <option value="approved">Posted</option>
           <option value="rejected">Rejected</option>
           <option value="pending">Pending</option>
           <option value="all">All</option>
@@ -89,35 +91,25 @@ const ManagerViewLedger = ({
   const handleSearchChange = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(event.target.value);
-    const dollarAmountPattern = /\$?\d+(\.\d{1,2})?/;
+
+    const dollarAmountPattern = /\$?(\d+(\.\d{1,2})?)$/;
     const isDollarAmount = dollarAmountPattern.test(searchValue);
 
-    const filteredData =
-      account === null
-        ? filterAccountsByRange(1000, 7999).filter(
-            (account) =>
-              account.accountName.toLowerCase().includes(searchValue) ||
-              account.accountNumber.toString().includes(searchValue) ||
-              (isDollarAmount &&
-                (account.debit
-                  .toString()
-                  .includes(searchValue.replace(/\$/g, "")) ||
-                  account.credit
-                    .toString()
-                    .includes(searchValue.replace(/\$/g, ""))))
-          )
-        : journalEntries.filter(
-            (entry) =>
-              entry.description.toLowerCase().includes(searchValue) ||
-              (isDollarAmount &&
-                (entry.debit
-                  .toString()
-                  .includes(searchValue.replace(/\$/g, "")) ||
-                  entry.credit
-                    .toString()
-                    .includes(searchValue.replace(/\$/g, ""))))
-          );
+    let filteredData;
     if (account === null) {
+      filteredData = filterAccountsByRange(1000, 7999).filter(
+        (account) =>
+          account.accountName.toLowerCase().includes(searchValue) ||
+          account.accountNumber.toString().includes(searchValue) ||
+          (isDollarAmount &&
+            (account.debit
+              .toString()
+              .includes(searchValue.replace(/\$/g, "")) ||
+              account.credit
+                .toString()
+                .includes(searchValue.replace(/\$/g, ""))))
+      );
+      // Update state with filtered data
       setAssetAccounts(
         filteredData.filter(
           (account) =>
@@ -148,6 +140,14 @@ const ManagerViewLedger = ({
             account.accountNumber >= 7000 && account.accountNumber <= 7999
         )
       );
+    } else {
+      filteredData = journalEntries.filter(
+        (entry) =>
+          entry.description.toLowerCase().includes(searchValue.toLowerCase()) ||
+          (isDollarAmount &&
+            (entry.debit.toString().includes(searchValue.replace(/\$/g, "")) ||
+              entry.credit.toString().includes(searchValue.replace(/\$/g, ""))))
+      );
     }
   };
 
@@ -156,14 +156,17 @@ const ManagerViewLedger = ({
       return data;
     }
 
-    const filteredData = data.filter((entry) => {
-      const entryDate = new Date(entry.date);
+    const filteredData = data.filter((item) => {
+      const itemDate = item.transactionDate
+        ? new Date(item.transactionDate)
+        : new Date(item.creationDate);
+
       if (startDate && endDate) {
-        return entryDate >= startDate && entryDate <= endDate;
+        return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
       } else if (startDate) {
-        return entryDate >= startDate;
+        return itemDate >= new Date(startDate);
       } else {
-        return entryDate <= endDate;
+        return itemDate <= new Date(endDate);
       }
     });
 
@@ -183,10 +186,29 @@ const ManagerViewLedger = ({
   const [showPostReferenceModal, setShowPostReferenceModal] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
 
-  const handleViewPR = (e, entry) => {
+  const handleViewPR = async (e, entry) => {
     e.preventDefault();
-    setSelectedEntry(entry);
-    setShowPostReferenceModal(true);
+
+    try {
+      const response = await axios.get(`http://localhost:8080/journal/getAll`);
+      const journals = response.data;
+
+      const matchedJournal = journals.find((journal) =>
+        journal.journalEntries.some(
+          (journalEntry) => journalEntry.journalEntryId === entry.journalEntryId
+        )
+      );
+
+      if (matchedJournal) {
+        setSelectedEntry({ ...entry, journalId: matchedJournal.journalId });
+        setMatchedJournal(matchedJournal); // Add this line to set the matched journal
+        setShowPostReferenceModal(true);
+      } else {
+        console.error("No matching journal found for the selected entry.");
+      }
+    } catch (error) {
+      console.error("Failed to fetch journals:", error);
+    }
   };
 
   const handleClosePostReferenceModal = () => {
@@ -195,20 +217,52 @@ const ManagerViewLedger = ({
   };
 
   const handleEntryUpdate = (updatedEntry) => {
-    const updatedDummyData = dummyData.map((entry) =>
-      entry.ledgerId === updatedEntry.ledgerId ? updatedEntry : entry
+    const updatedJournalEntries = journalEntries.map((entry) =>
+      entry.journalEntryId === updatedEntry.journalEntryId
+        ? updatedEntry
+        : entry
     );
-    setDummyData(updatedDummyData);
+    setJournalEntries(updatedJournalEntries);
   };
 
   const renderTable = (tableTitle, tableAccounts) => {
     if (account !== null) {
-      // Render Journal Entries table
-      let filteredTableAccounts = journalEntries;
+      // ============================
+      // Render Subledger tables
+      // ============================
+      console.log("Subledger--Non-Filtered Journal Entries:", journalEntries);
+      let filteredTableAccounts = filterDataByDate(
+        journalEntries,
+        startDate,
+        endDate
+      );
+      console.log(
+        "1 Subledger Filtered table accounts:",
+        filteredTableAccounts
+      );
 
       // Filter by status
       filteredTableAccounts = filteredTableAccounts.filter(
         (entry) => statusFilter === "all" || entry.status === statusFilter
+      );
+      console.log(
+        "2 Subledger Filtered table accounts:",
+        filteredTableAccounts
+      );
+
+      // Filter by search term
+      filteredTableAccounts = filteredTableAccounts.filter(
+        (entry) =>
+          (entry.description &&
+            entry.description
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())) ||
+          entry.debit.toString().includes(searchTerm.replace(/\$/g, "")) ||
+          entry.credit.toString().includes(searchTerm.replace(/\$/g, ""))
+      );
+      console.log(
+        "3 Subledger Filtered table accounts:",
+        filteredTableAccounts
       );
 
       if (filteredTableAccounts.length === 0) {
@@ -241,23 +295,27 @@ const ManagerViewLedger = ({
                   <th>Post Reference</th>
                 </tr>
               </thead>
+              {console.log("filteredTableAccounts:", filteredTableAccounts)}
               <tbody>
                 {filteredTableAccounts.map((entry) => (
                   <tr key={entry.journalEntryId}>
                     <td>
-                      {entry.journal &&
-                        new Date(
-                          entry.journal.transactionDate
-                        ).toLocaleDateString()}
+                      {new Date(entry.transactionDate).toLocaleDateString()}
                     </td>
-                    <td>{entry.description}</td>
+                    <td>{entry.description || ""}</td>
                     <td>${entry.debit.toFixed(2)}</td>
                     <td>${entry.credit.toFixed(2)}</td>
                     <td>${(entry.debit - entry.credit).toFixed(2)}</td>
-                    <td>{entry.status}</td>
                     <td>
-                      {/* Render Post Reference button or link */}
-                      <button>View PR</button>
+                      {entry.status}
+                      {entry.status === "rejected" && entry.rejectionReason ? (
+                        <span> - {entry.rejectionReason}</span>
+                      ) : null}
+                    </td>
+                    <td>
+                      <button onClick={(e) => handleViewPR(e, entry)}>
+                        View PR
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -278,21 +336,24 @@ const ManagerViewLedger = ({
         </React.Fragment>
       );
     } else {
+      // ============================
       // Render General Ledger tables
+      // ============================
       let filteredTableAccounts = filterDataByDate(
         tableAccounts,
         startDate,
         endDate
       );
-      // Filter by status (not applicable for General Ledger)
 
-      // Apply other filters (search term, etc.)
+      // Filter by search term
       filteredTableAccounts = filteredTableAccounts.filter(
         (account) =>
           account.accountName
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          account.accountNumber.toString().includes(searchTerm.toLowerCase())
+          account.accountNumber.toString().includes(searchTerm.toLowerCase()) ||
+          account.debit.toString().includes(searchTerm.replace(/\$/g, "")) ||
+          account.credit.toString().includes(searchTerm.replace(/\$/g, ""))
       );
 
       if (filteredTableAccounts.length === 0) {
@@ -355,13 +416,10 @@ const ManagerViewLedger = ({
                       })}
                     </td>
                     <td>
-                      {parseFloat(account.initialBalance).toLocaleString(
-                        "en-US",
-                        {
-                          style: "currency",
-                          currency: "USD",
-                        }
-                      )}
+                      {parseFloat(account.balance).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      })}
                     </td>
                   </tr>
                 ))}
@@ -518,6 +576,7 @@ const ManagerViewLedger = ({
                   {showPostReferenceModal && (
                     <PostReference
                       entry={selectedEntry}
+                      matchedJournal={matchedJournal}
                       onClose={handleClosePostReferenceModal}
                       handleEntryUpdate={handleEntryUpdate}
                     />

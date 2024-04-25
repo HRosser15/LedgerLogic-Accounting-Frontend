@@ -1,23 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { fetchAggregatedAccountBalancesByDateRange } from "../../../services/AccountService";
+import { fetchAccountBalancesByDate } from "../../../services/AccountService";
 import { emailUserTrialBalance } from "../../../services/EmailService";
 import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import html2canvas from "html2canvas";
 import "./DatePickerStyles.css";
-import styles from "./TrialBalance.module.css";
+import "./TrialBalance.module.css";
 
-const ManagerTrialBalance = () => {
+const AccountantTrialBalance = () => {
   const [accounts, setAccounts] = useState([]);
-  const [startDate, setStartDate] = useState(
-    new Date(
-      new Date().getFullYear(),
-      new Date().getMonth(),
-      new Date().getDate() - 365
-    )
-  );
-  const [endDate, setEndDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const trialBalanceRef = useRef(null);
 
   const [emailAddress, setEmailAddress] = useState("");
@@ -26,27 +19,16 @@ const ManagerTrialBalance = () => {
   useEffect(() => {
     const fetchBalances = async () => {
       try {
-        const response = await fetchAggregatedAccountBalancesByDateRange(
-          startDate,
-          endDate
-        );
-        setAccounts(response);
-        console.log("response data with date range: ", response);
+        const response = await fetchAccountBalancesByDate(selectedDate);
+        setAccounts(response.data);
+        console.log("response data", response.data);
       } catch (error) {
         console.error("Error fetching trial balances:", error);
       }
     };
 
     fetchBalances();
-  }, [startDate, endDate]);
-
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
-  };
-
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-  };
+  }, [selectedDate]);
 
   const handleSaveReport = () => {
     html2canvas(trialBalanceRef.current).then((canvas) => {
@@ -125,42 +107,21 @@ const ManagerTrialBalance = () => {
 
   return (
     <Container>
-      <div style={{ height: "50px" }}></div>
       <h1>Trial Balance Report</h1>
       <Form>
-        <Row>
+        <Row className="mb-3">
           <Col>
-            <Form.Label>Select Start Date</Form.Label>
+            <Form.Label>Select a Date</Form.Label>
             <DatePicker
-              selected={startDate}
-              onChange={handleStartDateChange}
+              selected={selectedDate}
+              onChange={handleDateChange}
               dateFormat="yyyy-MM-dd"
-              placeholderText="Select start date"
-            />
-          </Col>
-          <Col>
-            <Form.Label>Select End Date</Form.Label>
-            <DatePicker
-              selected={endDate}
-              onChange={handleEndDateChange}
-              dateFormat="yyyy-MM-dd"
-              placeholderText="Select end date"
             />
           </Col>
         </Row>
       </Form>
 
-      <div style={{ height: "50px" }}></div>
       <Container ref={trialBalanceRef}>
-        <Row>
-          <Col>
-            <h3>
-              Balance Sheet for {startDate.toLocaleDateString()} to{" "}
-              {endDate.toLocaleDateString()}
-            </h3>
-          </Col>
-        </Row>
-        <div style={{ height: "30px" }}></div>
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -202,54 +163,42 @@ const ManagerTrialBalance = () => {
         </Table>
       </Container>
 
-      <div style={{ height: "30px" }}></div>
-      {/* Buttons */}
-      <Row>
+      <Row className="mt-3">
         <Col>
-          <Button style={{ minWidth: "100px" }} onClick={handleSaveReport}>
-            Save
-          </Button>
+          <Button onClick={handleSaveReport}>Save</Button>
         </Col>
         <Col>
-          <Button style={{ minWidth: "100px" }} onClick={handlePrintReport}>
-            Print
-          </Button>
+          <Button onClick={handlePrintReport}>Print</Button>
         </Col>
       </Row>
-      <div style={{ height: "50px" }}></div>
-      <h3>Email Trial Balance Report</h3>
+
       <Form>
-        <div className={styles.emailFormContainer}>
-          <Form.Group controlId="emailAddress">
-            <Form.Label>Email Address</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="Enter email address"
-              value={emailAddress}
-              onChange={handleEmailChange}
-            />
-          </Form.Group>
-        </div>
-        <div style={{ height: "20px" }}></div>
-        <Form.Group controlId="emailContent">
-          <Form.Label>Email Body</Form.Label>
+        <Form.Group controlId="emailAddress" className="mt-3">
+          <Form.Label>Email Address</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder="Enter email address"
+            value={emailAddress}
+            onChange={handleEmailChange}
+          />
+        </Form.Group>
+        <Form.Group controlId="emailContent" className="mt-3">
+          <Form.Label>Email Content</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
-            placeholder="Enter email body content"
+            placeholder="Enter email content"
             value={emailContent}
             onChange={handleEmailContentChange}
           />
         </Form.Group>
-        <div style={{ height: "20px" }}></div>
-        <Button variant="primary" onClick={handleSendEmail}>
+        <Button variant="primary" onClick={handleSendEmail} className="mt-3">
           Send Email
         </Button>
       </Form>
-      <div style={{ height: "200px" }}></div>
       <div style={{ height: "200px" }}></div>
     </Container>
   );
 };
 
-export default ManagerTrialBalance;
+export default AccountantTrialBalance;
