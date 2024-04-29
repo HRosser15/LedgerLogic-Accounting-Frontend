@@ -379,8 +379,11 @@ const AdminViewAccountsForm = ({ isGeneralLedger }) => {
           </thead>
           <tbody>
             {filteredTableAccounts.map((account) => (
-              <tr key={account.accountNumber}>
-                <td>
+              <tr
+                key={account.accountNumber}
+                className={!account.active ? "table-danger" : ""}
+              >
+                <td className={!account.active ? styles.strikethrough : ""}>
                   <span
                     style={{ cursor: "pointer", textDecoration: "underline" }}
                     onClick={() => {
@@ -391,7 +394,7 @@ const AdminViewAccountsForm = ({ isGeneralLedger }) => {
                     {account.accountNumber}
                   </span>
                 </td>
-                <td>
+                <td className={!account.active ? styles.strikethrough : ""}>
                   <span
                     style={{ cursor: "pointer", textDecoration: "underline" }}
                     onClick={() => {
@@ -402,17 +405,30 @@ const AdminViewAccountsForm = ({ isGeneralLedger }) => {
                     {account.accountName}
                   </span>
                 </td>
-                <td>{account.subCategory}</td>
-                <td>{account.normalSide}</td>
-                <td>{account.description}</td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.subCategory}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.normalSide}
+                </td>
                 <td>
+                  <span className={!account.active ? styles.strikethrough : ""}>
+                    {account.description}
+                  </span>
+                  {!account.active && <span> (account deactivated)</span>}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
                   {parseFloat(account.balance).toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
                 </td>
-                <td>{account.statement}</td>
-                <td>{formatDate2(account.creationDate)}</td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.statement}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {formatDate2(account.creationDate)}
+                </td>
               </tr>
             ))}
           </tbody>

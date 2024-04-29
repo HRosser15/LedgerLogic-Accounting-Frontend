@@ -251,3 +251,15 @@
 .customModal .modal-dialog {
   max-width: 1200px;
 }
+
+.inactiveRow {
+  background-color: #eb8b8b;
+}
+
+.reactivateButton {
+  background: #7e7e7e;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+}

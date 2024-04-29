@@ -305,26 +305,36 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
             </thead>
             <tbody>
               {filteredTableAccounts.map((account) => (
-                <tr key={account.accountNumber}>
-                  <td>
+                <tr
+                  key={account.accountNumber}
+                  className={!account.active ? "table-danger" : ""}
+                >
+                  <td className={!account.active ? styles.strikethrough : ""}>
                     {account.creationDate && formatDate2(account.creationDate)}
                   </td>
-                  <td>
+                  <td className={!account.active ? styles.strikethrough : ""}>
                     <span
                       style={{
                         cursor: "pointer",
                         textDecoration: "underline",
                       }}
                       onClick={() => {
-                        // console.log("Clicked account:", account);
                         handleAccountSelection(account);
                       }}
                     >
                       {account.accountName}
                     </span>
                   </td>
-                  <td>{account.description}</td>
+                  <td>
+                    <span
+                      className={!account.active ? styles.strikethrough : ""}
+                    >
+                      {account.description}
+                    </span>
+                    {!account.active && <span> (account deactivated)</span>}
+                  </td>
                   <td
+                    className={!account.active ? styles.strikethrough : ""}
                     style={{
                       color: account.normalSide === "Debit" ? "black" : "red",
                     }}
@@ -335,6 +345,7 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
                     })}
                   </td>
                   <td
+                    className={!account.active ? styles.strikethrough : ""}
                     style={{
                       color: account.normalSide === "Credit" ? "black" : "red",
                     }}
@@ -344,7 +355,7 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
                       currency: "USD",
                     })}
                   </td>
-                  <td>
+                  <td className={!account.active ? styles.strikethrough : ""}>
                     {parseFloat(account.balance).toLocaleString("en-US", {
                       style: "currency",
                       currency: "USD",

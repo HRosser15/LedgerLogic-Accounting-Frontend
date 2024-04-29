@@ -176,7 +176,24 @@ export const deactivateAccount = async (accountID) => {
   } catch (error) {
     if (error.response) {
       // The request was made, but the server responded with a non-2xx status code
-      throw new Error(`Error adding account: ${error.response.data}`);
+      throw new Error(`Error deactivating account: ${error.response.data}`);
+    } else if (error.request) {
+      // The request was made, but no response was received
+      throw new Error("No response received from the server.");
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      throw new Error(`Error setting up the request: ${error.message}`);
+    }
+  }
+};
+
+export const reactivateAccount = async (accountID) => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/reactivate/${accountID}`)
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error("Error reactivating account: " + error.response.data);
     } else if (error.request) {
       // The request was made, but no response was received
       throw new Error("No response received from the server.");

@@ -174,12 +174,18 @@ const TrialBalance = () => {
                 <td>{account.accountName || "-"}</td>
                 <td>
                   {account.debit
-                    ? parseFloat(account.debit).toFixed(2)
+                    ? parseFloat(account.debit).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
                     : "0.00"}
                 </td>
                 <td>
                   {account.credit
-                    ? parseFloat(account.credit).toFixed(2)
+                    ? parseFloat(account.credit).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
                     : "0.00"}
                 </td>
               </tr>
@@ -191,10 +197,20 @@ const TrialBalance = () => {
                 <strong>Total</strong>
               </td>
               <td>
-                <strong>{totalDebit.toFixed(2)}</strong>
+                <strong>
+                  {totalDebit.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </strong>
               </td>
               <td>
-                <strong>{totalCredit.toFixed(2)}</strong>
+                <strong>
+                  {totalCredit.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </strong>
               </td>
             </tr>
           </tfoot>

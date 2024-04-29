@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { Form, Button, Container, Row, Col, Modal } from "react-bootstrap";
 import {
   deactivateAccount,
+  reactivateAccount,
   fetchAccounts,
 } from "../../../../services/AccountService";
 import AppContext from "../../../../../context/AppContext";
@@ -10,15 +11,40 @@ import styles from "./AccountForm.module.css";
 const DeactivateAccountsForm = () => {
   const [accounts, setAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
-  const handleDeactivateAccount = async (accountId) => {
+  const handleDeactivateAccount = async (account, e) => {
+    e.preventDefault();
+    if (parseFloat(account.initialBalance) !== 0) {
+      setModalMessage("Account balance must be 0 to deactivate.");
+      setShowModal(true);
+      return;
+    }
+
     try {
-      const response = await deactivateAccount(accountId);
+      const response = await deactivateAccount(account.accountId);
       console.log(response);
-      const updatedAccounts = accounts.filter(
-        (acc) => acc.accountNumber !== accountId
+      setAccounts((prevAccounts) =>
+        prevAccounts.map((acc) =>
+          acc.accountId === account.accountId ? { ...acc, active: false } : acc
+        )
       );
-      setAccounts(updatedAccounts);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const handleReactivateAccount = async (account, e) => {
+    e.preventDefault();
+    try {
+      const response = await reactivateAccount(account.accountId);
+      console.log(response);
+      setAccounts((prevAccounts) =>
+        prevAccounts.map((acc) =>
+          acc.accountId === account.accountId ? { ...acc, active: true } : acc
+        )
+      );
     } catch (error) {
       console.error(error.message);
     }
@@ -90,13 +116,26 @@ const DeactivateAccountsForm = () => {
           </thead>
           <tbody>
             {filteredTableAccounts.map((account) => (
-              <tr key={account.accountNumber}>
-                <td>{account.accountNumber}</td>
-                <td>{account.accountName}</td>
-                <td>{account.accountId}</td>
-                <td>{account.active ? "Yes" : "No"}</td>
-                <td>{account.description}</td>
-                <td>
+              <tr
+                key={account.accountNumber}
+                className={!account.active ? "table-danger" : ""}
+              >
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.accountNumber}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.accountName}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.accountId}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.active ? "Yes" : "No"}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.description}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
                   {parseFloat(account.initialBalance).toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
@@ -105,10 +144,16 @@ const DeactivateAccountsForm = () => {
                 <td>{formatDate2(account.creationDate)}</td>
                 <td>
                   <button
-                    className="button"
-                    onClick={() => handleDeactivateAccount(account.accountId)}
+                    className={
+                      account.active ? "button" : styles.reactivateButton
+                    }
+                    onClick={(e) =>
+                      account.active
+                        ? handleDeactivateAccount(account, e)
+                        : handleReactivateAccount(account, e)
+                    }
                   >
-                    Deactivate Account
+                    {account.active ? "Deactivate" : "Reactivate"}
                   </button>
                 </td>
               </tr>
@@ -143,6 +188,19 @@ const DeactivateAccountsForm = () => {
           </div>
         </Col>
       </Row>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Error</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{modalMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <h1>Chart of Accounts</h1>
       <Row className="mb-4">
         <Col>

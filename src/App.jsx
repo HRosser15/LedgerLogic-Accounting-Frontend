@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+// import "bootstrap/dist/js/bootstrap.bundle.min";
 import "./App.css";
 import ContextProvider from "../context/ContextProvider";
 import { AuthProvider } from "../context/AuthContext";
