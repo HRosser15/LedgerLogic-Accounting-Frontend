@@ -16,21 +16,27 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./DatePickerStyles.css";
 import { JournalContext } from "../../../../../context/JournalContext";
 import { fetchAccounts } from "../../../../services/AccountService";
+import { addJournal } from "../../../../services/JournalService";
+import AppContext from "../../../../../context/AppContext";
 
 const AdminCreateJournal = () => {
   const navigate = useNavigate();
+  const { state } = useContext(AppContext);
+  const userId = state.userId;
+  console.log("User ID:", userId);
   const { addJournal } = useContext(JournalContext);
   const [date, setDate] = useState(null);
   const [description, setDescription] = useState("");
   const [documents, setDocuments] = useState(null);
   const [error, setError] = useState("");
   const [jAccounts, setJAccounts] = useState([
-    { accountId: "", debit: "", credit: "" },
-    { accountId: "", debit: "", credit: "" },
+    { accountId: "", debit: "", credit: "", name: "" },
+    { accountId: "", debit: "", credit: "", name: "" },
   ]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailureModal, setShowFailureModal] = useState(false);
   const [balance, setBalance] = useState(0);
 
   const handleReset = () => {
@@ -39,8 +45,8 @@ const AdminCreateJournal = () => {
     setDocuments(null);
     setError("");
     setJAccounts([
-      { accountId: "", debit: "", credit: "" },
-      { accountId: "", debit: "", credit: "" },
+      { accountId: "", debit: "", credit: "", name: "" },
+      { accountId: "", debit: "", credit: "", name: "" },
     ]);
     setShowResetModal(false);
   };
@@ -48,66 +54,75 @@ const AdminCreateJournal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const debitTotal = jAccounts.reduce(
-      (total, account) => total + parseFloat(account.debit || 0),
-      0
-    );
-    const creditTotal = jAccounts.reduce(
-      (total, jAccount) => total + parseFloat(jAccount.credit || 0),
-      0
-    );
+    console.log("Handling form submission...");
 
-    if (debitTotal === 0 || creditTotal === 0) {
-      setError("Debit and Credit amounts are required.");
-      setShowErrorModal(true);
+    // Convert userId to a number and check if it's a valid number
+    console.log("User ID:", userId);
+    const numericUserId = Number(userId);
+    console.log("Numeric User ID:", numericUserId);
+    if (isNaN(numericUserId)) {
+      console.error("Invalid userId:", userId);
+      setShowFailureModal(true);
       return;
     }
 
-    if (debitTotal !== creditTotal) {
-      setError("Debit and Credit amounts must be equal.");
-      setShowErrorModal(true);
-      return;
-    }
-
-    if (date) {
-      // formattedDate = date.toISOString().split("T")[0];
-    } else {
-      setError("A date must be selected.");
-      setShowErrorModal(true);
-      return;
-    }
-
-    const newJournal = {
-      transactionDate: date,
-      rejectionReason: "",
-      attachments: documents,
-      journalEntries: jAccounts
-        .filter((jAccount) => jAccount.accountId)
-        .map((jAccount) => ({
-          credit: parseFloat(jAccount.credit),
-          debit: parseFloat(jAccount.debit),
-          description: description,
-          account: {
-            accountId: jAccount.accountId,
-          },
-        })),
+    // Create the journalData object
+    const journalData = {
+      status: "PENDING",
+      rejectionReason: null,
+      balance: 0.0,
+      createdDate: new Date().toISOString(),
+      transactionDate: date ? date.toISOString() : null,
+      createdBy: {
+        userId: numericUserId, // Use the converted numericUserId here
+      },
+      journalEntries: jAccounts.map((jAccount) => ({
+        credit: parseFloat(jAccount.credit) || 0,
+        debit: parseFloat(jAccount.debit) || 0,
+        description: description,
+        account: {
+          accountId: jAccount.accountId,
+        },
+      })),
     };
+    console.log("Journal Data:", journalData);
 
-    console.log("NewJournal:", newJournal);
+    // Create a new FormData object and append the journal data and other data
+    const formData = new FormData();
+    formData.append("journal", JSON.stringify(journalData));
+    console.log("Appended journal data to FormData");
+
+    if (documents) {
+      formData.append("attachedFile", documents);
+      formData.append("attachedFileContentType", documents.type);
+      console.log("Appended documents to FormData");
+    }
+
+    formData.append("userId", numericUserId); // Use the converted numericUserId here
+    console.log("Appended userId to FormData");
+
+    // Log all entries in FormData for debugging
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
 
     try {
-      await addJournal(newJournal);
+      const response = await addJournal(formData, documents, numericUserId);
+      console.log("Journal added successfully:", response);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Failed to add journal:", error);
+      setShowFailureModal(true);
     }
-
-    setError("");
   };
 
   const handleCloseSuccessModal = () => {
     setShowSuccessModal(false);
-    navigate("/admin-accounts-management");
+    // navigate("/admin-accounts-management");
+  };
+
+  const handleCloseFailureModal = () => {
+    setShowFailureModal(false);
   };
 
   const handleFileUpload = (e) => {
@@ -207,15 +222,13 @@ const AdminCreateJournal = () => {
                 </Form.Group>
               </Col>
               <Col>
-                <Form.Group controlId="journalEntryName">
+                {/* <Form.Group controlId="journalEntryName">
                   <Form.Label>Journal Entry Name</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Name"
-                    //   value={journalEntryName}
-                    //   onChange={(e) => setJournalEntryName(e.target.value)}
                   />
-                </Form.Group>
+                </Form.Group> */}
               </Col>
               <Col></Col>
             </Row>
@@ -403,6 +416,20 @@ const AdminCreateJournal = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleCloseSuccessModal}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showFailureModal} onHide={handleCloseFailureModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Error</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p style={{ color: "red" }}>Failed to add journal entry.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseFailureModal}>
             OK
           </Button>
         </Modal.Footer>

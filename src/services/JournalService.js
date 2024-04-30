@@ -2,28 +2,63 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8080";
 
-export const addJournal = (journal) => {
-  const user = JSON.parse(localStorage.getItem("user")) || {};
-  const userId = user.userId;
+export const addJournal = async (journalData, attachedFile, numericUserId) => {
+  try {
+    const formData = new FormData();
+    formData.append('journal', JSON.stringify(journalData));
 
-  // console.log("LoggedInUser Information in addJournal:", user);
-  // console.log("User ID: ", userId);
+    if (attachedFile) {
+      formData.append('attachedFile', attachedFile);
+      formData.append('attachedFileContentType', attachedFile.type);
+    }
 
-  const requestData = {
-    ...journal,
-    createdBy: {
-      userId: userId,
-    },
-  };
+    // Check if numericUserId is a valid number
+    // if (isNaN(numericUserId)) {
+    //   console.log('Invalid user ID:', numericUserId);
+    //   console.log('Type:', typeof numericUserId);
+    //   throw new Error('Invalid user ID');
+    // }
 
-  // console.log("Request Data: ", requestData);
+    formData.append('userId', 1);
 
-  return axios.post(`${API_BASE_URL}/journal/addJournal?userId=${userId}`, requestData, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+    const response = await axios.post(`${API_BASE_URL}/journal/addJournal`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Accept: 'application/json',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Failed to add journal:', error);
+    throw error;
+  }
 };
+
+
+
+// const getMimeType = (extension) => {
+//   switch (extension.toLowerCase()) {
+//     case 'jpg':
+//     case 'jpeg':
+//       return 'image/jpeg';
+//     case 'png':
+//       return 'image/png';
+//     case 'pdf':
+//       return 'application/pdf';
+//     case 'doc':
+//     case 'docx':
+//       return 'application/msword';
+//     case 'xls':
+//     case 'xlsx':
+//       return 'application/vnd.ms-excel';
+//     case 'csv':
+//       return 'text/csv';
+//     default:
+//       return 'application/octet-stream';
+//   }
+// };
+
 
 export const fetchJournalEntriesForAccount = async (accountName) => {
   try {
