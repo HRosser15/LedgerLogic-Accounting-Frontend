@@ -52,7 +52,8 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
               selectedAccount.accountName
             );
             setJournalEntries(entries);
-            setSelectedAccount(selectedAccount); // Update the selectedAccount state
+            setSelectedAccount(selectedAccount);
+            console.log("Fetched journal entries:", entries);
           } else {
             setSelectedAccount(undefined);
             setJournalEntries([]);
@@ -87,10 +88,10 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
           value={statusFilter}
           onChange={handleStatusFilterChange}
         >
-          <option value="approved">Posted</option>
-          <option value="rejected">Rejected</option>
-          <option value="pending">Pending</option>
           <option value="all">All</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
         </Form.Control>
       </Form.Group>
     );
@@ -232,7 +233,7 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
 
       if (matchedJournal) {
         setSelectedEntry({ ...entry, journalId: matchedJournal.journalId });
-        setMatchedJournal(matchedJournal); // Add this line to set the matched journal
+        setMatchedJournal(matchedJournal);
         setShowPostReferenceModal(true);
       } else {
         console.error("No matching journal found for the selected entry.");
@@ -240,6 +241,18 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
     } catch (error) {
       console.error("Failed to fetch journals:", error);
     }
+  };
+
+  const handleUpdateJournalEntries = (updatedJournalEntries) => {
+    setJournalEntries((prevEntries) => {
+      return prevEntries.map((entry) => {
+        const updatedEntry = updatedJournalEntries.find(
+          (journalEntry) =>
+            journalEntry.journalEntryId === entry.journalEntry.journalEntryId
+        );
+        return updatedEntry ? { ...entry, journalEntry: updatedEntry } : entry;
+      });
+    });
   };
 
   const handleClosePostReferenceModal = () => {
@@ -305,26 +318,36 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
             </thead>
             <tbody>
               {filteredTableAccounts.map((account) => (
-                <tr key={account.accountNumber}>
-                  <td>
+                <tr
+                  key={account.accountNumber}
+                  className={!account.active ? "table-danger" : ""}
+                >
+                  <td className={!account.active ? styles.strikethrough : ""}>
                     {account.creationDate && formatDate2(account.creationDate)}
                   </td>
-                  <td>
+                  <td className={!account.active ? styles.strikethrough : ""}>
                     <span
                       style={{
                         cursor: "pointer",
                         textDecoration: "underline",
                       }}
                       onClick={() => {
-                        // console.log("Clicked account:", account);
                         handleAccountSelection(account);
                       }}
                     >
                       {account.accountName}
                     </span>
                   </td>
-                  <td>{account.description}</td>
+                  <td>
+                    <span
+                      className={!account.active ? styles.strikethrough : ""}
+                    >
+                      {account.description}
+                    </span>
+                    {!account.active && <span> (account deactivated)</span>}
+                  </td>
                   <td
+                    className={!account.active ? styles.strikethrough : ""}
                     style={{
                       color: account.normalSide === "Debit" ? "black" : "red",
                     }}
@@ -335,6 +358,7 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
                     })}
                   </td>
                   <td
+                    className={!account.active ? styles.strikethrough : ""}
                     style={{
                       color: account.normalSide === "Credit" ? "black" : "red",
                     }}
@@ -344,7 +368,7 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
                       currency: "USD",
                     })}
                   </td>
-                  <td>
+                  <td className={!account.active ? styles.strikethrough : ""}>
                     {parseFloat(account.balance).toLocaleString("en-US", {
                       style: "currency",
                       currency: "USD",
@@ -360,40 +384,57 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
   };
 
   const renderSubledgerTable = () => {
-    // console.log("Subledger--Non-Filtered Journal Entries:", journalEntries);
+    console.log("Start rendering subledger table");
+    console.log("Journal entries:", journalEntries);
+    journalEntries.forEach((entry) => {
+      console.log("Entry status:", entry.journalEntry.status);
+    });
+
     let filteredJournalEntries = filterDataByDate(
       journalEntries,
       startDate,
       endDate
     );
-    // console.log("1 Subledger Filtered table accounts:", filteredJournalEntries);
+    console.log("Filtered by date:", filteredJournalEntries);
+
+    console.log("Status filter:", statusFilter);
 
     // Filter by status
     filteredJournalEntries = filteredJournalEntries.filter(
-      (entry) => statusFilter === "all" || entry.status === statusFilter
+      (entry) =>
+        statusFilter === "all" || entry.journalEntry.status === statusFilter
     );
-    // console.log("2 Subledger Filtered table accounts:", filteredJournalEntries);
+
+    console.log("Filtered by status:", filteredJournalEntries);
+    console.log("Search term:", searchTerm);
 
     // Filter by search term
     filteredJournalEntries = filteredJournalEntries.filter(
       (entry) =>
-        (entry.description &&
-          entry.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        entry.debit.toString().includes(searchTerm.replace(/\$/g, "")) ||
-        entry.credit.toString().includes(searchTerm.replace(/\$/g, ""))
+        (entry.journalEntry.description &&
+          entry.journalEntry.description
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())) ||
+        entry.journalEntry.debit
+          .toString()
+          .includes(searchTerm.replace(/\$/g, "")) ||
+        entry.journalEntry.credit
+          .toString()
+          .includes(searchTerm.replace(/\$/g, ""))
     );
-    // console.log("3 Subledger Filtered table accounts:", filteredJournalEntries);
+    console.log("Filtered by search term:", filteredJournalEntries);
 
     if (filteredJournalEntries.length === 0) {
+      console.log("No matching journal entries found");
       return null;
     }
 
     const debitTotal = filteredJournalEntries.reduce(
-      (total, entry) => total + entry.debit,
+      (total, entry) => total + entry.journalEntry.debit,
       0
     );
     const creditTotal = filteredJournalEntries.reduce(
-      (total, entry) => total + entry.credit,
+      (total, entry) => total + entry.journalEntry.credit,
       0
     );
     const balanceTotal = debitTotal - creditTotal;
@@ -422,22 +463,32 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
             {/* {console.log("filteredJournalEntries:", filteredJournalEntries)} */}
             <tbody>
               {filteredJournalEntries.map((entry) => (
-                <tr key={entry.journalEntryId}>
+                <tr key={entry.journalEntry.journalEntryId}>
                   <td>
-                    {new Date(entry.transactionDate).toLocaleDateString()}
+                    {new Date(
+                      entry.journalEntry.transactionDate
+                    ).toLocaleDateString()}
                   </td>
-                  <td>{entry.description || ""}</td>
-                  <td>${entry.debit.toFixed(2)}</td>
-                  <td>${entry.credit.toFixed(2)}</td>
-                  <td>${(entry.debit - entry.credit).toFixed(2)}</td>
+                  <td>{entry.journalEntry.description || ""}</td>
+                  <td>${entry.journalEntry.debit.toFixed(2)}</td>
+                  <td>${entry.journalEntry.credit.toFixed(2)}</td>
                   <td>
-                    {entry.status}
-                    {entry.status === "rejected" && entry.rejectionReason ? (
-                      <span> - {entry.rejectionReason}</span>
+                    $
+                    {(
+                      entry.journalEntry.debit - entry.journalEntry.credit
+                    ).toFixed(2)}
+                  </td>
+                  <td>
+                    {entry.journalEntry.status}
+                    {entry.journalEntry.status === "rejected" &&
+                    entry.journalEntry.rejectionReason ? (
+                      <span> - {entry.journalEntry.rejectionReason}</span>
                     ) : null}
                   </td>
                   <td>
-                    <button onClick={(e) => handleViewPR(e, entry)}>
+                    <button
+                      onClick={(e) => handleViewPR(e, entry.journalEntry)}
+                    >
                       View PR
                     </button>
                   </td>
@@ -637,6 +688,7 @@ const ManagerViewLedger = ({ account, handleBackToAccounts }) => {
                       matchedJournal={matchedJournal}
                       onClose={handleClosePostReferenceModal}
                       handleEntryUpdate={handleEntryUpdate}
+                      handleUpdateJournalEntries={handleUpdateJournalEntries}
                     />
                   )}
                 </React.Fragment>

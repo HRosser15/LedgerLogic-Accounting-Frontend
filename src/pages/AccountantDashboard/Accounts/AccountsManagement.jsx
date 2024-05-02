@@ -31,7 +31,6 @@ const AccountantAccountsManagement = ({ username }) => {
   };
 
   const handleAccountSelection = (account) => {
-    setSelectedAccount(account);
     navigate(`/accountant-accounts-management/ledgers/${account.accountId}`);
   };
 

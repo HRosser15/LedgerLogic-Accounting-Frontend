@@ -163,11 +163,8 @@ function App() {
                   path="/accountant-accounts-management"
                   element={<AccountantAccountsManagement />}
                 >
-                  <Route
-                    path="/accountant-accounts-management/ledgers"
-                    element={<AccountantViewLedger />}
-                  />
                   <Route index element={<AccountantViewAccountsForm />} />
+                  <Route path="ledgers" element={<AccountantViewLedger />} />
                   <Route
                     path="ledgers/:accountId"
                     element={<AccountantViewLedger />}

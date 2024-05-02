@@ -14,39 +14,49 @@ import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DatePickerStyles.css";
+import AppContext from "../../../../../context/AppContext";
 import { JournalContext } from "../../../../../context/JournalContext";
 import { fetchAccounts } from "../../../../services/AccountService";
+import axios from "axios";
 
 const ManagerCreateJournal = () => {
   const navigate = useNavigate();
   const { addJournal } = useContext(JournalContext);
   const [date, setDate] = useState(null);
   const [description, setDescription] = useState("");
-  const [documents, setDocuments] = useState(null);
+  const [attachedFile, setAttachedFile] = useState(null);
   const [error, setError] = useState("");
   const [jAccounts, setJAccounts] = useState([
-    { accountId: "", debit: "", credit: "" },
-    { accountId: "", debit: "", credit: "" },
+    { accountId: "", debit: "", credit: "", name: "" },
+    { accountId: "", debit: "", credit: "", name: "" },
   ]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [balance, setBalance] = useState(0);
+  const { state } = useContext(AppContext);
+  const userId = state.userId;
 
   const handleReset = () => {
     setDate("");
     setDescription("");
-    setDocuments(null);
+    setAttachedFile(null);
     setError("");
     setJAccounts([
-      { accountId: "", debit: "", credit: "" },
-      { accountId: "", debit: "", credit: "" },
+      { accountId: "", debit: "", credit: "", name: "" },
+      { accountId: "", debit: "", credit: "", name: "" },
     ]);
     setShowResetModal(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!date) {
+      setError("A date must be selected.");
+      setShowErrorModal(true);
+      return;
+    }
 
     const debitTotal = jAccounts.reduce(
       (total, account) => total + parseFloat(account.debit || 0),
@@ -69,40 +79,59 @@ const ManagerCreateJournal = () => {
       return;
     }
 
-    if (date) {
-      // formattedDate = date.toISOString().split("T")[0];
-    } else {
-      setError("A date must be selected.");
-      setShowErrorModal(true);
-      return;
-    }
+    // if (!attachedFile) {
+    //   setError("Please upload a file.");
+    //   return;
+    // }
 
-    const newJournal = {
-      transactionDate: date,
-      rejectionReason: "",
-      attachments: documents,
-      journalEntries: jAccounts
-        .filter((jAccount) => jAccount.accountId)
-        .map((jAccount) => ({
-          credit: parseFloat(jAccount.credit),
-          debit: parseFloat(jAccount.debit),
-          description: description,
-          account: {
-            accountId: jAccount.accountId,
-          },
-        })),
+    const formData = new FormData();
+
+    const journalEntries = jAccounts.map((jAccount) => ({
+      credit: parseFloat(jAccount.credit) || 0,
+      debit: parseFloat(jAccount.debit) || 0,
+      description: description,
+      account: {
+        accountId: jAccount.accountId,
+      },
+    }));
+
+    const journal = {
+      status: "PENDING",
+      rejectionReason: null,
+      balance: null,
+      createdDate: new Date().toISOString(),
+      transactionDate: date.toISOString(),
+      createdBy: {
+        userId: userId,
+      },
+      journalEntries: journalEntries,
     };
 
-    console.log("NewJournal:", newJournal);
+    formData.append("journal", JSON.stringify(journal));
+    if (attachedFile) {
+      formData.append("attachedFile", attachedFile);
+      formData.append("attachedFileContentType", attachedFile.type);
+    }
+    formData.append("userId", userId);
 
     try {
-      await addJournal(newJournal);
+      const response = await axios.post(
+        "http://localhost:8080/journal/addJournal",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // console.log(response.data);
       setShowSuccessModal(true);
     } catch (error) {
-      console.error("Failed to add journal:", error);
+      console.error(error);
+      setShowErrorModal(true);
+      // Handle any errors
     }
-
-    setError("");
   };
 
   const handleCloseSuccessModal = () => {
@@ -123,10 +152,10 @@ const ManagerCreateJournal = () => {
     ];
 
     if (file && allowedTypes.includes(file.type)) {
-      setDocuments(file);
+      setAttachedFile(file);
       setError("");
     } else {
-      setDocuments(null);
+      setAttachedFile(null);
       setError(
         "Invalid file type. Please upload a PDF, Word document, Excel file, CSV file, JPEG, or PNG."
       );
@@ -175,7 +204,10 @@ const ManagerCreateJournal = () => {
   };
 
   const addAccount = () => {
-    setJAccounts([...jAccounts, { accountId: "", debit: "", credit: "" }]);
+    setJAccounts([
+      ...jAccounts,
+      { accountId: "", debit: "", credit: "", name: "" },
+    ]);
   };
 
   const handleDateChange = (selectedDate) => {
@@ -206,17 +238,7 @@ const ManagerCreateJournal = () => {
                   </div>
                 </Form.Group>
               </Col>
-              <Col>
-                <Form.Group controlId="journalEntryName">
-                  <Form.Label>Journal Entry Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Name"
-                    //   value={journalEntryName}
-                    //   onChange={(e) => setJournalEntryName(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
+              <Col></Col>
               <Col></Col>
             </Row>
 
@@ -306,7 +328,7 @@ const ManagerCreateJournal = () => {
             </Row>
 
             <Row className="mb-4">
-              <Form.Group controlId="documents">
+              <Form.Group controlId="attachedFile">
                 <Form.Label>Upload Documents</Form.Label>
                 <Form.Control type="file" onChange={handleFileUpload} />
               </Form.Group>

@@ -38,7 +38,6 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
         const response = await fetchAccounts();
         setAccounts(response.data);
         setAllAccounts(response.data);
-        console.log("Accounts:", response.data);
 
         if (accountId) {
           // Find the account object based on the accountId
@@ -53,7 +52,6 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
             );
             setJournalEntries(entries);
             setSelectedAccount(selectedAccount);
-            console.log("Fetched journal entries:", entries);
           } else {
             setSelectedAccount(undefined);
             setJournalEntries([]);
@@ -66,8 +64,6 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
         console.error("Failed to fetch accounts or journal entries:", error);
       }
     };
-
-    console.log("accountId:", accountId);
     fetchData();
   }, [accountId]);
 
@@ -384,29 +380,17 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
   };
 
   const renderSubledgerTable = () => {
-    console.log("Start rendering subledger table");
-    console.log("Journal entries:", journalEntries);
-    journalEntries.forEach((entry) => {
-      console.log("Entry status:", entry.journalEntry.status);
-    });
-
     let filteredJournalEntries = filterDataByDate(
       journalEntries,
       startDate,
       endDate
     );
-    console.log("Filtered by date:", filteredJournalEntries);
-
-    console.log("Status filter:", statusFilter);
 
     // Filter by status
     filteredJournalEntries = filteredJournalEntries.filter(
       (entry) =>
         statusFilter === "all" || entry.journalEntry.status === statusFilter
     );
-
-    console.log("Filtered by status:", filteredJournalEntries);
-    console.log("Search term:", searchTerm);
 
     // Filter by search term
     filteredJournalEntries = filteredJournalEntries.filter(
@@ -422,10 +406,8 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
           .toString()
           .includes(searchTerm.replace(/\$/g, ""))
     );
-    console.log("Filtered by search term:", filteredJournalEntries);
 
     if (filteredJournalEntries.length === 0) {
-      console.log("No matching journal entries found");
       return null;
     }
 
@@ -460,7 +442,6 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
                 <th>Post Reference</th>
               </tr>
             </thead>
-            {/* {console.log("filteredJournalEntries:", filteredJournalEntries)} */}
             <tbody>
               {filteredJournalEntries.map((entry) => (
                 <tr key={entry.journalEntry.journalEntryId}>
@@ -513,29 +494,22 @@ const AdminViewLedger = ({ account, handleBackToAccounts }) => {
   };
 
   const renderTable = (tableTitle) => {
-    console.log("renderTable called with accountId:", accountId);
     if (accountId === undefined) {
       // If accountId is undefined, render the General Ledger tables
-      console.log("Rendering General Ledger tables");
       return renderGeneralLedgerTables(tableTitle);
     }
 
     if (!accountId) {
-      console.log("accountId is falsy:", accountId);
       // If accountId is falsy (null or empty string), don't render anything
-      console.log("AccountId is null or empty string:", accountId);
       return null;
     }
 
     if (account === null) {
-      console.log("Account is null:", account);
       // If account is null, return null to avoid rendering anything
-      console.log("Account is null:", account);
       return null;
     }
 
     // Otherwise, render the Subledger table
-    console.log("Rendering Subledger table");
     return renderSubledgerTable();
   };
 

@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import { addJournal as addJournalService } from "../src/services/JournalService";
+// import { addJournal as addJournalService } from "../src/services/JournalService";
 
 export const JournalContext = createContext();
 

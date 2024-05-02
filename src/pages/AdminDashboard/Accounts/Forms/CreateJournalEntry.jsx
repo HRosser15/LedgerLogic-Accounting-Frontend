@@ -238,17 +238,7 @@ const AdminCreateJournal = () => {
                   </div>
                 </Form.Group>
               </Col>
-              <Col>
-                <Form.Group controlId="journalEntryName">
-                  <Form.Label>Journal Entry Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Name"
-                    //   value={journalEntryName}
-                    //   onChange={(e) => setJournalEntryName(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
+              <Col></Col>
               <Col></Col>
             </Row>
 

@@ -27,13 +27,9 @@ const addAccount = async (requestData) => {
 
 export const updateAccount = async (accountId, updatedData) => {
   try {
-    console.log("Updated Data:", updatedData);
-    console.log("updating Account ID:", accountId);
     const url = `${BASE_URL}/updateAccount/${accountId}`;
-    console.log("Request URL:", url);
 
     const response = await axios.put(url, updatedData);
-    console.log("Response Data:", response.data);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -53,7 +49,6 @@ export const fetchEventLog = () => {
 
 export const fetchAccounts = () => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
-  // console.log("LoggedInUser Information in fetchAccounts:", user);
 
   if (user) {
     const requestOptions = {
@@ -107,15 +102,12 @@ export const fetchAccountBalancesByDate = async (selectedDate) => {
         };
         return accountDetails;
       } catch (error) {
-        // console.error(`Error parsing currentState for event ${event.id}:`, error);
         return null;
       }
     });
 
     const filteredAccountDetailsList = accountDetailsList.filter(details => details !== null);
 
-    // console.log("Account details list:", accountDetailsList);
-    // console.log("Account details list:", filteredAccountDetailsList);
 
     return { data: filteredAccountDetailsList };
   } catch (error) {
@@ -134,7 +126,6 @@ export const fetchAggregatedAccountBalancesByDateRange = async (startDate, endDa
         endDate: formattedEndDate
       }
     });
-    // console.log("Aggregated Account Balances:", response.data);
     return response.data;
   } catch (error) {
     throw error;
@@ -144,7 +135,6 @@ export const fetchAggregatedAccountBalancesByDateRange = async (startDate, endDa
 export const fetchAccountBalancesByDateRange = async (startDate, endDate) => {
   try {
     const response = await fetchAggregatedAccountBalancesByDateRange(startDate, endDate);
-    // console.log("Aggregated Account Balances:", response);
     return { data: response };
   } catch (error) {
     throw error;
