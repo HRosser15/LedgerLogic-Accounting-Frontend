@@ -52,10 +52,37 @@ const AdminCreateJournal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!attachedFile) {
-      setError("Please upload a file.");
+    if (!date) {
+      setError("A date must be selected.");
+      setShowErrorModal(true);
       return;
     }
+
+    const debitTotal = jAccounts.reduce(
+      (total, account) => total + parseFloat(account.debit || 0),
+      0
+    );
+    const creditTotal = jAccounts.reduce(
+      (total, jAccount) => total + parseFloat(jAccount.credit || 0),
+      0
+    );
+
+    if (debitTotal === 0 || creditTotal === 0) {
+      setError("Debit and Credit amounts are required.");
+      setShowErrorModal(true);
+      return;
+    }
+
+    if (debitTotal !== creditTotal) {
+      setError("Debit and Credit amounts must be equal.");
+      setShowErrorModal(true);
+      return;
+    }
+
+    // if (!attachedFile) {
+    //   setError("Please upload a file.");
+    //   return;
+    // }
 
     const formData = new FormData();
 
@@ -81,8 +108,10 @@ const AdminCreateJournal = () => {
     };
 
     formData.append("journal", JSON.stringify(journal));
-    formData.append("attachedFile", attachedFile);
-    formData.append("attachedFileContentType", attachedFile.type);
+    if (attachedFile) {
+      formData.append("attachedFile", attachedFile);
+      formData.append("attachedFileContentType", attachedFile.type);
+    }
     formData.append("userId", userId);
 
     try {
@@ -96,10 +125,11 @@ const AdminCreateJournal = () => {
         }
       );
 
-      console.log(response.data);
-      // Handle the response data
+      // console.log(response.data);
+      setShowSuccessModal(true);
     } catch (error) {
       console.error(error);
+      setShowErrorModal(true);
       // Handle any errors
     }
   };
