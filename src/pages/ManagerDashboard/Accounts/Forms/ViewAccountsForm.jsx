@@ -1,19 +1,18 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { fetchAccounts } from "../../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const ManagerViewAccountsForm = ({
-  selectedDate,
-  handleAccountSelection,
-  accounts,
-}) => {
+const ManagerViewAccountsForm = ({ isGeneralLedger }) => {
+  const [accounts, setAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
+  const [activeTab, setActiveTab] = useState("Chart of Accounts");
   const [selectedFilterOptionText, setSelectedFilterOptionText] = useState("");
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([
     "Assets",
     "Liabilities",
@@ -25,6 +24,31 @@ const ManagerViewAccountsForm = ({
   const [normalSideFilter, setNormalSideFilter] = useState("");
   const [balanceFilter, setBalanceFilter] = useState({ min: "", max: "" });
   const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchAccounts();
+        setAccounts(response.data);
+      } catch (error) {
+        console.error("Failed to fetch accounts:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleAccountSelection = (account) => {
+    navigate(`/manager-accounts-management/ledgers/${account.accountId}`);
+  };
+
+  const handleTabSelect = (tab) => {
+    setActiveTab(tab);
+    if (tab === "Chart of Accounts") {
+      setSelectedAccount(null);
+    }
+  };
 
   const filterOptions = [
     { value: "category", label: "Account Category", type: "checkbox" },
@@ -46,6 +70,10 @@ const ManagerViewAccountsForm = ({
   };
 
   const filterAccountsByRange = (start, end) => {
+    if (!accounts) {
+      return []; // Return an empty array if accounts is undefined or not provided
+    }
+
     return accounts.filter(
       (account) =>
         parseInt(account.accountNumber) >= start &&
@@ -298,34 +326,62 @@ const ManagerViewAccountsForm = ({
               <th>Normal Side</th>
               <th>Description</th>
               <th>Balance</th>
+              <th>Statement</th>
               <th>Creation Date</th>
             </tr>
           </thead>
           <tbody>
             {filteredTableAccounts.map((account) => (
-              <tr key={account.accountNumber}>
-                <td>{account.accountNumber}</td>
-                <td>
+              <tr
+                key={account.accountNumber}
+                className={!account.active ? "table-danger" : ""}
+              >
+                <td className={!account.active ? styles.strikethrough : ""}>
                   <span
                     style={{ cursor: "pointer", textDecoration: "underline" }}
                     onClick={() => {
-                      console.log("Clicked account:", account.accountName);
-                      handleAccountSelection(account.accountName);
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
+                    }}
+                  >
+                    {account.accountNumber}
+                  </span>
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
                     }}
                   >
                     {account.accountName}
                   </span>
                 </td>
-                <td>{account.subCategory}</td>
-                <td>{account.normalSide}</td>
-                <td>{account.description}</td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.subCategory}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.normalSide}
+                </td>
                 <td>
-                  {parseFloat(account.initialBalance).toLocaleString("en-US", {
+                  <span className={!account.active ? styles.strikethrough : ""}>
+                    {account.description}
+                  </span>
+                  {!account.active && <span> (account deactivated)</span>}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {parseFloat(account.balance).toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
                 </td>
-                <td>{formatDate2(account.creationDate)}</td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.statement}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {formatDate2(account.creationDate)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -386,11 +442,11 @@ const ManagerViewAccountsForm = ({
       <Row className="mb-4">
         <Col>
           <div className="container">
-            {renderTable("Assets", assetAccounts)}
-            {renderTable("Liabilities", liabilityAccounts)}
-            {renderTable("Equity", equityAccounts)}
-            {renderTable("Revenue", revenueAccounts)}
-            {renderTable("Expenses", expenseAccounts)}
+            {renderTable("Assets", assetAccounts, isGeneralLedger)}
+            {renderTable("Liabilities", liabilityAccounts, isGeneralLedger)}
+            {renderTable("Equity", equityAccounts, isGeneralLedger)}
+            {renderTable("Revenue", revenueAccounts, isGeneralLedger)}
+            {renderTable("Expenses", expenseAccounts, isGeneralLedger)}
             <div style={{ height: "200px" }}></div>
           </div>
         </Col>

@@ -2,21 +2,22 @@
 
 /* Style the outer container of the DatePicker */
 .react-datepicker-wrapper {
-    display: inline-block;
+  display: inline-block;
+  margin-left: 70px;
 }
 
 /* Style the input field */
 .react-datepicker__input-container input {
-    color: black;
-    /* Set text color to black */
-    background-color: white;
-    /* Set background color to white */
-    border: 1px solid #ced4da;
-    /* Add a border for better visibility */
-    padding: 8px;
-    /* Adjust padding as needed */
-    border-radius: 4px;
-    /* Add border-radius for a rounded look */
-    margin: 8px;
-    /* Add marging on all sides */
+  color: black;
+  /* Set text color to black */
+  background-color: white;
+  /* Set background color to white */
+  border: 1px solid #ced4da;
+  /* Add a border for better visibility */
+  padding: 8px;
+  /* Adjust padding as needed */
+  border-radius: 4px;
+  /* Add border-radius for a rounded look */
+  margin: 8px;
+  /* Add marging on all sides */
 }

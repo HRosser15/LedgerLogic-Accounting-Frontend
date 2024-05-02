@@ -1,6 +1,34 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import { emailUser } from "../../services/EmailService";
+import AppContext from "../../../context/AppContext";
 
 const HelpPage = () => {
+  const { state } = useContext(AppContext);
+  const [feedbackSubject, setFeedbackSubject] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+
+  const handleFeedbackSubmit = () => {
+    const email = "hrosser15@gmail.com";
+    const fromEmail = state.email ? state.email : "feedback@ledgerlogic.com";
+    const subject = `Feedback - ${feedbackSubject}`;
+    const emailContent = feedbackMessage;
+
+    emailUser(email, fromEmail, subject, emailContent)
+      .then((response) => {
+        // Handle successful email sending
+        alert("Feedback submitted successfully!");
+        setFeedbackSubject("");
+        setFeedbackMessage("");
+      })
+      .catch((error) => {
+        // Handle error if email sending fails
+        console.error("Error submitting feedback:", error);
+        alert(
+          "There was an error submitting your feedback. Please try again later."
+        );
+      });
+  };
+
   return (
     <div className="container">
       <h1 className="my-4">Help Page</h1>
@@ -279,38 +307,35 @@ const HelpPage = () => {
               <h5>Recording Transactions</h5>
               <p>To record a financial transaction, follow these steps:</p>
               <ol>
-                <li>Navigate to the "Accounts" section.</li>
                 <li>
-                  Click on the account you'd like to enter a transaction for.
-                </li>
-                <li>Add more here...</li>
-                {/* <li>
-                  Select the transaction type (e.g., invoice, expense, payment).
+                  Navigate to the "Accounts" section in the navigation bar, then
+                  select the "Journal" tab.
                 </li>
                 <li>
-                  Enter the transaction details, such as date, description, and
-                  amount.
+                  Enter the appropriate info for your transaction. Once
+                  submitted, a manager will review it for approval. Until then
+                  it will appear in the ledger as 'PENDING'
                 </li>
-                <li>
-                  Assign the appropriate accounts for debiting and crediting.
-                </li>
-                <li>Click "Save" to record the transaction.</li> */}
               </ol>
-
-              <h5>Transaction Types</h5>
-              <p>Our platform supports various transaction types, including:</p>
-              <ul>
-                <li>Journal entries</li>
-                <li>more to come...</li>
-                {/* <li>Invoices</li>
-                <li>Expenses</li>
-                <li>Payments</li> */}
-              </ul>
-              {/* <p>
-                Each transaction type has its own set of fields and
-                requirements. Refer to the specific transaction type
-                documentation for more detailed instructions.
-              </p> */}
+              <p>
+                Alternatively, you can record a financial transaction from the
+                Chart of Accounts or General Ledger by:
+              </p>
+              <ol>
+                <li>
+                  Click on the account name or account number for the account
+                  you'd like to enter a transaction for.
+                </li>
+                <li>
+                  From the ledger page, you can click "Add Journal Entry" to
+                  record a new transaction.
+                </li>
+                <li>
+                  Enter the appropriate info for your transaction. Once
+                  submitted, a manager will review it for approval. Until then
+                  it will appear in the ledger as 'PENDING'
+                </li>
+              </ol>
             </div>
           </div>
         </div>
@@ -346,14 +371,12 @@ const HelpPage = () => {
               </p>
               <ul>
                 <li>Balance Sheet</li>
-                <li>more to come...</li>
-                {/* <li>Income Statement</li>
+                <li>Income Statement</li>
                 <li>Cash Flow Statement</li>
-                <li>Trial Balance</li> */}
+                <li>Trial Balance</li>
               </ul>
-              <p> We can potentially add something about the event logs here</p>
 
-              {/* <h5>Generating Reports</h5>
+              <h5>Generating Reports</h5>
               <p>To generate a financial report, follow these steps:</p>
               <ol>
                 <li>Navigate to the "Reports" section.</li>
@@ -361,16 +384,243 @@ const HelpPage = () => {
                 <li>
                   Choose the reporting period or date range for the report.
                 </li>
+                <li>Click "Save" or "Print" to save or print the report.</li>
                 <li>
-                  Optionally, apply filters or customizations to the report.
+                  Enter an email address and email body message, then click
+                  "Send Email" to email the report to an email address
                 </li>
-                <li>Click "Generate Report" to view the report.</li>
               </ol>
+            </div>
+          </div>
+        </div>
 
+        {/* ========================
+            Financial Ratios
+            ======================== */}
+        <div className="accordion-item">
+          <h2 className="accordion-header">
+            <button
+              className="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseRatios"
+              aria-expanded="false"
+              aria-controls="collapseRatios"
+            >
+              Financial Ratios
+            </button>
+          </h2>
+          <div
+            id="collapseRatios"
+            className="accordion-collapse collapse"
+            data-bs-parent="#accordionHelp1"
+            style={{ textAlign: "left" }}
+          >
+            <div className="accordion-body">
+              <h5>Overview</h5>
               <p>
-                Once generated, you can view, print, or export the report in
-                various formats (e.g., PDF, Excel).
-              </p> */}
+                The main dashboard of our application displays these financial
+                ratios for the accounts using three color codes:
+              </p>
+              <ul>
+                <li>
+                  <strong>Green (Normal):</strong>
+                  <ul>
+                    <li>Ratios within healthy ranges.</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Yellow (Warning):</strong>
+                  <ul>
+                    <li>Ratios slightly outside of normal ranges.</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Red (Needs Closer Look):</strong>
+                  <ul>
+                    <li>Ratios significantly outside of normal ranges.</li>
+                  </ul>
+                </li>
+              </ul>
+
+              {/* Liquidity Ratios */}
+              <h5>Liquidity Ratios</h5>
+              <p>
+                Liquidity ratios measure a company's ability to meet short-term
+                obligations with its short-term assets.
+              </p>
+              <ul>
+                <li>
+                  <strong>Current Ratio:</strong> Current Assets / Current
+                  Liabilities
+                  <ul>
+                    <li>Healthy: 1.5 to 2.0</li>
+                    <li>
+                      Slightly outside of normal: 1.0 to 1.5 or 2.0 to 3.0
+                    </li>
+                    <li>
+                      Significantly outside of normal: Below 1.0 or above 3.0
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Quick Ratio (Acid-Test Ratio):</strong> (Current
+                  Assets - Inventory) / Current Liabilities
+                  <ul>
+                    <li>Healthy: 1.0 to 1.5</li>
+                    <li>
+                      Slightly outside of normal: 0.5 to 1.0 or 1.5 to 2.0
+                    </li>
+                    <li>
+                      Significantly outside of normal: Below 0.5 or above 2.0
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+
+              {/* Profitability Ratios */}
+              <h5>Profitability Ratios</h5>
+              <p>
+                Profitability ratios measure the company's ability to generate
+                profits from its operations.
+              </p>
+              <ul>
+                <li>
+                  <strong>Gross Profit Margin:</strong> (Revenue - Cost of Goods
+                  Sold) / Revenue
+                  <ul>
+                    <li>Healthy: 35% to 50%</li>
+                    <li>
+                      Slightly outside of normal: 25% to 35% or 50% to 60%
+                    </li>
+                    <li>
+                      Significantly outside of normal: Below 25% or above 60%
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Net Profit Margin:</strong> Net Income / Revenue
+                  <ul>
+                    <li>Healthy: 8% to 15%</li>
+                    <li>Slightly outside of normal: 5% to 8% or 15% to 20%</li>
+                    <li>
+                      Significantly outside of normal: Below 5% or above 20%
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Return on Assets (ROA):</strong> Net Income / Total
+                  Assets
+                  <ul>
+                    <li>Healthy: 10% to 20%</li>
+                    <li>Slightly outside of normal: 5% to 10% or 20% to 25%</li>
+                    <li>
+                      Significantly outside of normal: Below 5% or above 25%
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Return on Equity (ROE):</strong> Net Income /
+                  Shareholders' Equity
+                  <ul>
+                    <li>Healthy: 15% to 25%</li>
+                    <li>
+                      Slightly outside of normal: 10% to 15% or 25% to 30%
+                    </li>
+                    <li>
+                      Significantly outside of normal: Below 10% or above 30%
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+
+              {/* Efficiency Ratios */}
+              <h5>Efficiency Ratios</h5>
+              <p>
+                Efficiency ratios measure how effectively a company utilizes its
+                assets and liabilities.
+              </p>
+              <ul>
+                <li>
+                  <strong>Inventory Turnover Ratio:</strong> Cost of Goods Sold
+                  / Average Inventory
+                  <ul>
+                    <li>Healthy: 4 to 6 times per year</li>
+                    <li>
+                      Slightly outside of normal: 2 to 4 or 6 to 8 times per
+                      year
+                    </li>
+                    <li>
+                      Significantly outside of normal: Below 2 or above 8 times
+                      per year
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Accounts Receivable Turnover Ratio:</strong> Net
+                  Credit Sales / Average Accounts Receivable
+                  <ul>
+                    <li>Healthy: 6 to 10 times per year</li>
+                    <li>
+                      Slightly outside of normal: 4 to 6 or 10 to 12 times per
+                      year
+                    </li>
+                    <li>
+                      Significantly outside of normal: Below 4 or above 12 times
+                      per year
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Total Asset Turnover Ratio:</strong> Net Sales /
+                  Average Total Assets
+                  <ul>
+                    <li>Healthy: 1.5 to 2.5 times per year</li>
+                    <li>
+                      Slightly outside of normal: 1.0 to 1.5 or 2.5 to 3.0 times
+                      per year
+                    </li>
+                    <li>
+                      Significantly outside of normal: Below 1.0 or above 3.0
+                      times per year
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+
+              {/* Leverage Ratios */}
+              <h5>Leverage Ratios</h5>
+              <p>
+                Leverage ratios measure the proportion of debt in a company's
+                capital structure and its ability to meet financial obligations.
+              </p>
+              <ul>
+                <li>
+                  <strong>Debt-to-Equity Ratio:</strong> Total Liabilities /
+                  Total Shareholders' Equity
+                  <ul>
+                    <li>Healthy: 0.5 to 1.5</li>
+                    <li>
+                      Slightly outside of normal: 1.5 to 2.0 or 0.2 to 0.5
+                    </li>
+                    <li>
+                      Significantly outside of normal: Above 2.0 or below 0.2
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Debt Ratio:</strong> Total Liabilities / Total Assets
+                  <ul>
+                    <li>Healthy: 0.4 to 0.6</li>
+                    <li>
+                      Slightly outside of normal: 0.6 to 0.7 or 0.3 to 0.4
+                    </li>
+                    <li>
+                      Significantly outside of normal: Above 0.7 or below 0.3
+                    </li>
+                  </ul>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -421,12 +671,6 @@ const HelpPage = () => {
                   available for that period.
                 </li>
               </ul>
-
-              <h5>Frequently Asked Questions</h5>
-              <p>
-                For a comprehensive list of frequently asked questions and their
-                answers, please refer to our <a href="/faq">FAQ page</a>.
-              </p>
             </div>
           </div>
         </div>
@@ -462,14 +706,10 @@ const HelpPage = () => {
               </p>
               <ul>
                 <li>
-                  <strong>Email:</strong> support@example.com
+                  <strong>Email:</strong> grosser1@students.kennesaw.edu
                 </li>
                 <li>
                   <strong>Phone:</strong> +1 (555) 123-4567
-                </li>
-                <li>
-                  <strong>Live Chat:</strong> Available on our website during
-                  business hours.
                 </li>
               </ul>
 
@@ -520,6 +760,8 @@ const HelpPage = () => {
                     className="form-control"
                     id="feedbackSubject"
                     placeholder="Enter a subject"
+                    value={feedbackSubject}
+                    onChange={(e) => setFeedbackSubject(e.target.value)}
                   />
                 </div>
                 <div className="form-group">
@@ -529,9 +771,15 @@ const HelpPage = () => {
                     id="feedbackMessage"
                     rows="3"
                     placeholder="Enter your feedback or suggestions"
+                    value={feedbackMessage}
+                    onChange={(e) => setFeedbackMessage(e.target.value)}
                   ></textarea>
                 </div>
-                <button type="submit" className="btn btn-primary">
+                <button
+                  onClick={handleFeedbackSubmit}
+                  type="button"
+                  className="btn btn-primary"
+                >
                   Submit
                 </button>
               </form>

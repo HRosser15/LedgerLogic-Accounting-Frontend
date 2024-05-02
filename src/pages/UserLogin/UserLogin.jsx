@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logoNoWords.png";
 import styles from "./UserLogin.module.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -64,6 +64,7 @@ const UserLogin = () => {
         <div className={styles.column}>
           <img className={styles.image} src={logo} alt="Logo"></img>
           <h1 className={styles.header}> Ledger Logic</h1>
+          <div style={{ height: "20px" }}></div>
           <p>A logical approach to accounting.</p>
           <Link className={styles.fixLinks} to="/create-new-user">
             <button className={styles.button}>Register Now</button>
@@ -72,6 +73,8 @@ const UserLogin = () => {
         <div className={styles.column}>
           <form className={styles.forms} onSubmit={handleFormSubmit}>
             <h1 className={styles.header}>Login</h1>
+
+            <div style={{ height: "50px" }}></div>
             <div>
               <label>
                 <p>Username</p>
@@ -106,9 +109,10 @@ const UserLogin = () => {
             </div>
             <div>
               <Link className={styles.fixLinks} to="/forgot-password">
-                <button className={styles.button}>Forgot Password?</button>
+                Forgot Password?
               </Link>
             </div>
+            <div style={{ height: "40px" }}></div>
           </form>
         </div>
       </div>

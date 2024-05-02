@@ -1,17 +1,19 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Form, Button, Container, Row, Col, Modal } from "react-bootstrap";
 import { fetchAccounts } from "../../../../services/AccountService";
 import styles from "./AccountForm.module.css";
 import DatePicker from "react-datepicker";
 import "./DatePickerStyles.css";
-import AppContext from "../../../../../context/AppContext";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { emailUser } from "../../../../services/EmailService";
 
-const ViewAccountsForm = ({ selectedDate }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+const AdminViewAccountsForm = ({ isGeneralLedger }) => {
   const [accounts, setAccounts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilterOption, setSelectedFilterOption] = useState("");
+  const [activeTab, setActiveTab] = useState("Chart of Accounts");
+  const [selectedFilterOptionText, setSelectedFilterOptionText] = useState("");
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([
     "Assets",
     "Liabilities",
@@ -23,31 +25,77 @@ const ViewAccountsForm = ({ selectedDate }) => {
   const [normalSideFilter, setNormalSideFilter] = useState("");
   const [balanceFilter, setBalanceFilter] = useState({ min: "", max: "" });
   const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
+  const [email, setEmail] = useState("");
+  const subject = "Ledger Logic: Message from Administrator";
+  const fromEmail = "hrosser15@gmail.com";
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchAccounts()
+    const fetchData = async () => {
+      try {
+        const response = await fetchAccounts();
+        setAccounts(response.data);
+      } catch (error) {
+        console.error("Failed to fetch accounts:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleAccountSelection = (account) => {
+    navigate(`/admin-accounts-management/ledgers/${account.accountId}`);
+  };
+
+  const handleButtonClick = () => {
+    if (!email) {
+      // Alert the user if the email field is empty
+      alert("Please enter an email address");
+      return;
+    }
+
+    // Assuming you have access to the email content from the textarea
+    const emailContent = document.querySelector(
+      'textarea[name="emailContent"]'
+    ).value;
+
+    // Call the emailUser function with the email and emailContent
+    emailUser(email, fromEmail, subject, emailContent)
       .then((response) => {
-        const sortedAccounts = response.data.sort(
-          (a, b) => a.accountNumber - b.accountNumber
-        );
-        setAccounts(sortedAccounts);
+        // Handle successful email sending
+        setModalTitle("Email Sent");
+        setModalMessage("Email sent successfully!");
+        setShowModal(true); // Optionally, you can display a modal to inform the user
       })
       .catch((error) => {
-        console.error(error);
-        concole.log(
-          "Make sure you alter the column size of previous_state and current_state (in the h2 database)"
+        // Handle error if email sending fails
+        console.error("Error sending email:", error);
+        setModalTitle("Email Error");
+        setModalMessage(
+          "There was an error sending the email. Please try again later."
         );
-        console.log(
-          "This can be done in the h2 console at 'http://localhost:8080/h2-console' (Password is 'password' with:"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN previous_state VARCHAR(60000);"
-        );
-        console.log(
-          "ALTER TABLE event_log ALTER COLUMN current_state VARCHAR(60000);"
-        );
+        setShowModal(true); // Optionally, you can display a modal to inform the user
       });
-  }, []);
+  };
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleTabSelect = (tab) => {
+    setActiveTab(tab);
+    if (tab === "Chart of Accounts") {
+      setSelectedAccount(null);
+    }
+  };
 
   const filterOptions = [
     { value: "category", label: "Account Category", type: "checkbox" },
@@ -69,6 +117,10 @@ const ViewAccountsForm = ({ selectedDate }) => {
   };
 
   const filterAccountsByRange = (start, end) => {
+    if (!accounts) {
+      return []; // Return an empty array if accounts is undefined or not provided
+    }
+
     return accounts.filter(
       (account) =>
         parseInt(account.accountNumber) >= start &&
@@ -287,8 +339,6 @@ const ViewAccountsForm = ({ selectedDate }) => {
     }
 
     // Filter by creation date
-    // Filter by creation date
-    // Filter by creation date
     if (selectedFilterOption === "date") {
       filteredTableAccounts = tableAccounts.filter((account) => {
         const creationDate = new Date(account.creationDate);
@@ -323,28 +373,62 @@ const ViewAccountsForm = ({ selectedDate }) => {
               <th>Normal Side</th>
               <th>Description</th>
               <th>Balance</th>
+              <th>Statement</th>
               <th>Creation Date</th>
             </tr>
           </thead>
           <tbody>
             {filteredTableAccounts.map((account) => (
-              <tr key={account.accountNumber}>
-                <td>{account.accountNumber}</td>
-                <td>
-                  <Link to={`/account/${account.accountNumber}`}>
-                    {account.accountName}
-                  </Link>
+              <tr
+                key={account.accountNumber}
+                className={!account.active ? "table-danger" : ""}
+              >
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
+                    }}
+                  >
+                    {account.accountNumber}
+                  </span>
                 </td>
-                <td>{account.subCategory}</td>
-                <td>{account.normalSide}</td>
-                <td>{account.description}</td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  <span
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => {
+                      console.log("Clicked account:", account);
+                      handleAccountSelection(account);
+                    }}
+                  >
+                    {account.accountName}
+                  </span>
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.subCategory}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.normalSide}
+                </td>
                 <td>
-                  {parseFloat(account.initialBalance).toLocaleString("en-US", {
+                  <span className={!account.active ? styles.strikethrough : ""}>
+                    {account.description}
+                  </span>
+                  {!account.active && <span> (account deactivated)</span>}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {parseFloat(account.balance).toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
                 </td>
-                <td>{formatDate2(account.creationDate)}</td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {account.statement}
+                </td>
+                <td className={!account.active ? styles.strikethrough : ""}>
+                  {formatDate2(account.creationDate)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -405,17 +489,83 @@ const ViewAccountsForm = ({ selectedDate }) => {
       <Row className="mb-4">
         <Col>
           <div className="container">
-            {renderTable("Assets", assetAccounts)}
-            {renderTable("Liabilities", liabilityAccounts)}
-            {renderTable("Equity", equityAccounts)}
-            {renderTable("Revenue", revenueAccounts)}
-            {renderTable("Expenses", expenseAccounts)}
-            <div style={{ height: "200px" }}></div>
+            {renderTable("Assets", assetAccounts, isGeneralLedger)}
+            {renderTable("Liabilities", liabilityAccounts, isGeneralLedger)}
+            {renderTable("Equity", equityAccounts, isGeneralLedger)}
+            {renderTable("Revenue", revenueAccounts, isGeneralLedger)}
+            {renderTable("Expenses", expenseAccounts, isGeneralLedger)}
+            <div style={{ height: "80px" }}></div>
           </div>
         </Col>
+      </Row>
+      <Row>
+        {/* ============
+                CONTACT USER
+                ============ */}
+        <form className={styles.forms}>
+          <h4>Contact User</h4>
+
+          <Row>
+            <Col className="col-md-2">
+              <Form.Group controlId="email">
+                <Form.Label>User Email Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="JohnSmith@email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="custom-textbox"
+                  style={{
+                    marginLeft: "20px",
+                  }}
+                />
+              </Form.Group>
+            </Col>
+            <Col className="col-md-8">
+              <p>Enter your email below:</p>
+              <label>
+                <textarea
+                  name="emailContent"
+                  defaultValue=""
+                  rows={4}
+                  cols={80}
+                  align="left"
+                  style={{
+                    backgroundColor: "#ffffff",
+                    color: "black",
+                    borderRadius: "5px",
+                  }}
+                />
+              </label>
+            </Col>
+          </Row>
+
+          <Row>
+            <p></p>
+          </Row>
+          <Row>
+            <Col>
+              <Button variant="primary" onClick={handleButtonClick}>
+                Send Email to User
+              </Button>
+            </Col>
+          </Row>
+          <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>{modalTitle}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{modalMessage}</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModal}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </form>
+        <div style={{ height: "200px" }}></div>
       </Row>
     </Container>
   );
 };
 
-export default ViewAccountsForm;
+export default AdminViewAccountsForm;
