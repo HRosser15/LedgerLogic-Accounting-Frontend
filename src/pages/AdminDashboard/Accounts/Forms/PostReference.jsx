@@ -11,7 +11,7 @@ const PostReference = ({
   entry,
   matchedJournal,
   onClose,
-  handleEntryUpdate,
+  handleUpdateJournalEntries,
 }) => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [showModal, setShowModal] = useState(true);
@@ -19,8 +19,13 @@ const PostReference = ({
   const handleApprove = async () => {
     try {
       await approveJournal(matchedJournal.journalId, "APPROVED");
-      const updatedEntry = { ...entry, status: "approved" };
-      handleEntryUpdate(updatedEntry);
+      const updatedJournalEntries = matchedJournal.journalEntries.map(
+        (journalEntry) =>
+          journalEntry.journalEntryId === entry.journalEntryId
+            ? { ...journalEntry, status: "approved" }
+            : journalEntry
+      );
+      handleUpdateJournalEntries(updatedJournalEntries);
       setShowModal(false);
       onClose();
     } catch (error) {
@@ -31,8 +36,13 @@ const PostReference = ({
   const handleReject = async () => {
     try {
       await rejectJournal(matchedJournal.journalId, rejectionReason);
-      const updatedEntry = { ...entry, status: "rejected" };
-      handleEntryUpdate(updatedEntry);
+      const updatedJournalEntries = matchedJournal.journalEntries.map(
+        (journalEntry) =>
+          journalEntry.journalEntryId === entry.journalEntryId
+            ? { ...journalEntry, status: "rejected", rejectionReason }
+            : journalEntry
+      );
+      handleUpdateJournalEntries(updatedJournalEntries);
       setShowModal(false);
       onClose();
     } catch (error) {
@@ -43,6 +53,30 @@ const PostReference = ({
   const handleCancel = () => {
     setShowModal(false);
     onClose();
+  };
+
+  const handleDownloadAttachment = (attachedFile) => {
+    const fileName = `attachment.${
+      matchedJournal.attachedFileContentType.split("/")[1]
+    }`;
+
+    const binaryData = atob(attachedFile);
+    const byteNumbers = new Array(binaryData.length);
+    for (let i = 0; i < binaryData.length; i++) {
+      byteNumbers[i] = binaryData.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+
+    const blob = new Blob([byteArray], {
+      type: matchedJournal.attachedFileContentType,
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const formatDate = (dateString) => {
@@ -107,6 +141,24 @@ const PostReference = ({
                   />
                 </Form.Group>
               ) : null}
+            </React.Fragment>
+            <React.Fragment>
+              {matchedJournal.attachedFile ? (
+                <div>
+                  <h5>Attachment:</h5>
+                  <button
+                    onClick={() =>
+                      handleDownloadAttachment(matchedJournal.attachedFile)
+                    }
+                  >
+                    Download Attachment
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <h5>No Attachment</h5>
+                </div>
+              )}
             </React.Fragment>
           </Container>
         </div>
