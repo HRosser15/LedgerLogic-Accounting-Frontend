@@ -28,7 +28,7 @@ To work on this Vite React app locally, follow these steps:
 #### Clone the Repository
 
 ```bash
-git clone https://github.com/Ledger-Logic/Front-End.git
+git clone https://github.com/HRosser15/LedgerLogic-Accounting-Frontend.git
 ```
 
 #### Navigate Into the Local Repository
