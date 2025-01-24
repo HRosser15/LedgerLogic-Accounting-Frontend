@@ -34,7 +34,7 @@ git clone https://github.com/HRosser15/LedgerLogic-Accounting-Frontend.git
 #### Navigate Into the Local Repository
 
 ```bash
-cd Front-End
+cd LedgerLogic-Accounting-Frontend
 ```
 
 #### Create your branch for the feature you're working on (optional)
